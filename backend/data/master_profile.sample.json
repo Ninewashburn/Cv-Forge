@@ -1,0 +1,29 @@
+[
+  {
+    "id": "fact_laravel_angular_urssaf",
+    "type": "experience",
+    "title": "Développement d'applications Laravel / Angular",
+    "content": "Participation à la refonte et modernisation d'applications internes chez URSSAF en utilisant Laravel et Angular.",
+    "tags": ["Laravel", "Angular", "fullstack", "API REST", "application métier"],
+    "validated": true,
+    "proof_ids": ["proof_urssaf_project_note"]
+  },
+  {
+    "id": "fact_api_rest",
+    "type": "skill",
+    "title": "API REST",
+    "content": "Conception et implémentation d'API RESTful robustes et sécurisées.",
+    "tags": ["API", "REST", "backend", "design"],
+    "validated": true,
+    "proof_ids": []
+  },
+  {
+    "id": "fact_sql",
+    "type": "skill",
+    "title": "SQL avancé",
+    "content": "Optimisation de requêtes SQL complexes et indexation pour améliorer la performance des bases de données.",
+    "tags": ["SQL", "optimisation", "performances"],
+    "validated": true,
+    "proof_ids": ["proof_sql_optimization_note"]
+  }
+]

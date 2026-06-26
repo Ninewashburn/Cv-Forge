@@ -1,0 +1,7 @@
+Développeur Full Stack Laravel / Angular
+
+Nous recherchons un développeur full stack pour rejoindre notre équipe dynamique. Vous participerez à la refonte et au développement d'applications métier en utilisant Laravel et Angular. Les responsabilités incluent la conception et la maintenance d'API REST, l'optimisation des requêtes SQL et la collaboration avec les équipes métier.
+
+Compétences requises : Laravel, Angular, API REST, SQL
+
+Compétences appréciées : Docker, CI/CD, Cloud.

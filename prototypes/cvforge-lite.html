@@ -1,0 +1,1424 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CVForge Lite</title>
+  <!-- Thème papier clair assumé : on déclare le color-scheme et on désactive DarkReader
+       (sinon l'inversion auto casse les dégradés faits main comme la section copilote) -->
+  <meta name="color-scheme" content="light">
+  <meta name="darkreader-lock">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #F4F4F0;
+      --card: #FFFFFF;
+      --ink: #1C1B17;
+      --muted: #6B6A60;
+      --line: #E1E0D8;
+      --ember: #C8430D;
+      --ember-dark: #A23509;
+      --ember-soft: #FBEDE4;
+      --ok: #1E6F47;
+      --ok-soft: #E6F2EB;
+      --warn: #8A5800;
+      --warn-soft: #FBF2DF;
+      --del: #A93226;
+      --del-soft: #F9E8E6;
+      --serif: "Charter", "Bitstream Charter", Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box }
+
+    html, body { margin: 0; padding: 0 }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.55 var(--sans)
+    }
+
+    ::selection { background: var(--ember-soft) }
+
+    button { font: inherit; cursor: pointer }
+
+    :focus-visible {
+      outline: 2px solid var(--ember);
+      outline-offset: 2px;
+      border-radius: 3px
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important }
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px
+    }
+
+    /* Masthead */
+    .masthead {
+      padding-block: 26px 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .brand h1 {
+      font: 700 30px/1 var(--serif);
+      margin: 0 0 6px;
+      letter-spacing: .2px
+    }
+
+    .brand h1 .forge { color: var(--ember) }
+
+    .brand .bar {
+      height: 3px;
+      width: 120px;
+      background: linear-gradient(90deg, var(--ember), #E8B23A);
+      border-radius: 2px;
+      margin-bottom: 10px
+    }
+
+    .badges { display: flex; gap: 8px; flex-wrap: wrap }
+
+    .badge {
+      font: 600 10.5px/1 var(--mono);
+      letter-spacing: .08em;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 999px;
+      padding: 6px 10px
+    }
+
+    .mast-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .reset {
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font: 500 13px var(--sans);
+      padding: 10px 14px
+    }
+
+    .reset:hover { border-color: var(--del); color: var(--del) }
+
+    /* Bouton de lancement de la visite guidée */
+    .tour-launch {
+      background: var(--ember-soft);
+      border: 1px solid #E7C3A8;
+      color: var(--ember-dark);
+      border-radius: 8px;
+      font: 600 13px var(--sans);
+      padding: 10px 14px
+    }
+
+    .tour-launch:hover { background: #F6E0D2 }
+
+    /* Bulle flottante de la visite guidée (non bloquante) */
+    .tour-pop {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: min(420px, calc(100vw - 32px));
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 14px 44px rgba(28, 27, 23, .20);
+      padding: 16px 18px
+    }
+
+    .tour-pop .tour-step {
+      font: 700 10.5px var(--mono);
+      letter-spacing: .1em;
+      color: var(--ember);
+      margin-bottom: 6px
+    }
+
+    .tour-pop h4 { font: 700 15px var(--serif); margin: 0 0 4px }
+    .tour-pop p { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 0 0 14px }
+
+    .tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+
+    .tour-skip {
+      background: none;
+      border: 0;
+      color: var(--muted);
+      font: 600 13px var(--sans);
+      text-decoration: underline;
+      padding: 6px 4px
+    }
+
+    .tour-skip:hover { color: var(--del) }
+
+    .tour-next {
+      background: var(--ember);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      font: 600 14px var(--sans);
+      padding: 9px 16px
+    }
+
+    .tour-next:hover { background: var(--ember-dark) }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .tour-pop { animation: tour-in .2s ease both }
+    }
+
+    @keyframes tour-in {
+      from { opacity: 0; transform: translateX(-50%) translateY(8px) }
+      to   { opacity: 1; transform: translateX(-50%) }
+    }
+
+    /* Stepper */
+    .steps {
+      display: flex;
+      gap: 6px;
+      position: relative;
+      padding-block: 16px;
+      margin-bottom: 34px;
+      overflow-x: auto
+    }
+
+    .steps::before,
+    .steps::after {
+      content: "";
+      position: absolute;
+      left: 32px;
+      right: 32px;
+      height: 1px;
+      background: var(--line)
+    }
+
+    .steps::before { top: 0 }
+    .steps::after { bottom: 0 }
+
+    .step {
+      flex: 1;
+      min-width: 130px;
+      background: none;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      text-align: left;
+      color: var(--muted)
+    }
+
+    .step .n {
+      font: 700 10.5px var(--mono);
+      letter-spacing: .1em;
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .step .t {
+      font: 600 13px var(--sans);
+      display: block;
+      white-space: nowrap
+    }
+
+    .step[aria-current="step"] { background: var(--ink); color: #fff }
+    .step[aria-current="step"] .n { color: #E8B23A }
+    .step.done .n { color: var(--ok) }
+    .step:not([disabled]):not([aria-current="step"]):hover { background: #ECECE6 }
+    .step[disabled] { opacity: .45; cursor: not-allowed }
+
+    /* Mobile : les 4 étapes tiennent sur une ligne (plus de débordement de l'étape 4) */
+    @media (max-width: 640px) {
+      .step { min-width: 0; padding: 8px 6px }
+      .step .n { font-size: 9.5px }
+      .step .t { font-size: 11px; white-space: normal; line-height: 1.15 }
+    }
+
+    /* Sections */
+    section[data-step] {
+      display: none;
+      animation: appear .18s ease-out
+    }
+
+    section[data-step].active { display: block }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(4px) }
+      to   { opacity: 1; transform: none }
+    }
+
+    .eyebrow {
+      font: 700 11px var(--mono);
+      letter-spacing: .14em;
+      color: var(--ember);
+      margin: 0 0 6px
+    }
+
+    h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px }
+
+    .lead {
+      color: var(--muted);
+      font-size: 14.5px;
+      margin: 0 0 18px;
+      max-width: 680px
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 18px
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 240px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font: 13.5px/1.6 var(--mono);
+      color: var(--ink);
+      background: #FDFDFB
+    }
+
+    textarea:focus {
+      outline: 2px solid var(--ember);
+      outline-offset: 0;
+      border-color: transparent
+    }
+
+    textarea[readonly] { background: #F7F7F3; color: #3A3933 }
+
+    label { font: 600 13px var(--sans); display: block; margin-bottom: 8px }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px
+    }
+
+    .spacer { flex: 1 }
+    .hint { font: 12.5px var(--sans); color: var(--muted) }
+
+    .btn {
+      border-radius: 8px;
+      padding: 10px 16px;
+      font: 600 14px var(--sans);
+      border: 1px solid transparent
+    }
+
+    .btn-primary { background: var(--ember); color: #fff }
+    .btn-primary:hover { background: var(--ember-dark) }
+    .btn-primary[disabled] { background: #D8D7CF; color: #8B8A80; cursor: not-allowed }
+    .btn-ghost { background: var(--card); border-color: var(--line); color: var(--ink) }
+    .btn-ghost:hover { border-color: var(--ink) }
+
+    .btn-link {
+      background: none;
+      border: 0;
+      color: var(--ember);
+      font: 600 13px var(--sans);
+      padding: 6px 4px;
+      text-decoration: underline
+    }
+
+    /* Step 1 - Sources */
+    .sources {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px
+    }
+
+    @media (max-width: 840px) {
+      .sources { grid-template-columns: 1fr }
+    }
+
+    .samples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px }
+
+    /* Analyse / Matching */
+    .score-board {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .score-num { font: 700 52px/1 var(--mono); letter-spacing: -1px }
+    .score-num small { font-size: 22px; color: var(--muted) }
+
+    .score-meta { flex: 1; min-width: 220px }
+
+    .score-track {
+      height: 8px;
+      background: #E8E7DF;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0 6px
+    }
+
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--ember), #E8B23A);
+      border-radius: 99px;
+      transition: width .35s ease
+    }
+
+    .verdict { font: 600 13.5px var(--sans) }
+
+    .kw-group { margin-top: 16px }
+
+    .kw-title {
+      font: 700 11px var(--mono);
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: 10px
+    }
+
+    .chips { display: flex; gap: 8px; flex-wrap: wrap }
+
+    .chip {
+      font: 600 12.5px var(--mono);
+      padding: 7px 11px;
+      border-radius: 6px;
+      display: inline-flex;
+      gap: 7px;
+      align-items: center
+    }
+
+    .chip .f { opacity: .55; font-weight: 500 }
+    .chip-ok { background: var(--ok-soft); color: var(--ok); border: 1px solid #BBDCC9 }
+    .chip-miss { background: var(--warn-soft); color: var(--warn); border: 1px dashed #D9B36A }
+
+    .callout {
+      border-left: 3px solid var(--warn);
+      background: var(--warn-soft);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      margin-top: 18px
+    }
+
+    .callout strong { color: var(--warn) }
+
+    .nolm {
+      font: 600 10.5px var(--mono);
+      letter-spacing: .08em;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--card);
+      white-space: nowrap
+    }
+
+    /* Step 3 - Adaptation */
+    details.copilote {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #FDFAF7, var(--card));
+      padding: 0;
+      margin-bottom: 16px
+    }
+
+    details.copilote summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 18px;
+      font: 700 15px var(--serif)
+    }
+
+    details.copilote summary::-webkit-details-marker { display: none }
+    details.copilote summary::before { content: "▸ "; color: var(--ember) }
+    details.copilote[open] summary::before { content: "▾ " }
+
+    .copilote-body { padding: 0 18px 16px }
+    .copilote-body p { margin: 0 0 12px; font-size: 13.5px; color: var(--muted) }
+
+    .prompt-out { margin-top: 12px }
+    .prompt-out textarea { min-height: 160px; font-size: 12px }
+
+    .adapt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 300px;
+      gap: 24px;
+      align-items: start
+    }
+
+    @media (max-width: 1080px) {
+      .adapt-grid { grid-template-columns: 1fr 1fr }
+      .live-panel { grid-column: 1/-1; order: -1; position: static }
+    }
+
+    @media (max-width: 840px) {
+      .adapt-grid { grid-template-columns: 1fr }
+    }
+
+    .pane-label {
+      font: 700 11px var(--mono);
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px
+    }
+
+    .live-panel {
+      position: sticky;
+      top: 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px
+    }
+
+    .live-panel h3 {
+      font: 700 11px var(--mono);
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin: 0 0 10px
+    }
+
+    .live-score { font: 700 38px/1 var(--mono); letter-spacing: -1px }
+    .live-score small { font-size: 17px; color: var(--muted) }
+    .live-counts { font: 600 12px var(--mono); color: var(--muted); margin: 8px 0 12px }
+    .live-counts .c-ok { color: var(--ok) }
+    .live-counts .c-miss { color: var(--warn) }
+
+    .live-miss-title {
+      font: 700 10.5px var(--mono);
+      letter-spacing: .1em;
+      color: var(--warn);
+      margin: 0 0 8px
+    }
+
+    .live-chips { display: flex; gap: 6px; flex-wrap: wrap }
+    .live-chips .chip { padding: 5px 9px; font-size: 11.5px }
+
+    .live-note {
+      font: 11.5px/1.5 var(--sans);
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+      padding-top: 10px
+    }
+
+    .live-done { font: 600 12.5px var(--sans); color: var(--ok) }
+
+    /* Step 4 - Diff */
+    .panes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 0
+    }
+
+    @media (max-width: 840px) {
+      .panes { grid-template-columns: 1fr }
+    }
+
+    .diff-pane {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font: 13px/1.75 var(--mono);
+      max-height: 340px;
+      overflow: auto;
+      word-wrap: break-word
+    }
+
+    .d-del { background: var(--del-soft); color: var(--del); text-decoration: line-through; border-radius: 3px; padding: 1px 3px }
+    .d-ins { background: var(--ok-soft); color: var(--ok); border-radius: 3px; padding: 1px 3px; box-shadow: inset 0 -2px 0 #9CCBB1 }
+
+    .diff-stats {
+      font: 600 12.5px var(--mono);
+      color: var(--muted);
+      margin: 12px 0 0;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .diff-stats .ins { color: var(--ok) }
+    .diff-stats .del { color: var(--del) }
+
+    .segs { margin-top: 22px }
+    .segs h3 { font: 700 17px var(--serif); margin: 0 0 4px }
+    .segs .sub { font-size: 13.5px; color: var(--muted); margin: 0 0 14px; max-width: 640px }
+
+    .seg {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap
+    }
+
+    .seg-text { font: 13px/1.7 var(--mono) }
+    .seg-text mark { background: var(--ok-soft); color: var(--ok); border-radius: 3px; padding: 1px 3px }
+
+    .confirm {
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      background: #FAFAF7;
+      border-radius: 6px;
+      font: 700 11px var(--mono);
+      letter-spacing: .06em;
+      padding: 9px 12px;
+      color: var(--muted)
+    }
+
+    .confirm:hover { border-color: var(--ok); color: var(--ok) }
+    .confirm.on { background: var(--ok); border-color: var(--ok); color: #fff }
+
+    .gate {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      margin-top: 20px;
+      padding-top: 18px
+    }
+
+    .gate-count { font: 700 13px var(--mono); color: var(--muted) }
+    .gate-count.ok { color: var(--ok) }
+
+    .all-good {
+      border-left: 3px solid var(--ok);
+      background: var(--ok-soft);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      margin-top: 16px
+    }
+
+    /* Tracking */
+    .track {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      padding: 16px 18px
+    }
+
+    .track h3 { font: 700 16px var(--serif); margin: 0 0 4px }
+    .track p { font-size: 13px; color: var(--muted); margin: 0 0 12px }
+
+    .track-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding: 10px 0
+    }
+
+    .track-item .meta { font: 12.5px var(--mono) }
+
+    .track-item select {
+      font: 600 13px var(--sans);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 10px;
+      background: #FAFAF7
+    }
+
+    footer.wrap {
+      position: relative;
+      margin: 56px auto 40px;
+      padding-top: 26px;
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font: 600 10.5px var(--mono);
+      letter-spacing: .1em;
+      color: var(--muted)
+    }
+
+    footer.wrap::before {
+      content: "";
+      position: absolute;
+      left: 32px;
+      right: 32px;
+      top: 0;
+      height: 1px;
+      background: var(--line)
+    }
+
+    /* Print */
+    #printable { display: none }
+
+    @media print {
+      body * { visibility: hidden }
+      #printable, #printable * { visibility: visible }
+      #printable {
+        display: block;
+        position: absolute;
+        inset: 0;
+        padding: 14mm;
+        font: 11.5pt/1.55 var(--serif);
+        color: #000;
+        white-space: pre-wrap
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="wrap masthead">
+    <div class="brand">
+      <h1>CV<span class="forge">Forge</span></h1>
+      <div class="bar" aria-hidden="true"></div>
+      <div class="badges">
+        <span class="badge">LOCAL-FIRST</span>
+        <span class="badge">LE FICHIER EST LA SAUVEGARDE</span>
+        <span class="badge">0 DÉPENDANCE</span>
+        <span class="badge">LITE V0.5</span>
+      </div>
+    </div>
+    <div class="mast-actions">
+      <button class="tour-launch" id="btnTour" type="button">▶ Démo guidée</button>
+      <span class="hint" id="saveHint"></span>
+      <button class="btn btn-primary" id="btnSave" type="button">💾 Enregistrer</button>
+      <button class="reset" id="btnReset" type="button">Recharger</button>
+    </div>
+  </header>
+
+  <nav class="wrap steps" aria-label="Étapes">
+    <button class="step" data-go="1" type="button"><span class="n">01</span><span class="t">Sources</span></button>
+    <button class="step" data-go="2" type="button"><span class="n">02</span><span class="t">Analyse</span></button>
+    <button class="step" data-go="3" type="button"><span class="n">03</span><span class="t">Adaptation</span></button>
+    <button class="step" data-go="4" type="button"><span class="n">04</span><span class="t">Diff &amp; Export</span></button>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- ÉTAPE 1 - SOURCES -->
+    <section data-step="1">
+      <p class="eyebrow">ÉTAPE 01 - LES DEUX MATIÈRES PREMIÈRES</p>
+      <h2>L'offre d'un côté, ton CV de l'autre</h2>
+      <p class="lead">Colle le texte brut - depuis LinkedIn, Indeed, HelloWork, un PDF ou n'importe où. Ton CV est la
+        seule matière première autorisée : rien ne sera inventé à partir d'ailleurs.</p>
+      <div class="sources">
+        <div class="card">
+          <label for="offreInput">Offre d'emploi</label>
+          <textarea id="offreInput" placeholder="Colle ici le texte complet de l'offre…"></textarea>
+          <div class="samples">
+            <button class="btn-link" type="button" data-sample="offre-dev">Exemple - dev</button>
+            <button class="btn-link" type="button" data-sample="offre-gestion">Exemple - hors tech</button>
+          </div>
+        </div>
+        <div class="card">
+          <label for="cvInput">Ton CV - source de vérité</label>
+          <textarea id="cvInput"
+            placeholder="Colle ici le contenu de ton CV (copier-coller depuis ton PDF ou ton document)…"></textarea>
+          <div class="samples">
+            <button class="btn-link" type="button" data-sample="cv-dev">Exemple - dev</button>
+            <button class="btn-link" type="button" data-sample="cv-gestion">Exemple - hors tech</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <span class="hint">Les deux textes : minimum ~40 caractères.</span>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" id="btnAnalyse" type="button" disabled>Analyser le matching</button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 2 - ANALYSE -->
+    <section data-step="2">
+      <p class="eyebrow">ÉTAPE 02 - ÉTAT DES LIEUX</p>
+      <h2>Matching offre / CV</h2>
+      <p class="lead">Analyse par fréquence des mots-clés de l'offre, comparée à ton CV. <span class="nolm">CALCULÉ SANS
+          IA - 100% LOCAL</span></p>
+      <div class="card">
+        <div class="score-board">
+          <div class="score-num"><span id="scoreVal">0</span><small>%</small></div>
+          <div class="score-meta">
+            <div class="verdict" id="scoreVerdict"></div>
+            <div class="score-track">
+              <div class="score-fill" id="scoreFill" style="width:0%"></div>
+            </div>
+            <span class="hint">Couverture pondérée par la fréquence des mots-clés dans l'offre.</span>
+          </div>
+        </div>
+        <div class="kw-group">
+          <div class="kw-title">✓ COUVERT PAR TON CV</div>
+          <div class="chips" id="chipsOk"></div>
+        </div>
+        <div class="kw-group">
+          <div class="kw-title">? ABSENT DE TON CV</div>
+          <div class="chips" id="chipsMiss"></div>
+        </div>
+        <div class="callout"><strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question :
+          ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Si non, ne l'ajoute pas - un
+          entretien le révélera.</div>
+        <div class="row">
+          <button class="btn btn-ghost" type="button" data-go="1">← Revoir les sources</button>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" type="button" data-go="3">Commencer l'adaptation</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 3 - ADAPTATION -->
+    <section data-step="3">
+      <p class="eyebrow">ÉTAPE 03 - ADAPTATION CONTRÔLÉE</p>
+      <h2>Adapte ton CV - le score évolue en direct</h2>
+      <p class="lead">Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule le matching
+        à chaque frappe - plus besoin de revenir en arrière.</p>
+
+      <details class="copilote">
+        <summary>Mode copilote - utilise ton propre ChatGPT ou Claude</summary>
+        <div class="copilote-body">
+          <p>CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le, colle-le dans
+            ton IA, puis rapporte uniquement le CV adapté dans la colonne du milieu. Aucune clé API, aucun coût.</p>
+          <div class="row" style="margin-top:0">
+            <button class="btn btn-ghost" id="btnPrompt" type="button">Préparer le prompt verrouillé</button>
+            <button class="btn btn-ghost" id="btnCopy" type="button" hidden>Copier le prompt</button>
+            <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener"
+              style="text-decoration:none">Ouvrir Claude ↗</a>
+            <a class="btn btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener"
+              style="text-decoration:none">Ouvrir ChatGPT ↗</a>
+            <span class="hint" id="copyHint"></span>
+          </div>
+          <div class="prompt-out" id="promptOut" hidden>
+            <textarea id="promptText" readonly aria-label="Prompt verrouillé à copier"></textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="adapt-grid">
+        <div>
+          <div class="pane-label"><span>CV ORIGINAL - LECTURE SEULE</span></div>
+          <textarea id="cvOriginalView" readonly aria-label="CV original"></textarea>
+        </div>
+        <div>
+          <div class="pane-label"><span>CV ADAPTÉ - ÉDITABLE</span>
+            <button class="btn-link" id="btnResetAdapted" type="button">Repartir de l'original</button>
+          </div>
+          <textarea id="adaptedInput" aria-label="CV adapté"
+            placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."></textarea>
+        </div>
+        <aside class="live-panel" aria-live="polite">
+          <h3>MATCHING EN DIRECT</h3>
+          <div class="live-score"><span id="liveScore">0</span><small>%</small></div>
+          <div class="score-track">
+            <div class="score-fill" id="liveFill" style="width:0%"></div>
+          </div>
+          <div class="live-counts"><span class="c-ok" id="liveOkCount">0 couverts</span> · <span class="c-miss"
+              id="liveMissCount">0 manquants</span></div>
+          <p class="live-miss-title">? ENCORE ABSENTS</p>
+          <div class="live-chips" id="liveMiss"></div>
+          <p class="live-note">Rappel : n'ajoute que du prouvable. Le Diff vérifiera chaque ajout à l'étape suivante.
+          </p>
+        </aside>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-ghost" type="button" data-go="2">← Analyse complète</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" type="button" data-go="4">Vérifier dans le Diff</button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 4 - DIFF & EXPORT -->
+    <section data-step="4">
+      <p class="eyebrow">ÉTAPE 04 - LA PREUVE PAR LE DIFF</p>
+      <h2>Qu'est-ce qui a changé, exactement ?</h2>
+      <p class="lead">Chaque mot ajouté ou retiré est tracé. Avant d'exporter, tu confirmes que chaque ajout est vrai et
+        prouvable. C'est le contrat CVForge.</p>
+
+      <div class="card">
+        <div class="panes">
+          <div>
+            <div class="pane-label"><span>ORIGINAL</span></div>
+            <div class="diff-pane" id="diffLeft"></div>
+          </div>
+          <div>
+            <div class="pane-label"><span>ADAPTÉ</span></div>
+            <div class="diff-pane" id="diffRight"></div>
+          </div>
+        </div>
+        <div class="diff-stats" id="diffStats"></div>
+
+        <div class="segs" id="segsBlock">
+          <h3>Ajouts à confirmer</h3>
+          <p class="sub">Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document, expérience)
+            ? En V1 réelle, chaque confirmation se reliera à ta banque de preuves.</p>
+          <div id="segsList"></div>
+        </div>
+        <div class="all-good" id="noAdds" hidden>Aucun contenu ajouté - uniquement des reformulations ou suppressions.
+          Rien à confirmer.</div>
+
+        <div class="gate">
+          <button class="btn btn-ghost" type="button" data-go="3">← Modifier encore</button>
+          <div class="spacer"></div>
+          <span class="gate-count" id="gateCount"></span>
+          <button class="btn btn-primary" id="btnExport" type="button">Exporter en PDF</button>
+        </div>
+      </div>
+
+      <div class="track" id="trackBlock" hidden>
+        <h3>Suivi de candidature</h3>
+        <p>Micro-tracking - pense à 💾 Enregistrer pour le conserver dans le fichier.</p>
+        <div id="trackList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="wrap">
+    <span>ANTI-HALLUCINATION : RIEN N'EST INVENTÉ</span>
+    <span>LOCAL-FIRST : RIEN NE SORT SANS TON GESTE</span>
+    <span>PREUVE PAR LE DIFF : TOUT EST TRACÉ</span>
+  </footer>
+
+  <div id="printable" aria-hidden="true"></div>
+  <script type="application/json" id="cvforge-data">null</script>
+  <script>
+(function () {
+  "use strict";
+
+  /* Le fichier est la sauvegarde : capture du gabarit vierge */
+  const PRISTINE = "<!doctype html>\n" + document.documentElement.outerHTML;
+  let dirty = false, fileHandle = null, startStep = 1;
+
+  /* État */
+  const S = {
+    step: 1, offre: "", cv: "", adapted: "", kws: null, matching: null,
+    diffSig: null, segs: [], confirmed: new Set(), exports: []
+  };
+
+  /* Données d'exemple */
+  const SAMPLES = {
+    "cv-dev":
+      `Lina Carvalho - Développeuse Fullstack
+Caen · lina.carvalho@mail.fr · github.com/linacarvalho
+
+EXPÉRIENCE
+Développeuse fullstack - Atelier Numérique (2023–2026)
+- Développement d'un dashboard de supervision en Angular et TypeScript
+- API REST en Spring Boot, base PostgreSQL, conteneurisation Docker
+- Tests unitaires (JUnit, Jasmine), revues de code, méthode Scrum
+
+Développeuse junior - WebFabrik (2022–2023)
+- Sites e-commerce, intégration responsive, corrections de bugs
+
+PROJETS
+- Application de réservation : Angular, Spring Boot, PostgreSQL (GitHub)
+- Portfolio personnel déployé en ligne
+
+FORMATION
+Titre professionnel Concepteur Développeur d'Applications (2022)`,
+
+    "cv-gestion":
+      `Karim Bensaïd - Assistant de gestion
+Rouen · k.bensaid@mail.fr
+
+EXPÉRIENCE
+Assistant de gestion - Transports Lemaire (2021–2026)
+- Facturation clients et fournisseurs, établissement des devis
+- Relances clients et suivi des règlements
+- Saisie comptable dans l'ERP Sage, rapprochements bancaires
+- Accueil téléphonique et gestion du courrier
+
+Employé administratif - Mairie de Rouen (2019–2021)
+- Gestion des dossiers, archivage, mise à jour des tableaux Excel
+
+FORMATION
+BTS Gestion de la PME (2019)`,
+
+    "offre-dev":
+      `Développeur Fullstack Angular / Spring Boot (H/F) - CDI, Caen
+Nous recherchons un développeur fullstack pour renforcer notre équipe produit.
+
+Vos missions :
+- Développer de nouvelles fonctionnalités en Angular et TypeScript
+- Concevoir des API en Spring Boot avec PostgreSQL
+- Écrire des tests unitaires et participer aux revues de code
+- Déployer avec Docker, Kubernetes et GitLab CI
+
+Profil :
+- Vous maîtrisez Angular, Spring Boot et PostgreSQL
+- Vous connaissez Docker ; Kubernetes est un plus
+- Vous travaillez en méthode agile Scrum
+Angular et Spring Boot sont au coeur de notre stack.`,
+
+    "offre-gestion":
+      `Assistant administratif et commercial (H/F) - CDI, Rouen
+PME du secteur logistique, nous recherchons un assistant polyvalent.
+
+Vos missions :
+- Facturation et établissement des devis clients
+- Relances des impayés et suivi des règlements
+- Mise à jour du CRM et des tableaux de bord Excel (tableaux croisés dynamiques)
+- Accueil téléphonique, gestion des plannings
+
+Profil :
+- Vous maîtrisez Excel et les tableaux croisés dynamiques
+- Une première expérience en facturation est exigée
+- La connaissance d'un CRM et d'un ERP est un plus`
+  };
+
+  /* Utilitaires */
+  const $ = id => document.getElementById(id);
+  const esc = s => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const touch = () => { dirty = true; const h = $("saveHint"); if (h) h.textContent = "modifications non enregistrées"; };
+
+  /* Mots-clés sans LLM */
+  const STOP = new Set(("le la les un une des du de d l au aux a et ou en dans sur sous pour par avec sans chez vers entre vos votre nos notre mes mon ma ses son sa leur leurs ce cet cette ces qui que quoi dont si mais donc or ni car ne pas plus moins tres bien tout tous toute toutes autre autres comme aussi ainsi afin alors nous vous ils elles il elle on je tu y est sont sera serez etes etre avoir avez ont aura fait faire travail emploi offre poste postes mission missions profil profils experience experiences annee annees ans an entreprise societe pme equipe equipes secteur recherche recherchons recrute recrutons candidat candidate candidats environnement contexte rejoindre rejoignez renforcer integrer integre integrerez maitrise maitrisez maitriser connaissance connaissances connaissez minimum souhaite souhaitee souhaitez idealement notamment egalement plusieurs nouvelles nouvelle nouveaux forte fortes fort bon bonne bonnes premiere premier exigee exige h f hf cdi cdd temps plein partiel salaire remuneration avantages lieu type date description justifiez disposez possedez savez travaillez travaillerez assurez assurerez participez participerez contribuez contribuerez realisez realiserez developpez developperez developper concevez concevoir garantissez intervenez interviendrez evoluez evoluerez ecrivez ecrire utilisez utiliserez serez aurez competences competence requises requis qualites atouts exigences criteres niveau formation diplome bac titulaire capacite capacites sein cadre rigueur autonomie esprit sens coeur deja outil outils").split(/\s+/));
+  const norm = s => s.toLowerCase().replace(/œ/g, "oe").replace(/æ/g, "ae")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const tok = t => (norm(t).match(/[a-z0-9+#.]{2,}/g) || [])
+    .map(w => w.replace(/[.]+$/, "")).filter(w => w.length >= 2 && !/^[0-9.]+$/.test(w));
+  const stem = w => {
+    let s = w;
+    if (s.length > 3 && s.endsWith("s")) s = s.slice(0, -1);
+    if (s.length > 5 && s.endsWith("euse")) s = s.slice(0, -4) + "eur";
+    else if (s.length > 6 && s.endsWith("trice")) s = s.slice(0, -5) + "teur";
+    else if (s.length > 4 && s.endsWith("ee")) s = s.slice(0, -1);
+    return s;
+  };
+
+  function keywords(offre) {
+    const ws = tok(offre), ok = w => !STOP.has(w);
+    const uni = new Map(), bi = new Map();
+    for (let i = 0; i < ws.length; i++) {
+      if (ok(ws[i])) uni.set(ws[i], (uni.get(ws[i]) || 0) + 1);
+      if (i < ws.length - 1 && ok(ws[i]) && ok(ws[i + 1])) {
+        const b = ws[i] + " " + ws[i + 1]; bi.set(b, (bi.get(b) || 0) + 1);
+      }
+    }
+    const cand = [...bi].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]);
+    const used = new Set(), bigrams = [];
+    for (const [b, c] of cand) {
+      const [x, y] = b.split(" ");
+      if (!used.has(x) && !used.has(y)) {
+        bigrams.push([b, c]); used.add(x); used.add(y);
+        uni.set(x, (uni.get(x) || 0) - c); uni.set(y, (uni.get(y) || 0) - c);
+      }
+    }
+    return [...bigrams, ...[...uni].filter(([, c]) => c >= 1)]
+      .sort((p, q) => q[1] - p[1]).slice(0, 16);
+  }
+  function coverage(kws, text) {
+    const tn = norm(text).replace(/\s+/g, " ");
+    const stems = new Set(tok(text).map(stem));
+    const res = kws.map(([k, f]) => {
+      let hit;
+      if (k.includes(" ")) hit = tn.includes(k) || k.split(" ").every(p => stems.has(stem(p)));
+      else hit = stems.has(stem(k));
+      return { k, f, hit };
+    });
+    const tot = res.reduce((s, r) => s + r.f, 0);
+    const cov = res.filter(r => r.hit).reduce((s, r) => s + r.f, 0);
+    return { res, score: tot ? Math.round(100 * cov / tot) : 0 };
+  }
+
+  /* Diff LCS mot-a-mot */
+  const tokensOf = t => t.replace(/\r\n?/g, "\n").split(/(\n)|[ \t]+/).filter(x => x !== undefined && x !== "");
+  function lcsDiff(A, B) {
+    const n = A.length, m = B.length;
+    if (n * m > 4000000) return null;
+    const dp = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const ops = []; let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (A[i] === B[j]) { ops.push(["=", A[i]]); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push(["-", A[i]]); i++; }
+      else { ops.push(["+", B[j]]); j++; }
+    }
+    while (i < n) ops.push(["-", A[i++]]);
+    while (j < m) ops.push(["+", B[j++]]);
+    return ops;
+  }
+
+  /* Persistance */
+  function payload() {
+    return {
+      v: 1, step: S.step, offre: S.offre, cv: S.cv, adapted: S.adapted,
+      exports: S.exports, diffSig: S.diffSig, confirmed: [...S.confirmed]
+    };
+  }
+  function serialize() {
+    const json = JSON.stringify(payload()).replace(/<\//g, "<\\/");
+    return PRISTINE.replace(
+      /(<script type="application\/json" id="cvforge-data">)[\s\S]*?(<\/script>)/,
+      function (_, a, b) { return a + json + b; }
+    );
+  }
+  function fileName() {
+    try { return decodeURIComponent(location.pathname.split("/").pop()) || "cvforge-lite.html"; }
+    catch (e) { return "cvforge-lite.html"; }
+  }
+  async function save() {
+    const html = serialize();
+    if (window.showSaveFilePicker) {
+      try {
+        if (!fileHandle) {
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: fileName(),
+            types: [{ description: "CVForge Lite", accept: { "text/html": [".html", ".htm"] } }]
+          });
+        }
+        const w = await fileHandle.createWritable();
+        await w.write(html); await w.close();
+        dirty = false; $("saveHint").textContent = "Enregistré dans le fichier ✓";
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+        fileHandle = null;
+      }
+    }
+    const blob = new Blob([html], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    dirty = false; $("saveHint").textContent = "Téléchargé - remplace l'ancien fichier ✓";
+  }
+  function hydrate() {
+    const el = $("cvforge-data");
+    if (!el) return;
+    let d = null;
+    try { d = JSON.parse(el.textContent); } catch (e) { }
+    if (!d || typeof d !== "object") return;
+    S.offre = d.offre || ""; S.cv = d.cv || ""; S.adapted = d.adapted || "";
+    S.exports = Array.isArray(d.exports) ? d.exports : [];
+    S.diffSig = ("diffSig" in d) ? d.diffSig : null;
+    S.confirmed = new Set(Array.isArray(d.confirmed) ? d.confirmed : []);
+    $("offreInput").value = S.offre;
+    $("cvInput").value = S.cv;
+    syncAnalyserBtn();
+    renderTracking();
+    if (d.step && canEnter(d.step)) startStep = d.step;
+    $("saveHint").textContent = "Données restaurées depuis le fichier";
+  }
+  window.addEventListener("beforeunload", e => {
+    if (dirty) { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  /* Navigation */
+  function canEnter(n) {
+    if (n <= 1) return true;
+    if (n === 2 || n === 3) return S.offre.trim().length >= 40 && S.cv.trim().length >= 40;
+    if (n === 4) return canEnter(3) && S.adapted.trim().length > 0;
+    return false;
+  }
+  function go(n) {
+    if (!canEnter(n)) return;
+    S.step = n;
+    if (n === 2) renderAnalyse();
+    if (n === 3) enterAdaptation();
+    if (n === 4) renderDiff();
+    document.querySelectorAll("section[data-step]").forEach(s =>
+      s.classList.toggle("active", +s.dataset.step === n));
+    document.querySelectorAll(".steps .step").forEach(b => {
+      const k = +b.dataset.go;
+      b.toggleAttribute("disabled", !canEnter(k));
+      if (k === n) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+      b.classList.toggle("done", k < n);
+    });
+    window.scrollTo({ top: 0 });
+  }
+  function refreshNav() {
+    document.querySelectorAll(".steps .step").forEach(b =>
+      b.toggleAttribute("disabled", !canEnter(+b.dataset.go)));
+  }
+
+  /* Step 1 - sources */
+  function syncAnalyserBtn() {
+    $("btnAnalyse").disabled = !(S.offre.trim().length >= 40 && S.cv.trim().length >= 40);
+  }
+  $("offreInput").addEventListener("input", e => {
+    S.offre = e.target.value; S.kws = null; touch(); syncAnalyserBtn(); refreshNav();
+  });
+  $("cvInput").addEventListener("input", e => {
+    S.cv = e.target.value; touch(); syncAnalyserBtn(); refreshNav();
+  });
+  $("btnAnalyse").addEventListener("click", () => go(2));
+  document.querySelectorAll("[data-sample]").forEach(b => {
+    b.addEventListener("click", () => {
+      const key = b.dataset.sample, isCV = key.startsWith("cv");
+      const ta = $(isCV ? "cvInput" : "offreInput");
+      ta.value = SAMPLES[key];
+      ta.dispatchEvent(new Event("input"));
+    });
+  });
+
+  /* Step 2 - analyse */
+  function ensureKws() { if (!S.kws) S.kws = keywords(S.offre); return S.kws; }
+  function renderAnalyse() {
+    S.matching = coverage(ensureKws(), S.cv);
+    const { res, score } = S.matching;
+    $("scoreVal").textContent = score;
+    $("scoreFill").style.width = score + "%";
+    $("scoreVerdict").textContent =
+      score >= 75 ? "Bonne couverture - l'adaptation servira surtout à prioriser." :
+        score >= 50 ? "Couverture partielle - vérifie les manquants un par un." :
+          "Couverture faible - cette offre est-elle vraiment la bonne cible ?";
+    const chip = r => `<span class="chip ${r.hit ? "chip-ok" : "chip-miss"}">${r.hit ? "✓" : "?"} ${esc(r.k)} <span class="f">×${r.f}</span></span>`;
+    const ok = res.filter(r => r.hit), miss = res.filter(r => !r.hit);
+    $("chipsOk").innerHTML = ok.length ? ok.map(chip).join("") : '<span class="hint">Aucun mot-clé couvert.</span>';
+    $("chipsMiss").innerHTML = miss.length ? miss.map(chip).join("") : '<span class="hint">Rien ne manque - couverture totale.</span>';
+  }
+
+  /* Step 3 - adaptation + matching live */
+  function enterAdaptation() {
+    $("cvOriginalView").value = S.cv;
+    if (!S.adapted.trim()) { S.adapted = S.cv; }
+    $("adaptedInput").value = S.adapted;
+    renderLive();
+  }
+  function renderLive() {
+    const m = coverage(ensureKws(), S.adapted || "");
+    $("liveScore").textContent = m.score;
+    $("liveFill").style.width = m.score + "%";
+    const ok = m.res.filter(r => r.hit), miss = m.res.filter(r => !r.hit);
+    $("liveOkCount").textContent = ok.length + " couvert" + (ok.length > 1 ? "s" : "");
+    $("liveMissCount").textContent = miss.length + " manquant" + (miss.length > 1 ? "s" : "");
+    $("liveMiss").innerHTML = miss.length
+      ? miss.map(r => `<span class="chip chip-miss">? ${esc(r.k)} <span class="f">×${r.f}</span></span>`).join("")
+      : '<span class="live-done">✓ Couverture totale des mots-clés.</span>';
+  }
+  const liveDebounced = debounce(renderLive, 250);
+  $("adaptedInput").addEventListener("input", e => {
+    S.adapted = e.target.value; touch(); refreshNav(); liveDebounced();
+  });
+  $("btnResetAdapted").addEventListener("click", () => {
+    S.adapted = S.cv; $("adaptedInput").value = S.cv; touch(); renderLive();
+  });
+
+  function buildPrompt() {
+    const missing = coverage(ensureKws(), S.adapted || S.cv).res.filter(r => !r.hit).map(r => r.k);
+    return `Tu es un assistant de candidature. RÈGLES ABSOLUES, sans exception :
+1. Tu n'inventes JAMAIS : aucune compétence, expérience, diplôme, certification, technologie ou chiffre absent du CV ci-dessous.
+2. Tu peux uniquement reformuler, réorganiser, prioriser et résumer le contenu du CV.
+3. Les mots-clés listés en bas sont ABSENTS du CV : ne les ajoute PAS. Liste-les à la fin sous le titre « À vérifier avec le candidat ».
+4. Conserve la langue, le ton factuel et la structure générale du CV.
+5. Mets en avant en priorité ce qui correspond à l'offre.
+
+Réponds en deux blocs : d'abord le CV adapté seul, puis la liste « À vérifier avec le candidat ».
+
+=== OFFRE D'EMPLOI ===
+${S.offre}
+
+=== CV - SOURCE DE VÉRITÉ UNIQUE ===
+${S.cv}
+
+=== MOTS-CLÉS DE L'OFFRE ABSENTS DU CV (NE PAS AJOUTER) ===
+${missing.length ? missing.join(", ") : "(aucun)"}`;
+  }
+  $("btnPrompt").addEventListener("click", () => {
+    $("promptText").value = buildPrompt();
+    $("promptOut").hidden = false;
+    $("btnCopy").hidden = false;
+    $("copyHint").textContent = "";
+  });
+  $("btnCopy").addEventListener("click", async () => {
+    const t = $("promptText");
+    try { await navigator.clipboard.writeText(t.value); }
+    catch (e) { t.focus(); t.select(); document.execCommand("copy"); }
+    $("copyHint").textContent = "Copié - colle-le dans ton IA.";
+  });
+
+  /* Step 4 - diff, confirmations, export */
+  function renderDiff() {
+    const ops = lcsDiff(tokensOf(S.cv), tokensOf(S.adapted));
+    const sig = S.cv + " " + S.adapted;
+    if (sig !== S.diffSig) { S.confirmed = new Set(); S.diffSig = sig; }
+
+    if (!ops) {
+      $("diffLeft").innerHTML = $("diffRight").innerHTML =
+        '<span class="hint">Texte trop long pour le diff de la version Lite (limite mémoire).</span>';
+      S.segs = []; renderSegs(); return;
+    }
+    const html = side => ops.map(([t, w]) => {
+      if (w === "\n") return (side === "L" ? t !== "+" : t !== "-") ? "<br>" : "";
+      if (t === "=") return esc(w) + " ";
+      if (t === "-" && side === "L") return '<span class="d-del">' + esc(w) + "</span> ";
+      if (t === "+" && side === "R") return '<span class="d-ins">' + esc(w) + "</span> ";
+      return "";
+    }).join("");
+    $("diffLeft").innerHTML = html("L");
+    $("diffRight").innerHTML = html("R");
+
+    const nIns = ops.filter(o => o[0] === "+" && o[1] !== "\n").length;
+    const nDel = ops.filter(o => o[0] === "-" && o[1] !== "\n").length;
+    $("diffStats").innerHTML =
+      `<span class="ins">+ ${nIns} mot${nIns > 1 ? "s" : ""} ajouté${nIns > 1 ? "s" : ""}</span>` +
+      `<span class="del">- ${nDel} mot${nDel > 1 ? "s" : ""} supprimé${nDel > 1 ? "s" : ""}</span>` +
+      (nIns + nDel === 0 ? "<span>Aucune modification.</span>" : "");
+
+    const segs = []; let cur = [];
+    for (const [t, w] of ops) {
+      if (t === "+" && w !== "\n") cur.push(w);
+      else if (cur.length) { segs.push(cur.join(" ")); cur = []; }
+    }
+    if (cur.length) segs.push(cur.join(" "));
+    S.segs = segs;
+    renderSegs();
+  }
+  function renderSegs() {
+    const list = $("segsList"); list.innerHTML = "";
+    const has = S.segs.length > 0;
+    $("segsBlock").style.display = has ? "" : "none";
+    $("noAdds").hidden = has;
+    S.segs.forEach((txt, i) => {
+      const row = document.createElement("div"); row.className = "seg";
+      const p = document.createElement("div"); p.className = "seg-text";
+      p.innerHTML = "<mark>" + esc(txt) + "</mark>";
+      const b = document.createElement("button"); b.type = "button"; b.className = "confirm";
+      const paint = () => {
+        const on = S.confirmed.has(i);
+        b.classList.toggle("on", on);
+        b.textContent = on ? "✓ CONFIRMÉ - VRAI ET PROUVABLE" : "CONFIRMER - VRAI ET PROUVABLE ?";
+        b.setAttribute("aria-pressed", on);
+      };
+      b.addEventListener("click", () => {
+        S.confirmed.has(i) ? S.confirmed.delete(i) : S.confirmed.add(i);
+        touch(); paint(); gate();
+      });
+      paint();
+      row.append(p, b); list.append(row);
+    });
+    gate();
+  }
+  function gate() {
+    const total = S.segs.length, done = S.confirmed.size;
+    const ok = done >= total;
+    $("gateCount").textContent = total ? `${done}/${total} ajout${total > 1 ? "s" : ""} confirmé${done > 1 ? "s" : ""}` : "";
+    $("gateCount").classList.toggle("ok", ok && total > 0);
+    $("btnExport").disabled = !ok;
+  }
+  $("btnExport").addEventListener("click", () => {
+    $("printable").textContent = S.adapted;
+    window.print();
+    addTracking();
+  });
+
+  /* Micro-tracking */
+  function addTracking() {
+    const title = (S.offre.trim().split("\n")[0] || "Offre sans titre").slice(0, 70);
+    S.exports.push({ title, date: new Date().toLocaleDateString("fr-FR"), status: "envoyee" });
+    touch();
+    renderTracking();
+  }
+  function renderTracking() {
+    $("trackBlock").hidden = S.exports.length === 0;
+    const wrap = $("trackList"); wrap.innerHTML = "";
+    S.exports.forEach((e, i) => {
+      const row = document.createElement("div"); row.className = "track-item";
+      const meta = document.createElement("div"); meta.className = "meta";
+      meta.textContent = e.date + " - " + e.title;
+      const sel = document.createElement("select");
+      [["envoyee", "Envoyée"], ["reponse", "Réponse reçue"], ["entretien", "Entretien obtenu"], ["refus", "Refus"]]
+        .forEach(([v, l]) => {
+          const o = document.createElement("option"); o.value = v; o.textContent = l;
+          if (e.status === v) o.selected = true; sel.append(o);
+        });
+      sel.addEventListener("change", () => { S.exports[i].status = sel.value; touch(); });
+      sel.setAttribute("aria-label", "Statut de la candidature");
+      row.append(meta, sel); wrap.append(row);
+    });
+  }
+
+  /* Actions globales */
+  $("btnSave").addEventListener("click", save);
+  $("btnReset").addEventListener("click", () => {
+    if (!confirm("Recharger le fichier ? Les modifications non enregistrées seront perdues - tu reviendras à la dernière sauvegarde.")) return;
+    dirty = false;
+    location.reload();
+  });
+  document.querySelectorAll("[data-go]").forEach(b => {
+    if (!b.classList.contains("step")) b.addEventListener("click", () => go(+b.dataset.go));
+  });
+  document.querySelectorAll(".steps .step").forEach(b =>
+    b.addEventListener("click", () => go(+b.dataset.go)));
+
+  /* Visite guidée - lancée au clic, interruptible à tout moment */
+  (function tour() {
+    const btn = $("btnTour");
+    if (!btn) return;
+    const STEPS = [
+      { n: 1, fill: true, title: "Les deux matières premières", text: "On a chargé un exemple : une offre d'emploi et un CV. Tout reste éditable à la main." },
+      { n: 2, title: "Matching offre / CV", text: "La couverture des mots-clés de l'offre est calculée localement, sans IA." },
+      { n: 3, title: "Adaptation en direct", text: "Tu modifies le CV au centre ; le score se recalcule à chaque frappe, dans le panneau de droite." },
+      { n: 4, title: "La preuve par le diff", text: "Chaque ajout est tracé. Tu confirmes qu'il est vrai et prouvable avant d'exporter." },
+    ];
+    let i = -1, box = null;
+
+    function fillSample() {
+      ["offre", "cv"].forEach(k => {
+        const ta = $(k === "offre" ? "offreInput" : "cvInput");
+        ta.value = SAMPLES[k === "offre" ? "offre-dev" : "cv-dev"];
+        ta.dispatchEvent(new Event("input"));
+      });
+    }
+    function show(idx) {
+      i = idx;
+      const s = STEPS[i], last = i === STEPS.length - 1;
+      if (s.fill) fillSample();
+      go(s.n);
+      box.innerHTML =
+        `<div class="tour-step">Étape ${i + 1} / ${STEPS.length}</div>
+         <h4>${s.title}</h4>
+         <p>${s.text}</p>
+         <div class="tour-actions">
+           <button type="button" class="tour-skip">Passer</button>
+           <button type="button" class="tour-next">${last ? "Terminer" : "Suivant →"}</button>
+         </div>`;
+      box.querySelector(".tour-skip").addEventListener("click", end);
+      box.querySelector(".tour-next").addEventListener("click", () => last ? end() : show(i + 1));
+      box.querySelector(".tour-next").focus();
+    }
+    function start() {
+      if (!box) { box = document.createElement("div"); box.className = "tour-pop";
+        box.setAttribute("role", "dialog"); box.setAttribute("aria-live", "polite");
+        document.body.appendChild(box); }
+      box.hidden = false; show(0);
+    }
+    function end() { if (box) box.hidden = true; btn.focus(); }
+    btn.addEventListener("click", start);
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && box && !box.hidden) end(); });
+  })();
+
+  /* Démarrage */
+  hydrate();
+  go(startStep);
+})();
+  </script>
+</body>
+
+</html>

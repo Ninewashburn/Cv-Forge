@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://www.hellowork.com/fr-fr/emplois/123456.html",
+    "title": "Développeur Full Stack Laravel Angular",
+    "company": "Entreprise exemple",
+    "source": "hellowork",
+    "captured_at": "2026-05-04T14:30:00",
+    "status": "bookmarked"
+  },
+  {
+    "url": "https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre/987654",
+    "title": "Ingénieur logiciel Python",
+    "company": "Studio produit",
+    "source": "apec",
+    "captured_at": "2026-05-04T16:10:00",
+    "status": "ready"
+  },
+  {
+    "url": "https://www.linkedin.com/jobs/view/555555",
+    "title": "Développeur Angular",
+    "company": "SaaS locale",
+    "source": "linkedin-jobs",
+    "captured_at": "2026-05-05T09:15:00",
+    "status": "bookmarked"
+  }
+]

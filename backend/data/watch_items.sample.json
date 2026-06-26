@@ -1,0 +1,35 @@
+[
+  {
+    "url": "https://www.hellowork.com/fr-fr/emplois/123456.html",
+    "title": "Développeur Full Stack Laravel Angular",
+    "source": "hellowork",
+    "item_type": "offer",
+    "captured_at": "2026-05-04T14:30:00",
+    "status": "bookmarked",
+    "company": "Entreprise exemple",
+    "tags": ["laravel", "angular", "fullstack"],
+    "related_skill": null
+  },
+  {
+    "url": "https://openclassrooms.com/fr/courses/angular",
+    "title": "Approfondir Angular moderne",
+    "source": "openclassrooms",
+    "item_type": "training",
+    "captured_at": "2026-05-04T17:20:00",
+    "status": "bookmarked",
+    "company": null,
+    "tags": ["angular", "frontend"],
+    "related_skill": "Angular"
+  },
+  {
+    "url": "https://www.apec.fr/tendances-emploi",
+    "title": "Tendances du marché développeur",
+    "source": "apec",
+    "item_type": "news",
+    "captured_at": "2026-05-05T09:10:00",
+    "status": "read",
+    "company": null,
+    "tags": ["veille", "emploi"],
+    "related_skill": null
+  }
+]

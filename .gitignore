@@ -1,0 +1,77 @@
+# ───────────────────────────── Python / Backend ─────────────────────────────
+__pycache__/
+backend/**/__pycache__/
+*.py[cod]
+*$py.class
+backend/*.egg-info/
+*.egg-info/
+.eggs/
+build/
+.Python
+# Environnements virtuels
+.venv/
+venv/
+env/
+ENV/
+# Outils de test / typage
+.pytest_cache/
+backend/.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Sorties générées par le CLI/engine
+backend/outputs/
+
+# ───────────────────────────── Node / Angular ───────────────────────────────
+node_modules/
+frontend/node_modules/
+# Build Angular (sera servi par FastAPI, jamais committé)
+frontend/dist/
+dist/
+frontend/.angular/
+.angular/
+# Logs npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ──────────────────────── Secrets / Config sensible ─────────────────────────
+# La clé API LLM est saisie par l'utilisateur, stockée dans le dossier utilisateur,
+# JAMAIS committée (cf. CLAUDE.md — Interdits).
+.env
+.env.*
+*.key
+*.pem
+secrets*
+api_key*
+
+# ──────────────────────── Données utilisateur CVForge ───────────────────────
+# Créées au runtime par resolve_data_dir() — ne doivent jamais entrer dans le dépôt.
+*.db
+*.sqlite
+*.sqlite3
+/data/
+cvforge.db
+.cvforge/
+# Marqueur du mode portable (présent à côté de l'exe, pas dans le code source)
+cvforge.portable
+# Données de travail générées par l'app (les *.sample.json restent versionnés)
+backend/data/job_bookmarks.json
+backend/data/watch_items.json
+
+# ─────────────────────────────── OS / Système ───────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ──────────────────── Docs stratégiques (hors dépôt public) ─────────────────
+# Analyse concurrentielle + GTM : sensibles si le repo devient public.
+private/
+
+# ─────────────────────────────── IDE / Éditeurs ─────────────────────────────
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,109 @@
+<main class="cockpit">
+  <aside class="sidebar" aria-label="Filtres de veille">
+    <div class="brand">
+      <span>CVForge</span>
+      <strong>Veille</strong>
+    </div>
+
+    <section class="nav-section">
+      <h2>Sources</h2>
+      @for (source of sourceFilters; track source) {
+        <button
+          type="button"
+          [class.active]="selectedSource === source"
+          (click)="selectSource(source)"
+        >
+          {{ source === 'all' ? 'Toutes' : sourceLabel(source) }}
+        </button>
+      }
+    </section>
+
+    <section class="nav-section">
+      <h2>Types</h2>
+      @for (type of typeFilters; track type) {
+        <button
+          type="button"
+          [class.active]="selectedType === type"
+          (click)="selectType(type)"
+        >
+          {{ type === 'all' ? 'Tous' : typeLabels[type] }}
+        </button>
+      }
+    </section>
+  </aside>
+
+  <section class="content">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Marque-page intelligent local-first</p>
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="capture-endpoint">
+        <span>Extension navigateur</span>
+        <code>POST /api/watch-items</code>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="Synthèse de la veille">
+      <article>
+        <span>Éléments suivis</span>
+        <strong>{{ items.length }}</strong>
+      </article>
+      <article>
+        <span>Offres</span>
+        <strong>{{ offerCount }}</strong>
+      </article>
+      <article>
+        <span>Candidatures</span>
+        <strong>{{ applicationCount }}</strong>
+      </article>
+      <article>
+        <span>Formations</span>
+        <strong>{{ learningCount }}</strong>
+      </article>
+    </section>
+
+    <section class="watch-list" aria-label="Liste de veille candidature">
+      @for (item of filteredItems; track item.url) {
+        <article class="watch-card">
+          <div class="card-head">
+            <div>
+              <span class="source">{{ sourceLabel(item.source) }}</span>
+              <span class="type">{{ typeLabels[item.itemType] }}</span>
+            </div>
+            <span class="status">{{ statusLabels[item.status] }}</span>
+          </div>
+
+          <div class="card-body">
+            <h2>{{ item.title }}</h2>
+            <div class="meta">
+              @if (item.company) {
+                <span>{{ item.company }}</span>
+              }
+              <span>{{ item.capturedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              @if (item.relatedSkill) {
+                <span>Compétence : {{ item.relatedSkill }}</span>
+              }
+            </div>
+            <div class="tags" aria-label="Tags">
+              @for (tag of item.tags; track tag) {
+                <span>{{ tag }}</span>
+              }
+            </div>
+          </div>
+
+          <footer class="actions" aria-label="Actions">
+            <a [href]="item.url" target="_blank" rel="noreferrer">Ouvrir</a>
+            <button type="button">Analyser</button>
+            <button type="button">Générer CV</button>
+            <button type="button">Postulé</button>
+            <button type="button">Associer</button>
+            <button type="button">Archiver</button>
+          </footer>
+        </article>
+      } @empty {
+        <p class="empty">Aucun élément ne correspond aux filtres sélectionnés.</p>
+      }
+    </section>
+  </section>
+</main>
