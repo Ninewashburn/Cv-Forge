@@ -58,7 +58,7 @@
 
 **Garde-fou :** Lite ne grossit JAMAIS. Pas de pièces jointes (le base64 ferait exploser le fichier), preuves = texte + liens uniquement, pas d'historique de versions, une seule candidature active à la fois. Toute demande de plus = argument de vente pour la V1. **Lite est l'entonnoir, V1 est le produit.**
 
-- [ ] **Zone « révélation » LinkedIn — texte seul** *(entorse consciente et unique au gel, actée le 2026-06-26)*
+- [x] **Zone « révélation » LinkedIn — texte seul** *(entorse consciente et unique au gel, actée le 2026-06-26 ; livrée le 2026-06-28 : champ pointillé + tri 3 cases + double score, sans bouton auto)*
   - Inspiré d'un atelier RH (Michelin) : utiliser le profil LinkedIn comme **contexte de révélation**, version honnête. Spec complète en V1 ci-dessous.
   - **Pourquoi on déroge au gel** : ajout jugé **léger** (un champ optionnel + le tri 3 cases qui rejoue le matching déjà présent) et trop **aligné sur la philosophie anti-hallucination** pour être refusé.
   - **Reste texte-only dans Lite** : copier-coller du texte du profil, **aucun parsing PDF** (préserve le zéro-dépendance et le double-clic). Le parsing PDF est en V1.5.
@@ -80,6 +80,7 @@
 - [ ] **Adaptation contrôlée** — 3 niveaux :
   - Manuelle (sans IA, toujours disponible)
   - **Mode copilote** : prompt verrouillé généré par CVForge (anti-hallucination inclus) → copier-coller vers le ChatGPT/Claude de l'utilisateur (nouvel onglet) → retour validé par le Diff Viewer. Zéro clé API, zéro coût.
+    - *Prompt copilote **optionnel** — repérer les 5 compétences clés de l'offre* : « Lis cette offre d'emploi. Identifie les 5 compétences ou technologies les plus importantes, par ordre de priorité, en te basant UNIQUEMENT sur le texte de l'offre. Pour chacune, cite la phrase de l'offre qui la justifie. N'invente rien, ne note pas le candidat, ne suggère aucune compétence absente de l'offre. » → sortie = **liste brute** ; l'utilisateur décide ensuite quoi prouver. Le matching V1 reste **sans LLM** — ceci est un complément copilote **facultatif** (peut glisser en V1.5 si la V1 doit être allégée).
   - Clé API utilisateur (intégration directe, power users)
 - [ ] **Diff Viewer** ⭐ — avant/après côte à côte, surlignage des modifications
   - **Killer feature, centre du pitch.** Preuve visuelle que rien n'est inventé.
@@ -127,7 +128,8 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
   - Adjectifs creux en rafale (dynamique, motivé, rigoureux…) sans fait chiffré à proximité
   - Icônes/caractères décoratifs qui cassent le parsing ATS
 - [ ] **Versioning CV** — revenir à une version antérieure
-- [ ] **Parsing PDF du profil LinkedIn** *(couche optionnelle de la « Zone révélation » — spec en V1)* — extraction texte côté FastAPI du PDF exporté depuis LinkedIn, **même contrat** (preuve candidate, validation obligatoire par le Diff, jamais de fusion auto). **Statut : non garanti** — à confirmer selon l'usage réel ; le copier-coller texte (V1 + Lite) peut suffire. Pas d'appel réseau : l'utilisateur fournit le fichier.
+- [ ] **Parsing PDF — profils & offres** *(couche optionnelle de la « Zone révélation » — spec en V1 ; LinkedIn d'abord, plus tard Indeed/APEC)* — extraction texte **côté FastAPI** (Lite reste en copier-coller manuel, aucun parsing). Le texte extrait = **source de révélation** (gap analysis), **jamais d'auto-fusion** dans le CV ; réutilise le contrat déjà défini : preuve candidate → validation → Avant/Après. **Robustesse** : le format PDF LinkedIn change souvent (multilingue, sections déplacées) → prévoir un parsing **tolérant** + **fallback « colle le texte à la main »** si l'extraction échoue. **Statut : non garanti** — le copier-coller texte (V1 + Lite) peut suffire. Pas d'appel réseau : l'utilisateur fournit le fichier.
+- [ ] **Anonymisation / caviardage avant copilote** *(d'après un conseil RH — Philippe : « anonymise ton CV avant de l'envoyer à l'IA »)* — bouton **« Anonymiser »** qui masque, **avant** la génération du prompt copilote : nom, prénom, email, téléphone, adresse, liens personnels → remplacés par des marqueurs neutres (`[NOM]`, `[EMAIL]`…), réversibles en local. **Le CV réel n'est jamais modifié** ; seul le texte *envoyé* à l'IA est caviardé. Sert directement la confidentialité (cœur local-first), pas un gadget : il renforce preuve + contrôle. **Statut : V1.5+**.
 - [ ] **Export DOCX basique** *(remonté de V3 — beaucoup de RH exigent encore Word)*
 - [ ] **Packaging desktop — exe portable façon ADWCleaner** : PyInstaller `--onefile` (Python + FastAPI + build Angular dans un seul exécutable). Double-clic → serveur local → navigateur. **Données : résolues par `resolve_data_dir()` (câblée dès V1)** — défaut `~/.cvforge/` (mode installé, données préservées si on remplace l'exe) ; mode portable activé par un marqueur `cvforge.portable` à côté de l'exe → données dans `./data/` qui voyagent sur la clé USB. Le même binaire fait les deux. Option fenêtre native : pywebview (WebView2). Signature de code à prévoir contre SmartScreen (Azure Trusted Signing ~10 $/mois). Pas d'UPX (faux positifs antivirus). Tauri abandonné — plus nécessaire.
 
@@ -145,7 +147,14 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
 - [ ] **Suivi candidatures** — **5 statuts max** : À envoyer / Envoyée / Entretien / Refusée / Acceptée + **contact par candidature** (nom, email, coordonnées du recruteur — premier pas vers l'angle réseau)
 - [ ] **Dashboard** — "que dois-je faire aujourd'hui ?" : rappels, relances, entretiens à venir
 - [ ] **Calendrier de relances** — "relancer Entreprise X dans 7 jours si pas de réponse"
-- [ ] **Préparation entretien** — construit sur la règle des 6P : pitch **chronométré** (60/90 s), questions probables, notes post-entretien
+- [ ] **Préparation entretien — la grille des 5P** *(d'après Philippe, RH Michelin — grille de PRÉPARATION, jamais dans le prompt d'adaptation du CV qui reste factuel)* — une section par P, remplie **à partir de faits réels** (banque de preuves), jamais d'éléments inventés (l'outil **structure**, ne fabrique pas) :
+  1. **Pourquoi cette entreprise ?** (recherche, actualité, valeurs)
+  2. **Poste visé** (ce que le rôle demande vraiment)
+  3. **Parcours professionnel** (le fil narratif, pas la liste)
+  4. **Personnalité** (forces, façon de travailler — prouvables par des exemples)
+  5. **Pitch** (présentation courte, **chronométrée 60-90 s**)
+  - + questions probables et notes post-entretien.
+  - ⚠️ **Ne pas confondre avec la règle des 6P du CV Linter (V1.5)** : les **5P** = préparation entretien ; les **6P** = anti-patterns du CV. Deux grilles distinctes.
 - [ ] **Fiche mémo entretien** — consultable/imprimable juste avant l'entretien
 - [ ] **Analyse d'offre : signaux faibles** — détection points positifs / red flags d'une offre (issu des maquettes — bonne idée à conserver)
 

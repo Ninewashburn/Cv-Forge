@@ -43,6 +43,7 @@ Outil **local-first** de candidature basée sur des preuves. Lire `ROADMAP.md` a
 - TypeScript strict. `any` interdit (`unknown` si nécessaire).
 - Lazy loading des routes. Structure `core/` `shared/` `features/` `layout/`.
 - **Diff Viewer = composant central** : avant/après côte à côte, surlignage des modifications. Lisible par un non-dev — pas un diff git.
+  - **Terminologie UI — NON NÉGOCIABLE** : dans toute l'interface et les textes vus par l'utilisateur, on dit **« Avant / Après »**, jamais **« Diff »** (jargon dev qui sonne faux en français — on dit « la différence », pas « le diff »). « Diff Viewer » reste uniquement le **nom interne** du composant/code (classes, fonctions). Cf. règle « zéro jargon tech dans l'UI ».
 
 ---
 
