@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CVForge Lite · Démo</title>
+  <meta name="robots" content="noindex">
+  <!-- Thème papier clair assumé : on déclare le color-scheme et on désactive DarkReader
+       (sinon l'inversion auto casse les dégradés faits main comme la section copilote) -->
+  <meta name="color-scheme" content="light">
+  <meta name="darkreader-lock">
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="wrap masthead">
+    <div class="brand">
+      <h1>CV<span class="forge">Forge</span></h1>
+      <div class="bar" aria-hidden="true"></div>
+      <div class="badges">
+        <span class="badge">LOCAL-FIRST</span>
+        <span class="badge">LE FICHIER EST LA SAUVEGARDE</span>
+        <span class="badge">0 DÉPENDANCE</span>
+        <span class="badge">LITE V0.5</span>
+        <span class="badge"><a href="/" style="color:inherit;text-decoration:none">← Portfolio</a></span>
+      </div>
+    </div>
+    <div class="mast-actions">
+      <button class="tour-launch" id="btnTour" type="button">▶ Démo guidée</button>
+      <span class="hint" id="saveHint"></span>
+      <button class="btn btn-primary" id="btnSave" type="button">💾 Enregistrer</button>
+      <button class="reset" id="btnReset" type="button">Recharger</button>
+    </div>
+  </header>
+
+  <nav class="wrap steps" aria-label="Étapes">
+    <button class="step" data-go="1" type="button"><span class="n">01</span><span class="t">Sources</span></button>
+    <button class="step" data-go="2" type="button"><span class="n">02</span><span class="t">Analyse</span></button>
+    <button class="step" data-go="3" type="button"><span class="n">03</span><span class="t">Adaptation</span></button>
+    <button class="step" data-go="4" type="button"><span class="n">04</span><span class="t">Avant / Après &amp; Export</span></button>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- ÉTAPE 1 - SOURCES -->
+    <section data-step="1">
+      <p class="eyebrow">ÉTAPE 01 - LES DEUX MATIÈRES PREMIÈRES</p>
+      <h2>L'offre d'un côté, ton CV de l'autre</h2>
+      <p class="lead">Colle le texte brut - depuis LinkedIn, Indeed, HelloWork, un PDF ou n'importe où. Ton CV est la
+        seule matière première autorisée : rien ne sera inventé à partir d'ailleurs.</p>
+      <div class="sources">
+        <div class="card">
+          <label for="offreInput">Offre d'emploi</label>
+          <textarea id="offreInput" placeholder="Colle ici le texte complet de l'offre…"></textarea>
+          <div class="samples">
+            <button class="btn-link" type="button" data-sample="offre-dev">Exemple - dev</button>
+            <button class="btn-link" type="button" data-sample="offre-gestion">Exemple - hors tech</button>
+          </div>
+        </div>
+        <div class="card">
+          <label for="cvInput">Ton CV - source de vérité</label>
+          <textarea id="cvInput"
+            placeholder="Colle ici le contenu de ton CV (copier-coller depuis ton PDF ou ton document)…"></textarea>
+          <div class="samples">
+            <button class="btn-link" type="button" data-sample="cv-dev">Exemple - dev</button>
+            <button class="btn-link" type="button" data-sample="cv-gestion">Exemple - hors tech</button>
+          </div>
+        </div>
+      </div>
+
+      <details class="reveal" id="revealLi">
+        <summary>Profil LinkedIn - optionnel, pour repérer ce qui manque</summary>
+        <div class="reveal-body">
+          <p class="li-tip">Télécharge ton profil LinkedIn en PDF, puis copie-colle le texte ici. Il n'est <strong>jamais exporté</strong> : il sert seulement à révéler ce que ton CV oublie - c'est toi qui décides quoi ajouter.</p>
+          <textarea id="linkedinInput" placeholder="Colle ici le texte de ton profil LinkedIn (optionnel)…"></textarea>
+          <div class="samples">
+            <button class="btn-link" type="button" data-sample="linkedin-dev">Exemple - dev</button>
+            <button class="btn-link" type="button" data-sample="linkedin-gestion">Exemple - hors tech</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="row">
+        <span class="hint">Les deux textes : minimum ~40 caractères.</span>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" id="btnAnalyse" type="button" disabled>Analyser le matching</button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 2 - ANALYSE -->
+    <section data-step="2">
+      <p class="eyebrow">ÉTAPE 02 - ÉTAT DES LIEUX</p>
+      <h2>Matching offre / CV</h2>
+      <p class="lead">Analyse par fréquence des mots-clés de l'offre, comparée à ton CV. <span class="nolm">CALCULÉ SANS
+          IA - 100% LOCAL</span></p>
+      <div class="card">
+        <div class="score-board">
+          <div class="score-num"><span id="scoreVal">0</span><small>%</small></div>
+          <div class="score-meta">
+            <div class="verdict" id="scoreVerdict"></div>
+            <div class="score-track">
+              <div class="score-fill" id="scoreFill" style="width:0%"></div>
+            </div>
+            <span class="hint">Couverture pondérée par la fréquence des mots-clés dans l'offre.</span>
+            <div class="score-potential" id="scorePotential" hidden></div>
+          </div>
+        </div>
+        <div class="kw-group">
+          <div class="kw-title">✓ COUVERT PAR TON CV</div>
+          <div class="chips" id="chipsOk"></div>
+        </div>
+        <div class="kw-group" id="groupLi" hidden>
+          <div class="kw-title">↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV - À AJOUTER SI PROUVABLE</div>
+          <div class="chips" id="chipsLi"></div>
+        </div>
+        <div class="kw-group">
+          <div class="kw-title" id="missTitle">? ABSENT DE TON CV</div>
+          <div class="chips" id="chipsMiss"></div>
+        </div>
+        <div class="callout"><strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question :
+          ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Si non, ne l'ajoute pas - un
+          entretien le révélera.</div>
+        <div class="row">
+          <button class="btn btn-ghost" type="button" data-go="1">← Revoir les sources</button>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" type="button" data-go="3">Commencer l'adaptation</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 3 - ADAPTATION -->
+    <section data-step="3">
+      <p class="eyebrow">ÉTAPE 03 - ADAPTATION CONTRÔLÉE</p>
+      <h2>Adapte ton CV - le score évolue en direct</h2>
+      <p class="lead">Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule le matching
+        à chaque frappe - plus besoin de revenir en arrière.</p>
+
+      <details class="copilote">
+        <summary>Mode copilote - utilise ton propre ChatGPT ou Claude</summary>
+        <div class="copilote-body">
+          <p>CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le, colle-le dans
+            ton IA, puis rapporte uniquement le CV adapté dans la colonne du milieu. Aucune clé API, aucun coût.</p>
+          <div class="row" style="margin-top:0">
+            <button class="btn btn-ghost" id="btnPrompt" type="button">Préparer le prompt verrouillé</button>
+            <button class="btn btn-ghost" id="btnCopy" type="button" hidden>Copier le prompt</button>
+            <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener"
+              style="text-decoration:none">Ouvrir Claude ↗</a>
+            <a class="btn btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener"
+              style="text-decoration:none">Ouvrir ChatGPT ↗</a>
+            <span class="hint" id="copyHint"></span>
+          </div>
+          <div class="prompt-out" id="promptOut" hidden>
+            <textarea id="promptText" readonly aria-label="Prompt verrouillé à copier"></textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="adapt-grid">
+        <div>
+          <div class="pane-label"><span>CV ORIGINAL - LECTURE SEULE</span></div>
+          <textarea id="cvOriginalView" readonly aria-label="CV original"></textarea>
+        </div>
+        <div>
+          <div class="pane-label"><span>CV ADAPTÉ - ÉDITABLE</span>
+            <button class="btn-link" id="btnResetAdapted" type="button">Repartir de l'original</button>
+          </div>
+          <textarea id="adaptedInput" aria-label="CV adapté"
+            placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."></textarea>
+        </div>
+        <aside class="live-panel" aria-live="polite">
+          <h3>MATCHING EN DIRECT</h3>
+          <div class="live-score"><span id="liveScore">0</span><small>%</small></div>
+          <div class="score-track">
+            <div class="score-fill" id="liveFill" style="width:0%"></div>
+          </div>
+          <div class="live-counts"><span class="c-ok" id="liveOkCount">0 couverts</span> · <span class="c-miss"
+              id="liveMissCount">0 manquants</span></div>
+          <p class="live-miss-title">? ENCORE ABSENTS</p>
+          <div class="live-chips" id="liveMiss"></div>
+          <p class="live-note">Rappel : n'ajoute que du prouvable. L'étape suivante « Avant / Après » vérifiera chaque ajout.
+          </p>
+        </aside>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-ghost" type="button" data-go="2">← Analyse complète</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" type="button" data-go="4">Vérifier l'avant / après</button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 4 - DIFF & EXPORT -->
+    <section data-step="4">
+      <p class="eyebrow">ÉTAPE 04 - TU VOIS TOUT, TU VALIDES TOUT</p>
+      <h2>Qu'est-ce qui a changé, exactement ?</h2>
+      <p class="lead">Chaque mot ajouté ou retiré est tracé. Avant d'exporter, tu confirmes que chaque ajout est vrai et
+        prouvable. C'est le contrat CVForge.</p>
+
+      <div class="card">
+        <div class="panes">
+          <div>
+            <div class="pane-label"><span>ORIGINAL</span></div>
+            <div class="diff-pane" id="diffLeft"></div>
+          </div>
+          <div>
+            <div class="pane-label"><span>ADAPTÉ</span></div>
+            <div class="diff-pane" id="diffRight"></div>
+          </div>
+        </div>
+        <div class="diff-stats" id="diffStats"></div>
+
+        <div class="segs" id="segsBlock">
+          <h3>Ajouts à confirmer</h3>
+          <p class="sub">Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document, expérience)
+            ? En V1 réelle, chaque confirmation se reliera à ta banque de preuves.</p>
+          <div id="segsList"></div>
+        </div>
+        <div class="all-good" id="noAdds" hidden>Aucun contenu ajouté - uniquement des reformulations ou suppressions.
+          Rien à confirmer.</div>
+
+        <div class="gate">
+          <button class="btn btn-ghost" type="button" data-go="3">← Modifier encore</button>
+          <div class="spacer"></div>
+          <span class="gate-count" id="gateCount"></span>
+          <button class="btn btn-primary" id="btnExport" type="button">Exporter en PDF</button>
+        </div>
+      </div>
+
+      <div class="track" id="trackBlock" hidden>
+        <h3>Suivi de candidature</h3>
+        <p>Micro-tracking - pense à 💾 Enregistrer pour le conserver dans le fichier.</p>
+        <div id="trackList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="wrap">
+    <span>ANTI-HALLUCINATION : RIEN N'EST INVENTÉ</span>
+    <span>LOCAL-FIRST : RIEN NE SORT SANS TON GESTE</span>
+    <span>AVANT / APRÈS : TOUT EST TRACÉ</span>
+  </footer>
+
+  <div id="printable" aria-hidden="true"></div>
+  <script type="application/json" id="cvforge-data">null</script>
+  <script src="app.js"></script>
+</body>
+
+</html>
