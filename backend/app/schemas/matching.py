@@ -1,0 +1,30 @@
+"""Schémas I/O du matching et du mode copilote."""
+
+from __future__ import annotations
+
+from pydantic import BaseModel, Field
+
+
+class MatchRequest(BaseModel):
+    """Texte à matcher contre l'offre. Absent → contenu du profil maître."""
+
+    text: str | None = None
+
+
+class MatchingKeyword(BaseModel):
+    keyword: str
+    frequency: int
+    covered: bool
+
+
+class MatchingResult(BaseModel):
+    score: int = Field(ge=0, le=100)
+    keywords: list[MatchingKeyword]
+    missing: list[str]
+
+
+class CopilotPromptRead(BaseModel):
+    """Prompt verrouillé (anti-hallucination) prêt à coller dans le chat de l'utilisateur."""
+
+    prompt: str
+    missing_keywords: list[str]
