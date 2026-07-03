@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.db import get_session
 from app.schemas import (
     CopilotPromptRead,
+    CopilotPromptRequest,
     CvVariantRead,
     MatchingResult,
     MatchRequest,
@@ -63,11 +64,13 @@ def match_offer(
 
 @router.post("/{offer_id}/copilot-prompt", response_model=CopilotPromptRead)
 def copilot_prompt(
-    offer_id: str, data: MatchRequest, session: Session = Depends(get_session)
+    offer_id: str, data: CopilotPromptRequest, session: Session = Depends(get_session)
 ) -> CopilotPromptRead:
-    """Prompt verrouillé (anti-hallucination) à coller dans le chat de l'utilisateur."""
+    """Prompt verrouillé (anti-hallucination) à coller dans le chat de l'utilisateur.
+
+    ``kind`` choisit l'intention : adapter (défaut) / auditer / muscler / accrocher."""
     return CopilotPromptRead.model_validate(
-        copilot_service.build_prompt(session, offer_id, data.text)
+        copilot_service.build_prompt(session, offer_id, data.text, data.kind)
     )
 
 

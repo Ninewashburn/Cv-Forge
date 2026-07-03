@@ -13,9 +13,11 @@ from app.schemas.common import (
 from app.schemas.fact import FactCreate, FactRead, FactUpdate
 from app.schemas.matching import (
     CopilotPromptRead,
+    CopilotPromptRequest,
     MatchingKeyword,
     MatchingResult,
     MatchRequest,
+    PromptKind,
 )
 from app.schemas.offer import OfferCreate, OfferRead, OfferUpdate
 from app.schemas.profile import (
@@ -38,6 +40,7 @@ __all__ = [
     "ApplicationUpdate",
     "Confidentiality",
     "CopilotPromptRead",
+    "CopilotPromptRequest",
     "CvVariantCreate",
     "CvVariantRead",
     "CvVariantUpdate",
@@ -55,6 +58,7 @@ __all__ = [
     "OfferCreate",
     "OfferRead",
     "OfferUpdate",
+    "PromptKind",
     "ProofCreate",
     "ProofRead",
     "ProofType",

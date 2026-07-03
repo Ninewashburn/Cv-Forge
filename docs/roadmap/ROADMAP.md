@@ -73,7 +73,11 @@
 
 - [ ] **Import CV existant** (PDF/texte) → pré-remplissage du profil maître
   - Anti-mur d'onboarding : valeur visible en < 5 min
-- [ ] **Import offre** (copier-coller texte ou URL)
+- [ ] **Import offre** — copier-coller texte (l'URL n'est qu'une référence saisie, **jamais fetchée** — règle « aucun réseau sortant »)
+- [ ] **Bouton « Importer un fichier » sur chaque zone de texte** (CV, offre, profil LinkedIn) *(ajout 2026-07-02)*
+  - Extraction de texte **locale** (pypdf : PDF + .txt) côté FastAPI — le fichier ne quitte jamais la machine.
+  - Le texte extrait atterrit dans le champ, **visible et éditable avant toute analyse** — même contrat que le copier-coller, qui reste toujours disponible (fallback universel).
+  - Un seul endpoint générique réutilisé par les trois champs. **Hors Lite** (gel : zéro backend).
 - [ ] **Profil maître simple** — source de vérité, champs essentiels uniquement
 - [ ] **Banque de preuves simple** — texte, lien, document (GitHub = *un type* de preuve parmi d'autres)
 - [ ] **Matching mots-clés sans LLM** — fréquence, couverture des exigences de l'offre
@@ -81,6 +85,12 @@
   - Manuelle (sans IA, toujours disponible)
   - **Mode copilote** : prompt verrouillé généré par CVForge (anti-hallucination inclus) → copier-coller vers le ChatGPT/Claude de l'utilisateur (nouvel onglet) → retour validé par le Diff Viewer. Zéro clé API, zéro coût.
     - *Prompt copilote **optionnel** — repérer les 5 compétences clés de l'offre* : « Lis cette offre d'emploi. Identifie les 5 compétences ou technologies les plus importantes, par ordre de priorité, en te basant UNIQUEMENT sur le texte de l'offre. Pour chacune, cite la phrase de l'offre qui la justifie. N'invente rien, ne note pas le candidat, ne suggère aucune compétence absente de l'offre. » → sortie = **liste brute** ; l'utilisateur décide ensuite quoi prouver. Le matching V1 reste **sans LLM** — ceci est un complément copilote **facultatif** (peut glisser en V1.5 si la V1 doit être allégée).
+    - **Bibliothèque de prompts verrouillés** *(ajout 2026-07-02 — spec canonique : `docs/specs/copilot_prompts.md`)* — 4 intentions, sélecteur **Adapter / Auditer / Muscler / Accrocher** au-dessus du bouton « Préparer le prompt » (Adapter = défaut) :
+      1. **ADAPTER** — le prompt principal existant (verrou + Avant/Après obligatoire).
+      2. **AUDITER** — critique de recruteur exigeant, **ne réécrit rien**, chaque faiblesse citée + question pour la renforcer avec un fait réel.
+      3. **MUSCLER** — verbes d'action à partir des faits existants ; chiffre absent = jamais inventé, listé « **À chiffrer par le candidat** ».
+      4. **ACCROCHER** — accroche 3 lignes max, que du vérifiable, adjectifs autoproclamés interdits.
+      - Pattern commun : **ce qui manque n'est jamais ajouté, il est listé « À compléter par le candidat »**. Rejetés : « ATS Boost » (= stuffing), « Format Fix » (→ CV Linter V1.5), « Cover Letter » (→ V2, message de motivation).
   - Clé API utilisateur (intégration directe, power users)
 - [ ] **Diff Viewer** ⭐ — avant/après côte à côte, surlignage des modifications
   - **Killer feature, centre du pitch.** Preuve visuelle que rien n'est inventé.
@@ -128,7 +138,7 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
   - Adjectifs creux en rafale (dynamique, motivé, rigoureux…) sans fait chiffré à proximité
   - Icônes/caractères décoratifs qui cassent le parsing ATS
 - [ ] **Versioning CV** — revenir à une version antérieure
-- [ ] **Parsing PDF — profils & offres** *(couche optionnelle de la « Zone révélation » — spec en V1 ; LinkedIn d'abord, plus tard Indeed/APEC)* — extraction texte **côté FastAPI** (Lite reste en copier-coller manuel, aucun parsing). Le texte extrait = **source de révélation** (gap analysis), **jamais d'auto-fusion** dans le CV ; réutilise le contrat déjà défini : preuve candidate → validation → Avant/Après. **Robustesse** : le format PDF LinkedIn change souvent (multilingue, sections déplacées) → prévoir un parsing **tolérant** + **fallback « colle le texte à la main »** si l'extraction échoue. **Statut : non garanti** — le copier-coller texte (V1 + Lite) peut suffire. Pas d'appel réseau : l'utilisateur fournit le fichier.
+- [ ] **Parsing structuré des PDF LinkedIn** *(l'extraction **brute** est couverte dès V1 par le bouton « Importer un fichier » — voir V1)* — reste en V1.5 uniquement la **structuration robuste** si l'extraction brute ne suffit pas : reconnaissance des sections LinkedIn (Expérience, Compétences…), formats multilingues, sections déplacées → parsing **tolérant** + fallback « colle le texte à la main ». Même contrat : source de révélation, **jamais d'auto-fusion**, validation par l'Avant/Après. **Statut : non garanti** — à confirmer selon l'usage réel. Pas d'appel réseau : l'utilisateur fournit le fichier.
 - [ ] **Anonymisation / caviardage avant copilote** *(d'après un conseil RH — Philippe : « anonymise ton CV avant de l'envoyer à l'IA »)* — bouton **« Anonymiser »** qui masque, **avant** la génération du prompt copilote : nom, prénom, email, téléphone, adresse, liens personnels → remplacés par des marqueurs neutres (`[NOM]`, `[EMAIL]`…), réversibles en local. **Le CV réel n'est jamais modifié** ; seul le texte *envoyé* à l'IA est caviardé. Sert directement la confidentialité (cœur local-first), pas un gadget : il renforce preuve + contrôle. **Statut : V1.5+**.
 - [ ] **Export DOCX basique** *(remonté de V3 — beaucoup de RH exigent encore Word)*
 - [ ] **Packaging desktop — exe portable façon ADWCleaner** : PyInstaller `--onefile` (Python + FastAPI + build Angular dans un seul exécutable). Double-clic → serveur local → navigateur. **Données : résolues par `resolve_data_dir()` (câblée dès V1)** — défaut `~/.cvforge/` (mode installé, données préservées si on remplace l'exe) ; mode portable activé par un marqueur `cvforge.portable` à côté de l'exe → données dans `./data/` qui voyagent sur la clé USB. Le même binaire fait les deux. Option fenêtre native : pywebview (WebView2). Signature de code à prévoir contre SmartScreen (Azure Trusted Signing ~10 $/mois). Pas d'UPX (faux positifs antivirus). Tauri abandonné — plus nécessaire.
@@ -184,7 +194,12 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
 
 ## V4+ — Vision long terme
 
-- [ ] Multilingue / international
+- [ ] **Multilingue / international** — le produit est universel (tout public, tout pays) ; la V1 reste français-first (la *distribution* est ciblée, pas le produit). À câbler comme des **packs de langue**, jamais des refontes :
+  - **UI** : sélecteur de langue (i18n Angular), textes externalisés une fois le wizard V1 stabilisé.
+  - **Moteur de mots-clés** : stop-words + stemming sont **par langue** — aujourd'hui FR, isolés dans un module pur unique (`keyword_engine.py`) → ajouter l'anglais = un pack de plus, pas un refactor.
+  - **Prompt copilote** : un template par langue.
+  - **Export PDF** : libellés de sections traduits.
+  - **Données** : déjà neutres (UUID, timestamps, schéma sync-ready) — rien à migrer.
 - [ ] Projet professionnel complet (métiers visés, contraintes, motivations)
 - [ ] Partage avancé — lien temporaire, suivi de consultation
 - [ ] Intégrations LinkedIn / GitHub — import automatique de preuves

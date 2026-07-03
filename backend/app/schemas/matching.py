@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from pydantic import BaseModel, Field
 
 
@@ -9,6 +11,23 @@ class MatchRequest(BaseModel):
     """Texte à matcher contre l'offre. Absent → contenu du profil maître."""
 
     text: str | None = None
+
+
+class PromptKind(StrEnum):
+    """Intentions de la bibliothèque de prompts verrouillés
+    (cf. docs/specs/copilot_prompts.md)."""
+
+    ADAPTER = "adapter"
+    AUDITER = "auditer"
+    MUSCLER = "muscler"
+    ACCROCHER = "accrocher"
+
+
+class CopilotPromptRequest(BaseModel):
+    """Texte de CV (absent → profil maître) + intention choisie."""
+
+    text: str | None = None
+    kind: PromptKind = PromptKind.ADAPTER
 
 
 class MatchingKeyword(BaseModel):

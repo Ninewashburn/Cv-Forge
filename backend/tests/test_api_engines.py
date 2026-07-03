@@ -73,12 +73,43 @@ def test_copilot_prompt_is_locked_and_complete(client):
         f"/api/offers/{offer['id']}/copilot-prompt", json={"text": CV_TEXT}
     ).json()
     prompt = body["prompt"]
-    assert "Tu n'inventes JAMAIS" in prompt
+    assert "Tu n'inventes JAMAIS" in prompt  # kind absent → ADAPTER par défaut
     assert OFFER_TEXT in prompt
     assert CV_TEXT in prompt
     assert "kubernetes" in body["missing_keywords"]
     # Les mots-clés manquants sont explicitement interdits d'ajout.
     assert "NE PAS AJOUTER" in prompt
+
+
+def test_copilot_prompt_library_intents(client):
+    """Bibliothèque de prompts verrouillés : chaque intention garde son verrou."""
+    offer = _create_offer(client)
+    url = f"/api/offers/{offer['id']}/copilot-prompt"
+
+    auditer = client.post(url, json={"text": CV_TEXT, "kind": "auditer"}).json()["prompt"]
+    assert "tu ne réécris RIEN" in auditer
+    assert "Ne suggère JAMAIS" in auditer
+    assert OFFER_TEXT in auditer and CV_TEXT in auditer
+
+    muscler = client.post(url, json={"text": CV_TEXT, "kind": "muscler"}).json()["prompt"]
+    assert "À chiffrer par le candidat" in muscler
+    assert "INTERDIT d'ajouter un chiffre" in muscler
+    assert CV_TEXT in muscler
+    assert OFFER_TEXT not in muscler  # MUSCLER travaille sur le CV seul
+
+    accrocher = client.post(url, json={"text": CV_TEXT, "kind": "accrocher"}).json()["prompt"]
+    assert "3 lignes maximum" in accrocher
+    assert "passionné par" in accrocher  # cité comme interdit
+    assert OFFER_TEXT in accrocher and CV_TEXT in accrocher
+
+
+def test_copilot_prompt_rejects_unknown_kind(client):
+    offer = _create_offer(client)
+    response = client.post(
+        f"/api/offers/{offer['id']}/copilot-prompt",
+        json={"text": CV_TEXT, "kind": "ats-boost"},
+    )
+    assert response.status_code == 422  # intention hors bibliothèque → refusée
 
 
 # ------------------------------------------------------------- variantes
