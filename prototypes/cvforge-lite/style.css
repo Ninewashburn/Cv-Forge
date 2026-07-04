@@ -364,6 +364,13 @@ details.reveal[open] summary::before { content: "▾ " }
 .reveal-body textarea { min-height: 120px; background: #FCFCFA }
 .li-tip { font: 12.5px/1.5 var(--sans); color: var(--muted); margin: 0 0 10px }
 
+/* Mini-FAQ confiance (réassurance au moment du doute — contenu statique) */
+details.faq-trust { margin-top: 20px }
+.faq { margin: 0 }
+.faq dt { font: 600 13.5px var(--sans); color: var(--ink); margin: 12px 0 4px }
+.faq dt:first-of-type { margin-top: 0 }
+.faq dd { margin: 0; font: 13px/1.6 var(--sans); color: var(--muted) }
+
 /* Analyse / Matching */
 .score-board {
   display: flex;
