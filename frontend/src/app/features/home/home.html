@@ -1,0 +1,34 @@
+<p class="eyebrow">CVFORGE V1 — SQUELETTE (PHASE 3)</p>
+<h2>Candidater comme on code : avec méthode, traçabilité, sans bullshit.</h2>
+<p class="lead">
+  Le socle backend (données, API, moteurs) est en place. Voici la coquille Angular
+  qui l'habillera : navigation, services HTTP, modèles typés. Le parcours guidé
+  complet — import → matching → <strong>Avant / Après</strong> → export — arrive en Phase 4.
+</p>
+
+<div class="card status-card" [attr.data-state]="state()">
+  <div class="status-line">
+    <span class="dot"></span>
+    @switch (state()) {
+      @case ('loading') { <span>Connexion à l'API locale…</span> }
+      @case ('connected') { <span>API locale connectée — <code>/api/profile</code> répond.</span> }
+      @case ('error') {
+        <span>API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></span>
+      }
+    }
+  </div>
+
+  @if (profile(); as p) {
+    <dl class="profile-peek">
+      <dt>Profil maître</dt>
+      <dd>{{ p.headline || "(en-tête vide — à remplir dans l'Atelier)" }}</dd>
+      <dt>Identifiant</dt>
+      <dd><code>{{ p.id }}</code></dd>
+    </dl>
+  }
+</div>
+
+<div class="cta-row">
+  <a routerLink="/atelier" class="btn btn-primary">Ouvrir l'Atelier</a>
+  <span class="hint">Rien ne sort de ta machine — tout est local.</span>
+</div>

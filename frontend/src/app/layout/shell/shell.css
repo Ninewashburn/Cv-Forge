@@ -1,0 +1,52 @@
+:host { display: block; min-height: 100vh; }
+
+.masthead {
+  padding: 26px 24px 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand h1 { font: 700 30px/1 var(--serif); margin: 0 0 6px; letter-spacing: .2px; }
+.brand h1 .forge { color: var(--ember); }
+.brand .bar {
+  height: 3px;
+  width: 120px;
+  background: linear-gradient(90deg, var(--ember), #E8B23A);
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.mast-nav { display: flex; gap: 8px; }
+.mast-nav a {
+  font: 600 14px var(--sans);
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+.mast-nav a:hover { background: #ECECE6; color: var(--ink); }
+.mast-nav a.active { background: var(--ink); color: #fff; }
+
+.page {
+  padding-top: 8px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--line);
+  min-height: 50vh;
+}
+
+.site-footer {
+  margin: 40px auto;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font: 600 10.5px var(--mono);
+  letter-spacing: .1em;
+  color: var(--muted);
+}

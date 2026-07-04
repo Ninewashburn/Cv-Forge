@@ -1,0 +1,24 @@
+<header class="wrap masthead">
+  <div class="brand">
+    <h1>CV<span class="forge">Forge</span></h1>
+    <div class="bar" aria-hidden="true"></div>
+    <div class="badges">
+      <span class="badge">LOCAL-FIRST</span>
+      <span class="badge">V1 — EN CONSTRUCTION</span>
+    </div>
+  </div>
+  <nav class="mast-nav" aria-label="Navigation principale">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
+    <a routerLink="/atelier" routerLinkActive="active">Atelier</a>
+  </nav>
+</header>
+
+<main class="wrap page">
+  <router-outlet />
+</main>
+
+<footer class="wrap site-footer">
+  <span>ANTI-HALLUCINATION : RIEN N'EST INVENTÉ</span>
+  <span>LOCAL-FIRST : RIEN NE SORT SANS TON GESTE</span>
+  <span>AVANT / APRÈS : TOUT EST TRACÉ</span>
+</footer>

@@ -1,0 +1,20 @@
+<p class="eyebrow">L'ATELIER — PARCOURS GUIDÉ</p>
+<h2>Bientôt : le cœur de CVForge, étape par étape</h2>
+<p class="lead">
+  Ce parcours linéaire remplacera l'Atelier du prototype. L'ossature (API, moteurs,
+  services HTTP) est prête ; l'interface de chaque étape s'écrit en Phase 4.
+</p>
+
+<ol class="steps">
+  @for (step of steps; track step.n) {
+    <li class="card">
+      <span class="n">{{ step.n }}</span>
+      <div>
+        <strong>{{ step.label }}</strong>
+        <span class="detail">{{ step.detail }}</span>
+      </div>
+    </li>
+  }
+</ol>
+
+<a routerLink="/" class="btn btn-ghost">← Retour à l'accueil</a>

@@ -1,0 +1,34 @@
+:host { display: block; padding-top: 26px; }
+
+h2 { font: 700 26px/1.25 var(--serif); margin: 0 0 12px; max-width: 720px; }
+.lead { color: var(--muted); font-size: 15px; margin: 0 0 24px; max-width: 680px; }
+
+.status-card { max-width: 680px; }
+
+.status-line { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.status-line code {
+  font: 12.5px var(--mono);
+  background: #F4F4F0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.status-card[data-state='loading'] .dot { background: var(--warn); }
+.status-card[data-state='connected'] .dot { background: var(--ok); }
+.status-card[data-state='error'] .dot { background: var(--del); }
+
+.profile-peek {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+}
+.profile-peek dt { color: var(--muted); font-weight: 600; }
+.profile-peek dd { margin: 0; }
+.profile-peek code { font: 12px var(--mono); color: var(--muted); }
+
+.cta-row { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
