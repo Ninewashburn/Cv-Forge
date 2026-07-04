@@ -4,7 +4,7 @@
 
 **Corollaire :** la V1 embarque son propre instrument de mesure (micro-tracking). Sans mesure, le statement est un slogan.
 
-**Dernière mise à jour :** 2026-06-26
+**Dernière mise à jour :** 2026-07-02
 **Statut :** V0 tranché — prêt pour Claude Code (voir CLAUDE.md)
 **Maquettes :** les schémas d'interface = vision cible (North Star, V3+). Le périmètre de build reste la section V1, exclusivement.
 
@@ -31,6 +31,7 @@
   - La sync cloud est en V3, mais le schéma se décide **maintenant**
 - [ ] **Stack confirmée** : Angular + FastAPI + SQLite
 - [x] **Stratégie IA — TRANCHÉ** : 3 niveaux. Sans IA (toujours fonctionnel) → **Mode copilote** (prompt préparé + copier-coller vers le ChatGPT/Claude de l'utilisateur) → Clé API utilisateur. Ollama (IA 100% locale) reporté en V3.
+- [x] **Licence — TRANCHÉ : MIT sec** *(2026-07-02, sur précédent de projets voisins local-first)* — CVForge n'embarque aucun modèle ni composant tiers → MIT simple, sans NOTICE. Tout converge vers l'open source : le moat est la **philosophie** (pas le code), la preuve local-first exige un code auditable (« vérifie toi-même »), et la confiance au téléchargement en dépend.
 
 ---
 
@@ -62,6 +63,7 @@
   - Inspiré d'un atelier RH (Michelin) : utiliser le profil LinkedIn comme **contexte de révélation**, version honnête. Spec complète en V1 ci-dessous.
   - **Pourquoi on déroge au gel** : ajout jugé **léger** (un champ optionnel + le tri 3 cases qui rejoue le matching déjà présent) et trop **aligné sur la philosophie anti-hallucination** pour être refusé.
   - **Reste texte-only dans Lite** : copier-coller du texte du profil, **aucun parsing PDF** (préserve le zéro-dépendance et le double-clic). Le parsing PDF est en V1.5.
+- [x] **Mini-FAQ confiance in-app** *(2026-07-02 — contenu statique, pas une feature : le gel tient)* — dépliant discret à l'étape Sources, 4 questions : où vont mes données / faut-il installer / ça écrit à ma place ? / comment je garde mon travail. Rassure au moment exact où l'utilisateur hésite à coller son CV, et laisse entrevoir le produit complet (« une version application, à emporter partout, viendra plus tard »). Nuance d'honnêteté copilote incluse : c'est l'utilisateur qui colle son texte dans son IA — CVForge, lui, n'envoie jamais rien. À décliner en V1 (même contenu) et en README (version dev, vérifiable).
 
 ---
 
@@ -147,6 +149,12 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
 
 > 🔒 **Contenu GTM extrait hors du dépôt** (pour rester publiable) → voir `private/STRATEGIE.md` (non versionné).
 > Résumé neutre, sans risque : exe `--onefile` distribué via **GitHub Releases**, données créées au runtime par `resolve_data_dir()` (rien dans le téléchargement), entonnoir via la démo Lite en ligne.
+
+**Patterns de présentation actés (réf. projets voisins local-first, 2026-07-02) :**
+- **Bloc confiance en tête de README** — format question frontale → réponse en un mot → détail (« Mes données partent-elles quelque part ? » → **Jamais.** Pas de cloud, pas de compte, pas de télémétrie…). Ce bloc vaut mieux que dix paragraphes de philosophie. Version README = **factuelle et vérifiable** pour le public dev : « aucun appel réseau sortant sauf l'appel LLM que VOUS déclenchez — vérifiable dans le code ». Le dev ne veut pas être rassuré, il veut une preuve.
+- **Honnêteté de statut** — ne JAMAIS annoncer ce qui n'est pas testé (README, releases, posts). La démo est réellement en ligne AVANT l'annonce.
+- **FAQ confiance = même vérité, quatre habillages** : in-app (rassurer au moment du doute) / README (prouver au dev) / post (raconter pour sensibiliser) / site (présenter au curieux). Jamais une version passe-partout. Nuance obligatoire partout : CVForge n'envoie rien ; en mode copilote c'est **l'utilisateur** qui colle son texte dans son IA, en le sachant.
+- Patterns communautaires détaillés (post de lancement, angle accessibilité) → `private/STRATEGIE.md`.
 
 ---
 
