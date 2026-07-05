@@ -1,20 +1,35 @@
-<p class="eyebrow">L'ATELIER — PARCOURS GUIDÉ</p>
-<h2>Bientôt : le cœur de CVForge, étape par étape</h2>
-<p class="lead">
-  Ce parcours linéaire remplacera l'Atelier du prototype. L'ossature (API, moteurs,
-  services HTTP) est prête ; l'interface de chaque étape s'écrit en Phase 4.
-</p>
+<p class="eyebrow">ATELIER — PARCOURS GUIDÉ</p>
 
-<ol class="steps">
-  @for (step of steps; track step.n) {
-    <li class="card">
-      <span class="n">{{ step.n }}</span>
-      <div>
-        <strong>{{ step.label }}</strong>
-        <span class="detail">{{ step.detail }}</span>
-      </div>
-    </li>
+<nav class="steps" aria-label="Étapes du parcours">
+  @for (s of steps; track s.n) {
+    <button
+      type="button"
+      class="step"
+      [class.current]="store.step() === s.n"
+      [class.done]="store.step() > s.n"
+      [disabled]="disabled(s.n)"
+      [attr.aria-current]="store.step() === s.n ? 'step' : null"
+      (click)="store.goTo(s.n)"
+    >
+      <span class="n">{{ s.n < 10 ? '0' + s.n : s.n }}</span>
+      <span class="t">{{ s.label }}</span>
+    </button>
   }
-</ol>
+</nav>
 
-<a routerLink="/" class="btn btn-ghost">← Retour à l'accueil</a>
+@switch (store.step()) {
+  @case (1) {
+    <cvforge-sources />
+  }
+  @case (2) {
+    <cvforge-analyse />
+  }
+  @default {
+    <div class="card soon">
+      <h2>Étape à venir</h2>
+      <p class="hint">
+        Adaptation, Avant / Après et Export arrivent dans les prochains blocs de la Phase 4.
+      </p>
+    </div>
+  }
+}

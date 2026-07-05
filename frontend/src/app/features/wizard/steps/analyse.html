@@ -1,0 +1,78 @@
+@if (analysis(); as a) {
+  <h2>Matching offre / CV</h2>
+  <p class="lead">
+    Couverture des mots-clés de l'offre par ton CV.
+    <span class="nolm">CALCULÉ SANS IA — 100% LOCAL</span>
+  </p>
+
+  <div class="card">
+    <div class="score-board">
+      <div class="score-num"><span>{{ a.scoreCv }}</span><small>%</small></div>
+      <div class="score-meta">
+        <div class="verdict">{{ verdict(a.scoreCv) }}</div>
+        <div class="score-track">
+          <div class="score-fill" [style.width.%]="a.scoreCv"></div>
+        </div>
+        @if (a.hasLinkedin && a.scorePotential !== null) {
+          <div class="potential">
+            CV seul : <span class="hl">{{ a.scoreCv }}%</span> ·
+            CV + ce que tu peux légitimement ajouter depuis LinkedIn :
+            <span class="hl">{{ a.scorePotential }}%</span>
+            <span class="li-note">(potentiel — jamais un score envoyé)</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="kw-group">
+      <div class="kw-title">✓ COUVERT PAR TON CV</div>
+      <div class="chips">
+        @for (k of onCv(); track k.keyword) {
+          <span class="chip chip-ok">✓ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+        } @empty {
+          <span class="hint">Aucun mot-clé couvert.</span>
+        }
+      </div>
+    </div>
+
+    @if (a.hasLinkedin) {
+      <div class="kw-group">
+        <div class="kw-title">↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV — À AJOUTER SI PROUVABLE</div>
+        <div class="chips">
+          @for (k of onLinkedin(); track k.keyword) {
+            <span class="chip chip-li">↗ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+          } @empty {
+            <span class="hint">Rien de plus à révéler depuis ton LinkedIn.</span>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="kw-group">
+      <div class="kw-title">
+        {{ a.hasLinkedin ? '? ABSENT DU CV ET DE LINKEDIN — NE PAS INVENTER' : '? ABSENT DE TON CV' }}
+      </div>
+      <div class="chips">
+        @for (k of nowhere(); track k.keyword) {
+          <span class="chip chip-none">? {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+        } @empty {
+          <span class="hint">Rien ne manque — couverture totale.</span>
+        }
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question :
+      ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Sinon, ne
+      l'ajoute pas — un entretien le révélera.
+    </div>
+
+    <div class="row">
+      <button type="button" class="btn btn-ghost" (click)="store.goTo(1)">← Revoir les sources</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-primary" disabled title="Prochain bloc de la Phase 4">
+        Commencer l'adaptation (bientôt)
+      </button>
+    </div>
+  </div>
+}

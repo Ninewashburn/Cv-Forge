@@ -1,0 +1,67 @@
+<h2>L'offre d'un côté, ton CV de l'autre</h2>
+<p class="lead">
+  Colle le texte brut. Ton CV est la seule matière première autorisée : rien ne sera inventé
+  à partir d'ailleurs.
+</p>
+
+<div class="sources">
+  <div class="card">
+    <label for="offre">Offre d'emploi</label>
+    <textarea
+      id="offre"
+      #offre
+      [value]="store.offerText()"
+      (input)="store.offerText.set(offre.value)"
+      placeholder="Colle ici le texte complet de l'offre…"
+    ></textarea>
+  </div>
+
+  <div class="card">
+    <label for="cv">Ton CV — source de vérité</label>
+    <textarea
+      id="cv"
+      #cv
+      [value]="store.cvText()"
+      (input)="store.cvText.set(cv.value)"
+      placeholder="Colle ici le contenu de ton CV…"
+    ></textarea>
+  </div>
+</div>
+
+<details class="reveal">
+  <summary>Profil LinkedIn — optionnel, pour repérer ce qui manque</summary>
+  <div class="reveal-body">
+    <p class="li-tip">
+      Colle le texte de ton profil LinkedIn. Il n'est <strong>jamais exporté</strong> : il sert
+      seulement à révéler ce que ton CV oublie — c'est toi qui décides quoi ajouter.
+    </p>
+    <textarea
+      #linkedin
+      [value]="store.linkedinText()"
+      (input)="store.linkedinText.set(linkedin.value)"
+      placeholder="Colle ici le texte de ton profil LinkedIn (optionnel)…"
+    ></textarea>
+  </div>
+</details>
+
+<div class="row samples">
+  <span class="hint">Un doute ? Charge un exemple :</span>
+  <button type="button" class="btn-link" (click)="store.loadSample('dev')">Exemple — dev</button>
+  <button type="button" class="btn-link" (click)="store.loadSample('gestion')">Exemple — hors tech</button>
+</div>
+
+<div class="row footer-row">
+  <span class="hint">Les deux textes : minimum ~40 caractères.</span>
+  <span class="spacer"></span>
+  @if (store.error()) {
+    <span class="err">{{ store.error() }}</span>
+  }
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="!store.canAnalyse() || store.busy()"
+    (click)="store.analyse()"
+  >
+    {{ store.busy() ? 'Analyse…' : 'Analyser le matching' }}
+  </button>
+</div>
