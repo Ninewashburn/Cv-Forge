@@ -4,7 +4,7 @@
 
 **Corollaire :** la V1 embarque son propre instrument de mesure (micro-tracking). Sans mesure, le statement est un slogan.
 
-**Dernière mise à jour :** 2026-07-02
+**Dernière mise à jour :** 2026-07-05
 **Statut :** V0 tranché — prêt pour Claude Code (voir CLAUDE.md)
 **Maquettes :** les schémas d'interface = vision cible (North Star, V3+). Le périmètre de build reste la section V1, exclusivement.
 
@@ -142,6 +142,11 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
 - [ ] **Versioning CV** — revenir à une version antérieure
 - [ ] **Parsing structuré des PDF LinkedIn** *(l'extraction **brute** est couverte dès V1 par le bouton « Importer un fichier » — voir V1)* — reste en V1.5 uniquement la **structuration robuste** si l'extraction brute ne suffit pas : reconnaissance des sections LinkedIn (Expérience, Compétences…), formats multilingues, sections déplacées → parsing **tolérant** + fallback « colle le texte à la main ». Même contrat : source de révélation, **jamais d'auto-fusion**, validation par l'Avant/Après. **Statut : non garanti** — à confirmer selon l'usage réel. Pas d'appel réseau : l'utilisateur fournit le fichier.
 - [ ] **Anonymisation / caviardage avant copilote** *(d'après un conseil RH — Philippe : « anonymise ton CV avant de l'envoyer à l'IA »)* — bouton **« Anonymiser »** qui masque, **avant** la génération du prompt copilote : nom, prénom, email, téléphone, adresse, liens personnels → remplacés par des marqueurs neutres (`[NOM]`, `[EMAIL]`…), réversibles en local. **Le CV réel n'est jamais modifié** ; seul le texte *envoyé* à l'IA est caviardé. Sert directement la confidentialité (cœur local-first), pas un gadget : il renforce preuve + contrôle. **Statut : V1.5+**.
+- [ ] **Audit de sécurité avant déploiement — VICE** *(ajout 2026-07-05 ; github.com/Webba-Creative-Technologies/vice, MIT, npm `vice-security`)*
+  - **Mode local / white-box uniquement** : `vice audit .` — lit le code source, **ne lance aucune attaque**, sans risque. Modules pertinents : *Code Vulnerabilities* (XSS/eval/SQLi) + *Dependencies* (npm audit du frontend Angular).
+  - **NE PAS utiliser le mode remote** (`vice scan`) : il lance de vraies attaques (brute force, injection SQL, scan de ports) et vise des apps serveur. CVForge est local-first **sans serveur** → non applicable, et juridiquement à éviter sur toute URL non strictement auto-hébergée (GitHub Pages = infra GitHub incluse).
+  - **Point de vigilance prioritaire — l'Avant/Après (Diff Viewer)** : il met en forme du texte collé par l'utilisateur. C'est **LA vraie surface d'attaque** de CVForge (pas l'infra, qui n'existe pas). Vérifier qu'aucune XSS ne passe. *Côté Angular V1 : l'interpolation `{{ }}` échappe par défaut ; ne JAMAIS passer le texte utilisateur brut à `[innerHTML]` sans DomSanitizer.* Côté Lite : la fonction `esc()` joue ce rôle.
+  - **Bonus open source** : badge de sécurité VICE (score A–F) + GitHub Action sur les PR → signal de confiance vérifiable sur le README, cohérent avec la promesse « vos données sont en sécurité ». À activer quand le repo passe public.
 - [ ] **Export DOCX basique** *(remonté de V3 — beaucoup de RH exigent encore Word)*
 - [ ] **Packaging desktop — exe portable façon ADWCleaner** : PyInstaller `--onefile` (Python + FastAPI + build Angular dans un seul exécutable). Double-clic → serveur local → navigateur. **Données : résolues par `resolve_data_dir()` (câblée dès V1)** — défaut `~/.cvforge/` (mode installé, données préservées si on remplace l'exe) ; mode portable activé par un marqueur `cvforge.portable` à côté de l'exe → données dans `./data/` qui voyagent sur la clé USB. Le même binaire fait les deux. Option fenêtre native : pywebview (WebView2). Signature de code à prévoir contre SmartScreen (Azure Trusted Signing ~10 $/mois). Pas d'UPX (faux positifs antivirus). Tauri abandonné — plus nécessaire.
 
