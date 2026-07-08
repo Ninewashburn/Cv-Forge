@@ -1,0 +1,136 @@
+:host { display: block; }
+
+h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px; }
+.lead { color: var(--muted); font-size: 14.5px; margin: 0 0 18px; max-width: 680px; }
+
+/* Mode copilote (dépliant) */
+.copilote {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #FDFAF7, var(--card));
+  margin-bottom: 16px;
+}
+.copilote summary { cursor: pointer; list-style: none; padding: 14px 18px; font: 700 15px var(--serif); }
+.copilote summary::-webkit-details-marker { display: none; }
+.copilote summary::before { content: "▸ "; color: var(--ember); }
+.copilote[open] summary::before { content: "▾ "; }
+.copilote-body { padding: 0 18px 16px; }
+.copilote-body p { margin: 0 0 12px; font-size: 13.5px; color: var(--muted); }
+
+.intents { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.intent {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font: 600 13px var(--sans);
+  color: var(--muted);
+  cursor: pointer;
+}
+.intent:hover { border-color: var(--ink); color: var(--ink); }
+.intent.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.prompt-out {
+  width: 100%;
+  min-height: 160px;
+  margin-top: 12px;
+  font: 12px/1.6 var(--mono);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #F7F7F3;
+  color: #3A3933;
+  resize: vertical;
+}
+
+/* Grille d'adaptation */
+.adapt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 260px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1080px) {
+  .adapt-grid { grid-template-columns: 1fr 1fr; }
+  .live-panel { grid-column: 1 / -1; order: -1; position: static; }
+}
+@media (max-width: 840px) { .adapt-grid { grid-template-columns: 1fr; } }
+
+.pane-label {
+  font: 700 11px var(--mono);
+  letter-spacing: .12em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 320px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font: 13.5px/1.6 var(--mono);
+  color: var(--ink);
+  background: #FDFDFB;
+}
+textarea:focus { outline: 2px solid var(--ember); outline-offset: 0; border-color: transparent; }
+textarea[readonly] { background: #F7F7F3; color: #3A3933; }
+
+.btn-link {
+  background: none;
+  border: 0;
+  color: var(--ember);
+  font: 600 12.5px var(--sans);
+  padding: 4px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Panneau matching live */
+.live-panel {
+  position: sticky;
+  top: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.live-panel h3 { font: 700 11px var(--mono); letter-spacing: .12em; color: var(--muted); margin: 0 0 10px; }
+.live-score { font: 700 38px/1 var(--mono); letter-spacing: -1px; }
+.live-score small { font-size: 17px; color: var(--muted); }
+
+.score-track { height: 8px; background: #E8E7DF; border-radius: 99px; overflow: hidden; margin: 8px 0 6px; }
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ember), #E8B23A);
+  border-radius: 99px;
+  transition: width .35s ease;
+}
+
+.live-miss-title { font: 700 10.5px var(--mono); letter-spacing: .1em; color: var(--warn); margin: 10px 0 8px; }
+.live-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font: 600 11.5px var(--mono);
+  padding: 5px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  gap: 6px;
+}
+.chip-miss { background: var(--warn-soft); color: var(--warn); border: 1px dashed #D9B36A; }
+.live-done { font: 600 12.5px var(--sans); color: var(--ok); }
+.live-note {
+  font: 11.5px/1.5 var(--sans);
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  margin: 12px 0 0;
+  padding-top: 10px;
+}
+
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.spacer { flex: 1; }
+.footer-row { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px; }

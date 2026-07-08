@@ -1,0 +1,101 @@
+<h2>Adapte ton CV — le score évolue en direct</h2>
+<p class="lead">
+  Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule le
+  matching à chaque pause de frappe — sans IA, 100&nbsp;% local.
+</p>
+
+<details class="copilote">
+  <summary>Mode copilote — utilise ton propre ChatGPT ou Claude</summary>
+  <div class="copilote-body">
+    <p>
+      CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le,
+      colle-le dans ton IA, puis rapporte uniquement le CV adapté dans la colonne du milieu.
+      Aucune clé API, aucun coût.
+    </p>
+
+    <div class="intents" role="group" aria-label="Intention du prompt">
+      @for (intent of intents; track intent.kind) {
+        <button
+          type="button"
+          class="intent"
+          [class.on]="kind() === intent.kind"
+          [title]="intent.hint"
+          (click)="kind.set(intent.kind)"
+        >
+          {{ intent.label }}
+        </button>
+      }
+    </div>
+
+    <div class="row">
+      <button type="button" class="btn btn-ghost" [disabled]="promptBusy()" (click)="preparePrompt()">
+        {{ promptBusy() ? 'Préparation…' : 'Préparer le prompt verrouillé' }}
+      </button>
+      @if (promptText()) {
+        <button type="button" class="btn btn-ghost" (click)="copyPrompt()">Copier le prompt</button>
+      }
+      <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener">Ouvrir Claude ↗</a>
+      <a class="btn btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener">Ouvrir ChatGPT ↗</a>
+      <span class="hint">{{ copyHint() }}</span>
+    </div>
+
+    @if (promptText()) {
+      <textarea class="prompt-out" readonly aria-label="Prompt verrouillé à copier">{{ promptText() }}</textarea>
+    }
+  </div>
+</details>
+
+<div class="adapt-grid">
+  <div>
+    <div class="pane-label"><span>CV ORIGINAL — LECTURE SEULE</span></div>
+    <textarea readonly [value]="store.cvText()" aria-label="CV original"></textarea>
+  </div>
+
+  <div>
+    <div class="pane-label">
+      <span>CV ADAPTÉ — ÉDITABLE</span>
+      <button type="button" class="btn-link" (click)="resetAdapted()">Repartir de l'original</button>
+    </div>
+    <textarea
+      #adapted
+      [value]="store.adaptedText()"
+      (input)="store.adaptedText.set(adapted.value)"
+      aria-label="CV adapté"
+      placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."
+    ></textarea>
+  </div>
+
+  <aside class="live-panel" aria-live="polite">
+    <h3>MATCHING EN DIRECT</h3>
+    @if (live(); as m) {
+      <div class="live-score"><span>{{ m.score }}</span><small>%</small></div>
+      <div class="score-track"><div class="score-fill" [style.width.%]="m.score"></div></div>
+      <p class="live-miss-title">? ENCORE ABSENTS</p>
+      <div class="live-chips">
+        @for (keyword of m.missing; track keyword) {
+          <span class="chip chip-miss">? {{ keyword }}</span>
+        } @empty {
+          <span class="live-done">✓ Couverture totale des mots-clés.</span>
+        }
+      </div>
+    } @else {
+      <p class="hint">Calcul en cours…</p>
+    }
+    <p class="live-note">
+      Rappel : n'ajoute que du prouvable. L'étape suivante « Avant / Après » vérifiera chaque ajout.
+    </p>
+  </aside>
+</div>
+
+<div class="row footer-row">
+  <button type="button" class="btn btn-ghost" (click)="store.goTo(2)">← Analyse complète</button>
+  <span class="spacer"></span>
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="!store.adaptedText().trim()"
+    (click)="store.goTo(4)"
+  >
+    Vérifier l'avant / après
+  </button>
+</div>

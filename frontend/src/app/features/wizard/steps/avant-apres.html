@@ -1,0 +1,97 @@
+<p class="eyebrow">TU VOIS TOUT, TU VALIDES TOUT</p>
+<h2>Qu'est-ce qui a changé, exactement ?</h2>
+<p class="lead">
+  Chaque mot ajouté ou retiré est tracé. Avant d'exporter, tu confirmes que chaque ajout est
+  vrai et prouvable. C'est le contrat CVForge.
+</p>
+
+<div class="card">
+  @if (tooLong) {
+    <p class="hint">Texte trop long pour la comparaison mot à mot (limite mémoire).</p>
+  } @else {
+    <div class="panes">
+      <div>
+        <div class="pane-label"><span>ORIGINAL</span></div>
+        <div class="diff-pane">
+          @for (segment of left; track $index) {
+            @if (segment.type === 'break') {
+              <br />
+            } @else {
+              <span
+                [class.d-del]="segment.kind === 'removed'"
+              >{{ segment.text }}</span>{{ ' ' }}
+            }
+          }
+        </div>
+      </div>
+      <div>
+        <div class="pane-label"><span>ADAPTÉ</span></div>
+        <div class="diff-pane">
+          @for (segment of right; track $index) {
+            @if (segment.type === 'break') {
+              <br />
+            } @else {
+              <span
+                [class.d-ins]="segment.kind === 'added'"
+              >{{ segment.text }}</span>{{ ' ' }}
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="diff-stats">
+      <span class="ins">+ {{ stats.added }} mot{{ stats.added > 1 ? 's' : '' }} ajouté{{ stats.added > 1 ? 's' : '' }}</span>
+      <span class="del">− {{ stats.removed }} mot{{ stats.removed > 1 ? 's' : '' }} supprimé{{ stats.removed > 1 ? 's' : '' }}</span>
+      @if (stats.added + stats.removed === 0) {
+        <span>Aucune modification.</span>
+      }
+    </div>
+
+    @if (additions.length > 0) {
+      <div class="segs">
+        <h3>Ajouts à confirmer</h3>
+        <p class="sub">
+          Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document,
+          expérience) ? Bientôt, chaque confirmation se reliera à ta banque de preuves.
+        </p>
+        @for (text of additions; track $index) {
+          <div class="seg">
+            <div class="seg-text"><mark>{{ text }}</mark></div>
+            <button
+              type="button"
+              class="confirm"
+              [class.on]="isConfirmed($index)"
+              [attr.aria-pressed]="isConfirmed($index)"
+              (click)="store.toggleConfirmation($index)"
+            >
+              {{ isConfirmed($index) ? '✓ CONFIRMÉ — VRAI ET PROUVABLE' : 'CONFIRMER — VRAI ET PROUVABLE ?' }}
+            </button>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="all-good">
+        Aucun contenu ajouté — uniquement des reformulations ou suppressions. Rien à confirmer.
+      </div>
+    }
+
+    <div class="gate">
+      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">← Modifier encore</button>
+      <span class="spacer"></span>
+      @if (additions.length > 0) {
+        <span class="gate-count" [class.ok]="allConfirmed()">
+          {{ confirmedCount() }}/{{ additions.length }} ajout{{ additions.length > 1 ? 's' : '' }} confirmé{{ confirmedCount() > 1 ? 's' : '' }}
+        </span>
+      }
+      <button
+        type="button"
+        class="btn btn-primary"
+        disabled
+        [title]="allConfirmed() ? 'Export : Bloc 3 de la Phase 4' : 'Confirme chaque ajout d\'abord'"
+      >
+        {{ allConfirmed() ? 'Exporter (bientôt — Bloc 3)' : 'Confirme les ajouts pour exporter' }}
+      </button>
+    </div>
+  }
+</div>

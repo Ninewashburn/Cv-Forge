@@ -1,9 +1,9 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { EMPTY, forkJoin, Observable, of, switchMap } from 'rxjs';
 
 import { OfferService } from '../../core/api';
-import { MatchingResult, Offer } from '../../core/models';
+import { CopilotPrompt, MatchingResult, Offer, PromptKind } from '../../core/models';
 import { SampleKind, SAMPLES } from './samples';
 
 /** Case d'un mot-clé de l'offre : sur le CV / révélé par LinkedIn / nulle part. */
@@ -44,17 +44,57 @@ export class WizardStore {
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
 
+  /** Texte « après » — édité à la main ou collé depuis l'IA de l'utilisateur. */
+  readonly adaptedText = signal('');
+  /** Index des passages ajoutés confirmés « vrai et prouvable » (étape Avant/Après). */
+  readonly confirmedAdditions = signal<ReadonlySet<number>>(new Set());
+
   private offerId: string | null = null;
+  private diffSignature: string | null = null;
 
   readonly canAnalyse = computed(
     () => this.offerText().trim().length >= MIN_CHARS && this.cvText().trim().length >= MIN_CHARS,
   );
 
   goTo(step: number): void {
-    // On ne peut atteindre l'Analyse qu'après un premier calcul.
-    if (step === 2 && !this.analysis()) return;
-    if (step > 2) return; // étapes 3-5 : blocs suivants de la Phase 4
+    // L'Analyse et l'Adaptation exigent un premier calcul ; l'Avant/Après, un texte adapté.
+    if ((step === 2 || step === 3) && !this.analysis()) return;
+    if (step === 4 && !this.adaptedText().trim()) return;
+    if (step === 5) return; // Export : Bloc 3
+    if (step === 3 && !this.adaptedText().trim()) this.adaptedText.set(this.cvText());
     this.step.set(step);
+  }
+
+  /** Matching du texte en cours d'adaptation (recalcul en direct, sans IA). */
+  liveMatch(text: string): Observable<MatchingResult> {
+    if (!this.offerId) return EMPTY;
+    return this.offers.matching(this.offerId, { text });
+  }
+
+  /** Prompt verrouillé : le CV envoyé est TOUJOURS l'original (source de vérité). */
+  buildPrompt(kind: PromptKind): Observable<CopilotPrompt> {
+    if (!this.offerId) return EMPTY;
+    return this.offers.copilotPrompt(this.offerId, { text: this.cvText(), kind });
+  }
+
+  /** À l'entrée dans l'Avant/Après : si le couple (original, adapté) a changé,
+   *  toutes les confirmations retombent — on ne valide jamais un diff périmé. */
+  syncDiffSignature(): void {
+    const signature = `${this.cvText()}\u0000${this.adaptedText()}`;
+    if (signature !== this.diffSignature) {
+      this.diffSignature = signature;
+      this.confirmedAdditions.set(new Set());
+    }
+  }
+
+  toggleConfirmation(index: number): void {
+    const next = new Set(this.confirmedAdditions());
+    if (next.has(index)) {
+      next.delete(index);
+    } else {
+      next.add(index);
+    }
+    this.confirmedAdditions.set(next);
   }
 
   loadSample(kind: SampleKind): void {
