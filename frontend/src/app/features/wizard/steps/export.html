@@ -1,0 +1,62 @@
+<h2>Ton CV adapté est prêt</h2>
+<p class="lead">
+  Chaque ajout a été confirmé « vrai et prouvable » dans l'Avant / Après. Le PDF est généré
+  sur ta machine — rien ne part sur un serveur.
+</p>
+
+<div class="card">
+  <div class="export-row">
+    <div>
+      <div class="offer-title">{{ store.offer()?.title || 'Offre' }}</div>
+      @if (store.variant(); as v) {
+        <span class="hint">
+          Variante enregistrée
+          @if (v.match_score !== null) {
+            — couverture {{ v.match_score }}%
+          }
+        </span>
+      } @else {
+        <span class="hint">La variante sera enregistrée au premier téléchargement.</span>
+      }
+    </div>
+    <div class="actions">
+      @if (store.exportError()) {
+        <span class="err">{{ store.exportError() }}</span>
+      }
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="store.exportBusy()"
+        (click)="store.downloadPdf()"
+      >
+        {{ store.exportBusy() ? 'Génération…' : '📄 Télécharger le PDF' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (store.application(); as application) {
+  <div class="card track">
+    <h3>Suivi de candidature</h3>
+    <p class="sub">
+      C'est la mesure qui compte : cette candidature a-t-elle donné une réponse, un entretien ?
+    </p>
+    <div class="track-item">
+      <span class="meta">{{ application.sent_at | date: 'dd/MM/yyyy' }} — {{ store.offer()?.title || 'Offre' }}</span>
+      <select
+        #statusSelect
+        [value]="application.status"
+        (change)="onStatusChange(statusSelect.value)"
+        aria-label="Statut de la candidature"
+      >
+        @for (status of statuses; track status.value) {
+          <option [value]="status.value">{{ status.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+}
+
+<div class="row footer-row">
+  <button type="button" class="btn btn-ghost" (click)="store.goTo(4)">← Revoir l'avant / après</button>
+</div>

@@ -5,3 +5,4 @@ export * from './proof.model';
 export * from './offer.model';
 export * from './variant.model';
 export * from './matching.model';
+export * from './application.model';

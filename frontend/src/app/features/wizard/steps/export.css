@@ -1,0 +1,43 @@
+:host { display: block; }
+
+h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px; }
+.lead { color: var(--muted); font-size: 14.5px; margin: 0 0 18px; max-width: 680px; }
+
+.export-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.offer-title { font: 600 15px var(--sans); margin-bottom: 4px; }
+.actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.err { font: 12.5px var(--sans); color: var(--del); }
+
+.track { margin-top: 16px; }
+.track h3 { font: 700 16px var(--serif); margin: 0 0 4px; }
+.track .sub { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+
+.track-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.track-item .meta { font: 12.5px var(--mono); }
+
+.track-item select {
+  font: 600 13px var(--sans);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  background: #FAFAF7;
+}
+
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.footer-row { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px; }

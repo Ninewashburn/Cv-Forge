@@ -1,9 +1,17 @@
-import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, forkJoin, Observable, of, switchMap } from 'rxjs';
+import { EMPTY, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
-import { OfferService } from '../../core/api';
-import { CopilotPrompt, MatchingResult, Offer, PromptKind } from '../../core/models';
+import { ApplicationService, OfferService, VariantService } from '../../core/api';
+import {
+  Application,
+  ApplicationStatus,
+  CopilotPrompt,
+  CvVariant,
+  MatchingResult,
+  Offer,
+  PromptKind,
+} from '../../core/models';
 import { SampleKind, SAMPLES } from './samples';
 
 /** Case d'un mot-clé de l'offre : sur le CV / révélé par LinkedIn / nulle part. */
@@ -32,7 +40,19 @@ const MIN_CHARS = 40;
 @Injectable()
 export class WizardStore {
   private readonly offers = inject(OfferService);
+  private readonly variants = inject(VariantService);
+  private readonly applications = inject(ApplicationService);
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // Toute modification des textes invalide la porte d'export : il faudra
+    // repasser par l'Avant/Après (on n'exporte jamais un diff périmé).
+    effect(() => {
+      this.cvText();
+      this.adaptedText();
+      this.exportReady.set(false);
+    });
+  }
 
   readonly step = signal(1);
   readonly offerText = signal('');
@@ -49,20 +69,101 @@ export class WizardStore {
   /** Index des passages ajoutés confirmés « vrai et prouvable » (étape Avant/Après). */
   readonly confirmedAdditions = signal<ReadonlySet<number>>(new Set());
 
+  /** Vrai quand l'Avant/Après a été validé en entier — condition d'accès à l'Export. */
+  readonly exportReady = signal(false);
+  readonly variant = signal<CvVariant | null>(null);
+  readonly application = signal<Application | null>(null);
+  readonly exportBusy = signal(false);
+  readonly exportError = signal<string | null>(null);
+
   private offerId: string | null = null;
   private diffSignature: string | null = null;
+  /** Texte adapté au moment où la variante a été persistée (détection d'obsolescence). */
+  private variantText: string | null = null;
 
   readonly canAnalyse = computed(
     () => this.offerText().trim().length >= MIN_CHARS && this.cvText().trim().length >= MIN_CHARS,
   );
 
   goTo(step: number): void {
-    // L'Analyse et l'Adaptation exigent un premier calcul ; l'Avant/Après, un texte adapté.
+    // L'Analyse et l'Adaptation exigent un premier calcul ; l'Avant/Après, un
+    // texte adapté ; l'Export, un Avant/Après validé en entier.
     if ((step === 2 || step === 3) && !this.analysis()) return;
     if (step === 4 && !this.adaptedText().trim()) return;
-    if (step === 5) return; // Export : Bloc 3
+    if (step === 5 && !this.exportReady()) return;
     if (step === 3 && !this.adaptedText().trim()) this.adaptedText.set(this.cvText());
     this.step.set(step);
+  }
+
+  /** Export : persiste la variante validée, télécharge le PDF, ouvre le micro-suivi. */
+  downloadPdf(): void {
+    const offer = this.offer();
+    if (!offer || this.exportBusy() || !this.exportReady()) return;
+    this.exportBusy.set(true);
+    this.exportError.set(null);
+
+    const adapted = this.adaptedText();
+    const existing = this.variant();
+    const variant$: Observable<CvVariant> =
+      existing && this.variantText === adapted
+        ? of(existing)
+        : existing
+          ? this.variants.update(existing.id, { adapted_text: adapted, status: 'validated' })
+          : this.offers.generateVariant(offer.id, { adapted_text: adapted });
+
+    variant$
+      .pipe(
+        tap((variant) => {
+          this.variant.set(variant);
+          this.variantText = adapted;
+        }),
+        switchMap((variant) =>
+          this.variants.pdf(variant.id).pipe(map((blob) => ({ variant, blob }))),
+        ),
+        switchMap(({ variant, blob }) => {
+          this.triggerDownload(blob, offer.title);
+          const known = this.application();
+          return known
+            ? of(known)
+            : this.applications.create({ offer_id: offer.id, variant_id: variant.id });
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (application) => {
+          this.application.set(application);
+          this.exportBusy.set(false);
+        },
+        error: () => {
+          this.exportError.set('Export impossible — le backend est-il lancé sur :8000 ?');
+          this.exportBusy.set(false);
+        },
+      });
+  }
+
+  setApplicationStatus(status: ApplicationStatus): void {
+    const application = this.application();
+    if (!application) return;
+    this.applications
+      .update(application.id, { status })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((updated) => this.application.set(updated));
+  }
+
+  private triggerDownload(blob: Blob, offerTitle: string): void {
+    const slug =
+      offerTitle
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'offre';
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `cv-adapte-${slug}.pdf`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   /** Matching du texte en cours d'adaptation (recalcul en direct, sans IA). */

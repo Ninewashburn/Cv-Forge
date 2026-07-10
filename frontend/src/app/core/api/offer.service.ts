@@ -54,8 +54,10 @@ export class OfferService {
     return this.http.post<CopilotPrompt>(`${this.base}/${id}/copilot-prompt`, body);
   }
 
-  generateVariant(id: string): Observable<CvVariant> {
-    return this.http.post<CvVariant>(`${this.base}/${id}/variants`, {});
+  /** Avec `adapted_text` : variante portant l'adaptation validée du wizard.
+   *  Sans corps : génération tracée depuis les faits. */
+  generateVariant(id: string, body: { adapted_text?: string } = {}): Observable<CvVariant> {
+    return this.http.post<CvVariant>(`${this.base}/${id}/variants`, body);
   }
 
   listVariants(id: string): Observable<CvVariant[]> {

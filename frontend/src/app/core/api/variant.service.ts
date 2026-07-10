@@ -22,4 +22,9 @@ export class VariantService {
   remove(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
+
+  /** PDF propre et parsable du texte « après » validé (généré localement par le backend). */
+  pdf(id: string): Observable<Blob> {
+    return this.http.get(`${this.base}/${id}/pdf`, { responseType: 'blob' });
+  }
 }

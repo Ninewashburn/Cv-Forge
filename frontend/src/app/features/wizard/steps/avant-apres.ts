@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 
 import { addedSegments, diffStats, lcsDiff, paneSegments, PaneSegment, tokensOf } from '../diff';
 import { WizardStore } from '../wizard-store';
@@ -32,6 +32,10 @@ export class AvantApresStep {
     this.right = ops ? paneSegments(ops, 'right') : [];
     this.additions = ops ? addedSegments(ops) : [];
     this.stats = ops ? diffStats(ops) : { added: 0, removed: 0 };
+
+    // La porte d'export s'ouvre quand tout est confirmé — et seulement si le
+    // diff a pu être vérifié (passage par l'Avant/Après obligatoire).
+    effect(() => this.store.exportReady.set(!this.tooLong && this.allConfirmed()));
   }
 
   protected readonly confirmedCount = computed(() => this.store.confirmedAdditions().size);

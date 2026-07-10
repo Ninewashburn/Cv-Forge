@@ -31,6 +31,7 @@ from app.schemas.variant import (
     CvVariantRead,
     CvVariantUpdate,
     GeneratedSentenceRead,
+    VariantCreateRequest,
 )
 
 __all__ = [
@@ -65,5 +66,6 @@ __all__ = [
     "ProofUpdate",
     "ReadBase",
     "SentenceStatus",
+    "VariantCreateRequest",
     "VariantStatus",
 ]

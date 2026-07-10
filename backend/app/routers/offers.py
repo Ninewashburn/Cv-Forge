@@ -13,6 +13,7 @@ from app.schemas import (
     OfferCreate,
     OfferRead,
     OfferUpdate,
+    VariantCreateRequest,
 )
 from app.services import analysis_service, copilot_service, offer_service, variant_service
 
@@ -75,9 +76,18 @@ def copilot_prompt(
 
 
 @router.post("/{offer_id}/variants", response_model=CvVariantRead, status_code=201)
-def generate_variant(offer_id: str, session: Session = Depends(get_session)) -> CvVariantRead:
-    """Génère une variante tracée : chaque phrase référence ses faits et preuves."""
-    return CvVariantRead.model_validate(variant_service.generate_variant(session, offer_id))
+def create_variant(
+    offer_id: str,
+    data: VariantCreateRequest | None = None,
+    session: Session = Depends(get_session),
+) -> CvVariantRead:
+    """Avec ``adapted_text`` : variante portant l'adaptation validée du wizard.
+    Sans corps : génération tracée depuis les faits (chaque phrase sourcée)."""
+    if data is not None and data.adapted_text and data.adapted_text.strip():
+        variant = variant_service.create_manual_variant(session, offer_id, data.adapted_text)
+    else:
+        variant = variant_service.generate_variant(session, offer_id)
+    return CvVariantRead.model_validate(variant)
 
 
 @router.get("/{offer_id}/variants", response_model=list[CvVariantRead])

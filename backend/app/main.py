@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.db import run_migrations
 from app.routers import (
+    applications_router,
     facts_router,
     offers_router,
     profile_router,
@@ -59,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(proofs_router)
     app.include_router(offers_router)
     app.include_router(variants_router)
+    app.include_router(applications_router)
     return app
 
 

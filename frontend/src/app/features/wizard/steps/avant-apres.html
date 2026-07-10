@@ -87,10 +87,10 @@
       <button
         type="button"
         class="btn btn-primary"
-        disabled
-        [title]="allConfirmed() ? 'Export : Bloc 3 de la Phase 4' : 'Confirme chaque ajout d\'abord'"
+        [disabled]="!allConfirmed()"
+        (click)="store.goTo(5)"
       >
-        {{ allConfirmed() ? 'Exporter (bientôt — Bloc 3)' : 'Confirme les ajouts pour exporter' }}
+        {{ allConfirmed() ? "Passer à l'export" : 'Confirme les ajouts pour exporter' }}
       </button>
     </div>
   }

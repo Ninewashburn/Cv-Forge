@@ -81,6 +81,25 @@ def generate_variant(session: Session, offer_id: str) -> CvVariant:
     return variant
 
 
+def create_manual_variant(session: Session, offer_id: str, adapted_text: str) -> CvVariant:
+    """Variante portée par le wizard : le texte « après » a été validé ajout par
+    ajout dans l'Avant/Après — il arrive donc déjà ``validated``."""
+    offer = _ensure_analyzed(session, offer_id)
+    profile = get_or_create_profile(session)
+    keywords = [tuple(kw) for kw in offer.keywords]
+    variant = CvVariant(
+        profile_id=profile.id,
+        offer_id=offer.id,
+        recommended_title=profile.headline,
+        adapted_text=adapted_text,
+        match_score=keyword_engine.coverage(keywords, adapted_text)["score"],
+        status="validated",
+    )
+    session.add(variant)
+    session.commit()
+    return variant
+
+
 def list_variants_for_offer(session: Session, offer_id: str) -> list[CvVariant]:
     return list(
         session.scalars(

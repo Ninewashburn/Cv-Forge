@@ -22,6 +22,14 @@ class CvVariantCreate(BaseModel):
     offer_id: str
 
 
+class VariantCreateRequest(BaseModel):
+    """Corps optionnel de POST /offers/{id}/variants : avec ``adapted_text``,
+    la variante porte l'adaptation du wizard (manuelle/copilote) au lieu
+    d'être générée depuis les faits."""
+
+    adapted_text: str | None = None
+
+
 class CvVariantUpdate(BaseModel):
     recommended_title: str | None = None
     recommended_summary: str | None = None
