@@ -20,7 +20,8 @@ h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px; }
   border-radius: 8px;
   padding: 14px 16px;
   font: 13px/1.75 var(--mono);
-  max-height: 340px;
+  /* Les volets grandissent avec l'écran (340px = plancher hérité de Lite). */
+  max-height: max(340px, calc(100dvh - 460px));
   overflow: auto;
   overflow-wrap: break-word;
 }
