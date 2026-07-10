@@ -27,9 +27,9 @@
 - [x] **Packaging — TRANCHÉ** : V1 = web app locale. FastAPI sert le build Angular, un seul process, lancement par script double-cliquable (`start.bat` / `start.sh`) qui ouvre le navigateur sur `localhost:8000`.
   - Cross-platform gratuit (Windows/Mac/Linux), zéro temps de packaging avant validation du produit
   - Packaging desktop natif reporté en V1.5 — **exe portable PyInstaller** (le « sidecar Python » n'est plus un problème : Python EST l'exe). Mode installé + mode portable réconciliés par `resolve_data_dir()` câblée dès V1.
-- [ ] **Schéma de données sync-ready dès le départ** : UUIDs, `created_at`/`updated_at`, soft deletes
+- [x] **Schéma de données sync-ready dès le départ** : UUIDs, `created_at`/`updated_at`, soft deletes *(livré Phase 0, 2026-07)*
   - La sync cloud est en V3, mais le schéma se décide **maintenant**
-- [ ] **Stack confirmée** : Angular + FastAPI + SQLite
+- [x] **Stack confirmée** : Angular + FastAPI + SQLite *(en production locale depuis les Phases 1-3)*
 - [x] **Stratégie IA — TRANCHÉ** : 3 niveaux. Sans IA (toujours fonctionnel) → **Mode copilote** (prompt préparé + copier-coller vers le ChatGPT/Claude de l'utilisateur) → Clé API utilisateur. Ollama (IA 100% locale) reporté en V3.
 - [x] **Licence — TRANCHÉ : MIT sec** *(2026-07-02, sur précédent de projets voisins local-first)* — CVForge n'embarque aucun modèle ni composant tiers → MIT simple, sans NOTICE. Tout converge vers l'open source : le moat est la **philosophie** (pas le code), la preuve local-first exige un code auditable (« vérifie toi-même »), et la confiance au téléchargement en dépend.
 
@@ -75,15 +75,15 @@
 
 - [ ] **Import CV existant** (PDF/texte) → pré-remplissage du profil maître
   - Anti-mur d'onboarding : valeur visible en < 5 min
-- [ ] **Import offre** — copier-coller texte (l'URL n'est qu'une référence saisie, **jamais fetchée** — règle « aucun réseau sortant »)
+- [x] **Import offre** — copier-coller texte (l'URL n'est qu'une référence saisie, **jamais fetchée** — règle « aucun réseau sortant »)
 - [ ] **Bouton « Importer un fichier » sur chaque zone de texte** (CV, offre, profil LinkedIn) *(ajout 2026-07-02)*
   - Extraction de texte **locale** (pypdf : PDF + .txt) côté FastAPI — le fichier ne quitte jamais la machine.
   - Le texte extrait atterrit dans le champ, **visible et éditable avant toute analyse** — même contrat que le copier-coller, qui reste toujours disponible (fallback universel).
   - Un seul endpoint générique réutilisé par les trois champs. **Hors Lite** (gel : zéro backend).
 - [ ] **Profil maître simple** — source de vérité, champs essentiels uniquement
 - [ ] **Banque de preuves simple** — texte, lien, document (GitHub = *un type* de preuve parmi d'autres)
-- [ ] **Matching mots-clés sans LLM** — fréquence, couverture des exigences de l'offre
-- [ ] **Adaptation contrôlée** — 3 niveaux :
+- [x] **Matching mots-clés sans LLM** — fréquence, couverture des exigences de l'offre
+- [ ] **Adaptation contrôlée** — 3 niveaux *(fait : manuelle + copilote 4 intentions ; **reste : niveau clé API utilisateur**)* :
   - Manuelle (sans IA, toujours disponible)
   - **Mode copilote** : prompt verrouillé généré par CVForge (anti-hallucination inclus) → copier-coller vers le ChatGPT/Claude de l'utilisateur (nouvel onglet) → retour validé par le Diff Viewer. Zéro clé API, zéro coût.
     - *Prompt copilote **optionnel** — repérer les 5 compétences clés de l'offre* : « Lis cette offre d'emploi. Identifie les 5 compétences ou technologies les plus importantes, par ordre de priorité, en te basant UNIQUEMENT sur le texte de l'offre. Pour chacune, cite la phrase de l'offre qui la justifie. N'invente rien, ne note pas le candidat, ne suggère aucune compétence absente de l'offre. » → sortie = **liste brute** ; l'utilisateur décide ensuite quoi prouver. Le matching V1 reste **sans LLM** — ceci est un complément copilote **facultatif** (peut glisser en V1.5 si la V1 doit être allégée).
@@ -94,14 +94,14 @@
       4. **ACCROCHER** — accroche 3 lignes max, que du vérifiable, adjectifs autoproclamés interdits.
       - Pattern commun : **ce qui manque n'est jamais ajouté, il est listé « À compléter par le candidat »**. Rejetés : « ATS Boost » (= stuffing), « Format Fix » (→ CV Linter V1.5), « Cover Letter » (→ V2, message de motivation).
   - Clé API utilisateur (intégration directe, power users)
-- [ ] **Diff Viewer** ⭐ — avant/après côte à côte, surlignage des modifications
+- [x] **Diff Viewer** ⭐ — avant/après côte à côte, surlignage des modifications
   - **Killer feature, centre du pitch.** Preuve visuelle que rien n'est inventé.
   - Pas un diff git : lisible par tout public
-- [ ] **Export PDF** propre (format simple, parsable)
-- [ ] **Backup ZIP** — export/import complet des données (incarnation du "tes données t'appartiennent")
-- [ ] **Micro-tracking** — 1 champ par candidature exportée : "réponse reçue ? entretien obtenu ?"
+- [x] **Export PDF** propre (format simple, parsable)
+- [x] **Backup ZIP** — export/import complet des données (incarnation du "tes données t'appartiennent")
+- [x] **Micro-tracking** — 1 champ par candidature exportée : "réponse reçue ? entretien obtenu ?"
   - 3 clics max. Rend le MVP statement mesurable.
-- [ ] **Zone « révélation » LinkedIn** ⭐ *(inspiré d'un atelier RH Michelin — le profil LinkedIn comme contexte, version honnête. Aussi en Lite, texte seul.)*
+- [x] **Zone « révélation » LinkedIn** ⭐ *(inspiré d'un atelier RH Michelin — le profil LinkedIn comme contexte, version honnête. Aussi en Lite, texte seul.)*
   - **Principe — deux statuts de données, jamais confondus :**
     - *Source de vérité* = le CV. C'est ce qui est adapté et exporté.
     - *Sources de révélation* (LinkedIn ; plus tard GitHub/portfolio) = éclairent les trous, **n'entrent JAMAIS dans la source de vérité sans décision explicite**.
@@ -113,13 +113,13 @@
   - **Règle anti-fusion (NON NÉGOCIABLE)** : « Ajouter X » **n'écrit PAS** dans le CV — ça pré-remplit une **suggestion** que l'utilisateur intègre lui-même → elle apparaît dans le **Diff** → rituel « vrai et prouvable ? ». *LinkedIn révèle, l'utilisateur décide, le Diff trace.* **INTERDIT** : verser automatiquement les compétences LinkedIn dans la base d'adaptation — gonfler la source en amont vide le Diff de son sens (= geste WorkMachine).
   - **Double score (honnêteté d'un cran)** : « ton CV couvre 55 % » **et** « CV + ce que tu peux légitimement ajouter depuis LinkedIn : 71 % ». Le second est un **potentiel/objectif, jamais un score envoyé**.
   - **Périmètre V1** : copier-coller **texte uniquement** (pas de parsing PDF — voir V1.5). Même contrat en Lite.
-- [ ] **Layout « établi » de l'Atelier** *(ajout 2026-07-08, retour visuel : « des petits encadrés pour travailler, c'est frustrant »)* — l'Atelier est un **espace de travail**, pas une page de lecture ; l'Accueil, lui, reste étroit (confort de lecture ~1060px). Repère : **la V1 ne doit jamais être plus étriquée que Lite (1280px)**.
+- [x] **Layout « établi » de l'Atelier** *(ajout 2026-07-08, livré 2026-07-10 ; retour visuel : « des petits encadrés pour travailler, c'est frustrant »)* — l'Atelier est un **espace de travail**, pas une page de lecture ; l'Accueil, lui, reste étroit (confort de lecture ~1060px). Repère : **la V1 ne doit jamais être plus étriquée que Lite (1280px)**.
   1. **Largeur fluide réservée à l'Atelier** : `min(~1440px, 94vw)`.
   2. **Hauteurs pilotées par l'écran, jamais en pixels fixes** : Sources ≈ 55vh ; Adaptation et Avant/Après remplissent la hauteur restante du viewport (`100dvh − chrome`) — sensation « éditeur ».
   3. **Chrome vertical dégraissé** dans l'Atelier : masthead compact, intro raccourcie (~120px récupérés).
   4. Bonus : `field-sizing: content` (auto-grow des textareas, progressive enhancement — Chrome/Edge OK, fallback min-height ailleurs).
   - Plus tard (polish optionnel, ne pas coder avant le core loop) : bouton « agrandir » par volet / mode focus. L'instinct « l'espace de travail domine » = maquettes North Star, on y répond par le layout, pas en avançant la V3.
-- [ ] **Mini-FAQ confiance in-app (V1)** — décliner dans l'Atelier (étape Sources) le dépliant 4 questions déjà livré dans Lite. ⚠️ Adapter la réponse « Comment je garde mon travail ? » à la V1 : le fichier n'est plus la sauvegarde — les données vivent dans `~/.cvforge/` (SQLite, enregistrement automatique), et le **backup ZIP** est l'incarnation « tes données t'appartiennent ». Les 3 autres réponses restent valables telles quelles.
+- [x] **Mini-FAQ confiance in-app (V1)** *(livré 2026-07-10)* — décliner dans l'Atelier (étape Sources) le dépliant 4 questions déjà livré dans Lite. ⚠️ Adapter la réponse « Comment je garde mon travail ? » à la V1 : le fichier n'est plus la sauvegarde — les données vivent dans `~/.cvforge/` (SQLite, enregistrement automatique), et le **backup ZIP** est l'incarnation « tes données t'appartiennent ». Les 3 autres réponses restent valables telles quelles.
 
 ### Critères de sortie V1
 
