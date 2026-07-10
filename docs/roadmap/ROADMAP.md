@@ -4,7 +4,7 @@
 
 **Corollaire :** la V1 embarque son propre instrument de mesure (micro-tracking). Sans mesure, le statement est un slogan.
 
-**Dernière mise à jour :** 2026-07-05
+**Dernière mise à jour :** 2026-07-08
 **Statut :** V0 tranché — prêt pour Claude Code (voir CLAUDE.md)
 **Maquettes :** les schémas d'interface = vision cible (North Star, V3+). Le périmètre de build reste la section V1, exclusivement.
 
@@ -113,6 +113,13 @@
   - **Règle anti-fusion (NON NÉGOCIABLE)** : « Ajouter X » **n'écrit PAS** dans le CV — ça pré-remplit une **suggestion** que l'utilisateur intègre lui-même → elle apparaît dans le **Diff** → rituel « vrai et prouvable ? ». *LinkedIn révèle, l'utilisateur décide, le Diff trace.* **INTERDIT** : verser automatiquement les compétences LinkedIn dans la base d'adaptation — gonfler la source en amont vide le Diff de son sens (= geste WorkMachine).
   - **Double score (honnêteté d'un cran)** : « ton CV couvre 55 % » **et** « CV + ce que tu peux légitimement ajouter depuis LinkedIn : 71 % ». Le second est un **potentiel/objectif, jamais un score envoyé**.
   - **Périmètre V1** : copier-coller **texte uniquement** (pas de parsing PDF — voir V1.5). Même contrat en Lite.
+- [ ] **Layout « établi » de l'Atelier** *(ajout 2026-07-08, retour visuel : « des petits encadrés pour travailler, c'est frustrant »)* — l'Atelier est un **espace de travail**, pas une page de lecture ; l'Accueil, lui, reste étroit (confort de lecture ~1060px). Repère : **la V1 ne doit jamais être plus étriquée que Lite (1280px)**.
+  1. **Largeur fluide réservée à l'Atelier** : `min(~1440px, 94vw)`.
+  2. **Hauteurs pilotées par l'écran, jamais en pixels fixes** : Sources ≈ 55vh ; Adaptation et Avant/Après remplissent la hauteur restante du viewport (`100dvh − chrome`) — sensation « éditeur ».
+  3. **Chrome vertical dégraissé** dans l'Atelier : masthead compact, intro raccourcie (~120px récupérés).
+  4. Bonus : `field-sizing: content` (auto-grow des textareas, progressive enhancement — Chrome/Edge OK, fallback min-height ailleurs).
+  - Plus tard (polish optionnel, ne pas coder avant le core loop) : bouton « agrandir » par volet / mode focus. L'instinct « l'espace de travail domine » = maquettes North Star, on y répond par le layout, pas en avançant la V3.
+- [ ] **Mini-FAQ confiance in-app (V1)** — décliner dans l'Atelier (étape Sources) le dépliant 4 questions déjà livré dans Lite. ⚠️ Adapter la réponse « Comment je garde mon travail ? » à la V1 : le fichier n'est plus la sauvegarde — les données vivent dans `~/.cvforge/` (SQLite, enregistrement automatique), et le **backup ZIP** est l'incarnation « tes données t'appartiennent ». Les 3 autres réponses restent valables telles quelles.
 
 ### Critères de sortie V1
 
