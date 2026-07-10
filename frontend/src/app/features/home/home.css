@@ -33,3 +33,9 @@ h2 { font: 700 26px/1.25 var(--serif); margin: 0 0 12px; max-width: 720px; }
 .profile-peek code { font: 12px var(--mono); color: var(--muted); }
 
 .cta-row { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+
+.backup-card { max-width: 680px; margin-top: 20px; }
+.backup-card h3 { font: 700 16px var(--serif); margin: 0 0 4px; }
+.backup-card .sub { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.backup-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.restore-label { cursor: pointer; }

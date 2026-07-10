@@ -1,9 +1,9 @@
-<p class="eyebrow">CVFORGE V1 — SQUELETTE (PHASE 3)</p>
+<p class="eyebrow">CVFORGE V1 — LOCAL-FIRST</p>
 <h2>Candidater comme on code : avec méthode, traçabilité, sans bullshit.</h2>
 <p class="lead">
-  Le socle backend (données, API, moteurs) est en place. Voici la coquille Angular
-  qui l'habillera : navigation, services HTTP, modèles typés. Le parcours guidé
-  complet — import → matching → <strong>Avant / Après</strong> → export — arrive en Phase 4.
+  Colle une offre et ton CV dans l'Atelier : matching sans IA, adaptation contrôlée,
+  <strong>Avant / Après</strong> où chaque ajout est confirmé « vrai et prouvable »,
+  export PDF et suivi de candidature. Tout se passe sur ta machine.
 </p>
 
 <div class="card status-card" [attr.data-state]="state()">
@@ -11,7 +11,7 @@
     <span class="dot"></span>
     @switch (state()) {
       @case ('loading') { <span>Connexion à l'API locale…</span> }
-      @case ('connected') { <span>API locale connectée — <code>/api/profile</code> répond.</span> }
+      @case ('connected') { <span>Application locale prête — tes données sont sur ta machine.</span> }
       @case ('error') {
         <span>API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></span>
       }
@@ -31,4 +31,29 @@
 <div class="cta-row">
   <a routerLink="/atelier" class="btn btn-primary">Ouvrir l'Atelier</a>
   <span class="hint">Rien ne sort de ta machine — tout est local.</span>
+</div>
+
+<div class="card backup-card">
+  <h3>Tes données t'appartiennent</h3>
+  <p class="sub">
+    Emporte tout dans un fichier ZIP (base + preuves), ou restaure un backup existant.
+    Aucune donnée n'est envoyée où que ce soit.
+  </p>
+  <div class="backup-row">
+    <a class="btn btn-ghost" [href]="backup.exportUrl">⬇ Exporter mes données (ZIP)</a>
+    <label class="btn btn-ghost restore-label">
+      {{ restoring() ? 'Restauration…' : '⬆ Restaurer un backup' }}
+      <input
+        #restoreInput
+        type="file"
+        accept=".zip,application/zip"
+        [disabled]="restoring()"
+        (change)="onRestoreFile(restoreInput)"
+        hidden
+      />
+    </label>
+    @if (backupHint()) {
+      <span class="hint">{{ backupHint() }}</span>
+    }
+  </div>
 </div>

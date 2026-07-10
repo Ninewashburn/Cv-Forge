@@ -45,3 +45,17 @@ def resolve_data_dir() -> Path:
 def database_url() -> str:
     """URL SQLAlchemy de la base SQLite, dérivée de resolve_data_dir()."""
     return f"sqlite:///{resolve_data_dir() / DB_FILENAME}"
+
+
+def static_dir() -> Path | None:
+    """Build Angular servi par FastAPI (single process, Phase 5).
+
+    Point de résolution UNIQUE, comme resolve_data_dir() : dans l'exe
+    PyInstaller (V1.5) le build sera embarqué dans ``static/`` à côté du
+    binaire ; en dev/local il vit dans ``frontend/dist``. Retourne ``None``
+    si aucun build n'existe (mode API seule)."""
+    if getattr(sys, "frozen", False):
+        candidate = app_dir() / "static"
+    else:
+        candidate = app_dir().parent / "frontend" / "dist" / "cvforge" / "browser"
+    return candidate if (candidate / "index.html").is_file() else None
