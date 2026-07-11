@@ -49,6 +49,23 @@ def test_fact_crud_and_soft_delete(client):
     assert all(f["id"] != fact_id for f in client.get("/api/facts").json())
 
 
+def test_delete_is_soft_row_stays_in_database(client):
+    """Garde-fou sync V3 : un DELETE API pose deleted_at, la ligne reste en base."""
+    from sqlalchemy import text
+
+    from app.core.db import get_engine
+
+    fact_id = _create_fact(client)["id"]
+    assert client.delete(f"/api/facts/{fact_id}").status_code == 204
+
+    with get_engine().connect() as conn:
+        row = conn.execute(
+            text("SELECT deleted_at FROM fact WHERE id = :id"), {"id": fact_id}
+        ).one_or_none()
+    assert row is not None, "la ligne a été effacée physiquement — interdit (sync V3)"
+    assert row.deleted_at is not None
+
+
 def test_fact_invalid_type_rejected(client):
     response = client.post("/api/facts", json={"type": "magie", "title": "X"})
     assert response.status_code == 422

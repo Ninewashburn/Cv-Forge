@@ -1,0 +1,275 @@
+<p class="eyebrow">SOURCE DE VÉRITÉ</p>
+<h2>Ton profil maître & ta banque de preuves</h2>
+<p class="lead">
+  Tout ce qui est écrit ici doit être <strong>vrai et prouvable en entretien</strong>.
+  C'est la matière première que l'Atelier adapte ensuite à chaque offre — rien d'autre
+  ne sera jamais inventé à ta place.
+</p>
+
+@switch (state()) {
+  @case ('loading') {
+    <p class="hint">Chargement depuis ta base locale…</p>
+  }
+  @case ('error') {
+    <p class="err">API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></p>
+  }
+  @case ('ready') {
+    <!-- ============================================= Profil maître -->
+    <section class="card profile-card">
+      <h3>Profil maître</h3>
+      <p class="sub">Les champs essentiels, rien de plus. Ils coiffent tes exports PDF.</p>
+
+      <div class="field-grid">
+        <label>
+          Nom complet
+          <input #fn [value]="fullName()" (input)="fullName.set(fn.value)" autocomplete="off" />
+        </label>
+        <label>
+          En-tête (métier en une ligne)
+          <input #hl [value]="headline()" (input)="headline.set(hl.value)"
+                 placeholder="Ex. Développeur full-stack Angular / Python" autocomplete="off" />
+        </label>
+        <label>
+          Email
+          <input #em [value]="email()" (input)="email.set(em.value)" autocomplete="off" />
+        </label>
+        <label>
+          Téléphone
+          <input #ph [value]="phone()" (input)="phone.set(ph.value)" autocomplete="off" />
+        </label>
+        <label>
+          Localisation
+          <input #lo [value]="location()" (input)="location.set(lo.value)"
+                 placeholder="Ex. Clermont-Ferrand / télétravail" autocomplete="off" />
+        </label>
+        <label>
+          Liens (un par ligne — GitHub, portfolio…)
+          <textarea #lk rows="2" [value]="linksText()" (input)="linksText.set(lk.value)"></textarea>
+        </label>
+        <label class="full">
+          Résumé (quelques phrases, factuelles)
+          <textarea #su rows="4" [value]="summary()" (input)="summary.set(su.value)"></textarea>
+        </label>
+        <div class="full">
+          <div class="label-row">
+            <span class="field-label">Ton CV complet (le matching et le copilote s'en servent automatiquement)</span>
+            <button
+              type="button"
+              class="btn-import"
+              title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+              [disabled]="importingCv()"
+              (click)="cvImportFile.click()"
+            >
+              {{ importingCv() ? 'Lecture…' : '📄 Importer un fichier' }}
+            </button>
+            <input
+              #cvImportFile
+              type="file"
+              accept=".pdf,.txt,.md,application/pdf,text/plain"
+              hidden
+              (change)="onImportCv(cvImportFile)"
+            />
+          </div>
+          <textarea
+            #raw
+            rows="8"
+            [value]="rawImportText()"
+            (input)="rawImportText.set(raw.value)"
+            placeholder="Importe ton CV (PDF/TXT) ou colle son texte ici…"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" class="btn btn-primary" [disabled]="savingProfile()" (click)="saveProfile()">
+          {{ savingProfile() ? 'Enregistrement…' : 'Enregistrer le profil' }}
+        </button>
+        @if (profileHint()) {
+          <span class="hint">{{ profileHint() }}</span>
+        }
+      </div>
+    </section>
+
+    <!-- ============================================= Faits & Preuves -->
+    <div class="bank">
+      <!-- ------------------------------------------------ Faits -->
+      <section>
+        <h3>Faits de ton parcours</h3>
+        <p class="sub">
+          Expériences, compétences, projets… Coche « prouvable » quand une preuve l'appuie :
+          c'est ce que le matching et l'adaptation utiliseront en priorité.
+        </p>
+
+        <div class="card form-card">
+          <div class="form-row">
+            <label>
+              Type
+              <select #ft [value]="factType()" (change)="factType.set($any(ft.value))">
+                @for (t of factTypes; track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="grow">
+              Titre
+              <input #fti [value]="factTitle()" (input)="factTitle.set(fti.value)"
+                     placeholder="Ex. Refonte du site vitrine en Angular" autocomplete="off" />
+            </label>
+          </div>
+          <label>
+            Détail (factuel — ce que tu as fait, mesuré si tu l'as mesuré)
+            <textarea #ftc rows="3" [value]="factContent()" (input)="factContent.set(ftc.value)"></textarea>
+          </label>
+          <label>
+            Mots-clés (séparés par des virgules)
+            <input #ftt [value]="factTags()" (input)="factTags.set(ftt.value)"
+                   placeholder="angular, typescript, accessibilité" autocomplete="off" />
+          </label>
+          <div class="row">
+            <button type="button" class="btn btn-primary" (click)="submitFact()">
+              {{ editingFactId() ? 'Enregistrer le fait' : 'Ajouter ce fait' }}
+            </button>
+            @if (editingFactId()) {
+              <button type="button" class="btn btn-ghost" (click)="cancelFactEdit()">Annuler</button>
+            }
+            @if (factHint()) {
+              <span class="hint">{{ factHint() }}</span>
+            }
+          </div>
+        </div>
+
+        @if (facts().length === 0) {
+          <p class="empty">Aucun fait pour l'instant — commence par ce que tu sais prouver.</p>
+        }
+        @for (fact of facts(); track fact.id) {
+          <article class="card item" [class.editing]="editingFactId() === fact.id">
+            <div class="item-head">
+              <span class="badge">{{ typeLabel(fact.type) }}</span>
+              <strong class="title">{{ fact.title }}</strong>
+              <label class="provable" [class.on]="fact.validated" title="Une preuve de la banque appuie ce fait">
+                <input type="checkbox" [checked]="fact.validated" (change)="toggleValidated(fact)" />
+                prouvable
+              </label>
+            </div>
+            @if (fact.content) {
+              <p class="body">{{ fact.content }}</p>
+            }
+            <div class="item-foot">
+              @for (tag of fact.tags; track tag) {
+                <span class="chip">{{ tag }}</span>
+              }
+              <span class="spacer"></span>
+              <span class="hint">{{ proofCountOf(fact) }} preuve(s)</span>
+              <button type="button" class="btn-link" (click)="startFactEdit(fact)">Modifier</button>
+              <button type="button" class="btn-link danger" (click)="removeFact(fact)">Supprimer</button>
+            </div>
+          </article>
+        }
+      </section>
+
+      <!-- ------------------------------------------------ Preuves -->
+      <section>
+        <h3>Banque de preuves</h3>
+        <p class="sub">
+          Une note, un lien (GitHub, article…) ou un document (attestation, certificat).
+          Relie chaque preuve aux faits qu'elle appuie.
+        </p>
+
+        <div class="card form-card">
+          <div class="form-row">
+            <label>
+              Type
+              <select #pt [value]="proofType()" (change)="proofType.set($any(pt.value))">
+                @for (t of proofTypes; track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="grow">
+              Titre
+              <input #pti [value]="proofTitle()" (input)="proofTitle.set(pti.value)"
+                     placeholder="Ex. Dépôt GitHub du projet" autocomplete="off" />
+            </label>
+          </div>
+          <label>
+            {{ proofType() === 'link' ? 'Adresse du lien' : 'Contenu / description' }}
+            <textarea #ptc rows="2" [value]="proofContent()" (input)="proofContent.set(ptc.value)"
+                      [placeholder]="proofType() === 'link' ? 'https://…' : 'Ce que cette preuve montre…'"></textarea>
+          </label>
+          @if (facts().length > 0) {
+            <fieldset class="link-facts">
+              <legend>Appuie les faits :</legend>
+              @for (fact of facts(); track fact.id) {
+                <label class="fact-check">
+                  <input
+                    type="checkbox"
+                    [checked]="proofFactIds().includes(fact.id)"
+                    (change)="toggleProofFact(fact.id)"
+                  />
+                  {{ fact.title }}
+                </label>
+              }
+            </fieldset>
+          }
+          <div class="row">
+            <button type="button" class="btn btn-primary" (click)="submitProof()">
+              {{ editingProofId() ? 'Enregistrer la preuve' : 'Ajouter cette preuve' }}
+            </button>
+            @if (editingProofId()) {
+              <button type="button" class="btn btn-ghost" (click)="cancelProofEdit()">Annuler</button>
+            }
+            @if (proofHint()) {
+              <span class="hint">{{ proofHint() }}</span>
+            }
+          </div>
+        </div>
+
+        @if (proofs().length === 0) {
+          <p class="empty">Aucune preuve pour l'instant — un lien GitHub, une attestation, une note suffisent.</p>
+        }
+        @for (proof of proofs(); track proof.id) {
+          <article class="card item" [class.editing]="editingProofId() === proof.id">
+            <div class="item-head">
+              <span class="badge">{{ proofTypeLabel(proof.type) }}</span>
+              <strong class="title">{{ proof.title }}</strong>
+            </div>
+            @if (proof.type === 'link' && proof.content) {
+              <p class="body">
+                <a [href]="proof.content" target="_blank" rel="noopener noreferrer">{{ proof.content }}</a>
+              </p>
+            } @else if (proof.content) {
+              <p class="body">{{ proof.content }}</p>
+            }
+            @if (proof.fact_ids.length > 0) {
+              <div class="linked">
+                @for (factId of proof.fact_ids; track factId) {
+                  <span class="chip">{{ factTitleOf(factId) }}</span>
+                }
+              </div>
+            }
+            <div class="item-foot">
+              @if (proof.file_name) {
+                <a class="btn-link" [href]="fileUrl(proof)" target="_blank" rel="noopener">
+                  📎 {{ attachedName(proof) }}
+                </a>
+              }
+              <span class="spacer"></span>
+              <label class="btn-link attach">
+                {{ attachingId() === proof.id ? 'Envoi…' : proof.file_name ? 'Remplacer la pièce' : 'Joindre un fichier' }}
+                <input
+                  #attach
+                  type="file"
+                  hidden
+                  [disabled]="attachingId() !== null"
+                  (change)="onAttachFile(proof, attach)"
+                />
+              </label>
+              <button type="button" class="btn-link" (click)="startProofEdit(proof)">Modifier</button>
+              <button type="button" class="btn-link danger" (click)="removeProof(proof)">Supprimer</button>
+            </div>
+          </article>
+        }
+      </section>
+    </div>
+  }
+}

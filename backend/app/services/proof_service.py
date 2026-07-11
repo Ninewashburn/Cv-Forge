@@ -1,14 +1,22 @@
-"""Banque de preuves : CRUD + liaisons N–N vers les faits."""
+"""Banque de preuves : CRUD + liaisons N–N vers les faits + pièce jointe locale."""
 
 from __future__ import annotations
+
+import re
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import resolve_data_dir
 from app.db import Proof, ProofFact
 from app.schemas import ProofCreate, ProofUpdate
 from app.services.errors import NotFoundError
 from app.services.fact_service import get_fact
+
+# Pièces jointes rangées sous <data>/proofs/ — le backup ZIP les embarque déjà.
+PROOFS_DIR_NAME = "proofs"
+MAX_FILE_BYTES = 25 * 1024 * 1024
 
 
 def list_proofs(session: Session) -> list[Proof]:
@@ -79,3 +87,55 @@ def soft_delete_proof(session: Session, proof_id: str) -> None:
             link.soft_delete()
     proof.soft_delete()
     session.commit()
+    # La pièce jointe éventuelle reste sur disque : soft delete = récupérable.
+
+
+def attach_file(session: Session, proof_id: str, filename: str, content: bytes) -> Proof:
+    """Range la pièce jointe sous <data>/proofs/ et la référence sur la preuve.
+
+    Une seule pièce par preuve : en remettre une remplace la précédente
+    (geste explicite de l'utilisateur, comme réécrire le contenu d'une note)."""
+    proof = get_proof(session, proof_id)
+    if not content:
+        raise ValueError("Ce fichier est vide.")
+    if len(content) > MAX_FILE_BYTES:
+        raise ValueError("Fichier trop volumineux (25 Mo maximum).")
+
+    proofs_dir = resolve_data_dir() / PROOFS_DIR_NAME
+    proofs_dir.mkdir(parents=True, exist_ok=True)
+    stored = f"{proof.id}--{_safe_filename(filename)}"
+
+    if proof.file_name:
+        _existing_path(proof).unlink(missing_ok=True)
+    (proofs_dir / stored).write_bytes(content)
+    proof.file_name = f"{PROOFS_DIR_NAME}/{stored}"
+    session.commit()
+    return proof
+
+
+def attached_file(session: Session, proof_id: str) -> tuple[Path, str]:
+    """(chemin, nom d'origine) de la pièce jointe. NotFoundError si absente."""
+    proof = get_proof(session, proof_id)
+    if not proof.file_name:
+        raise NotFoundError("proof file", proof_id)
+    path = _existing_path(proof)
+    if not path.is_file():
+        raise NotFoundError("proof file", proof_id)
+    display = path.name.split("--", 1)[-1]
+    return path, display
+
+
+def _existing_path(proof: Proof) -> Path:
+    """Chemin absolu de la pièce référencée, verrouillé dans le dossier de données."""
+    data_dir = resolve_data_dir().resolve()
+    path = (data_dir / str(proof.file_name)).resolve()
+    if not path.is_relative_to(data_dir):  # garde-fou path traversal
+        raise NotFoundError("proof file", proof.id)
+    return path
+
+
+def _safe_filename(raw: str) -> str:
+    """Nom de fichier inoffensif : pas de chemin, caractères sûrs, longueur bornée."""
+    name = Path(raw or "document").name
+    name = re.sub(r"[^\w.\- ]", "_", name, flags=re.UNICODE).strip(" .") or "document"
+    return name[-150:]

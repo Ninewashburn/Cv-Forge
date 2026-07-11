@@ -73,15 +73,15 @@
 
 ### Features
 
-- [ ] **Import CV existant** (PDF/texte) *(fait 2026-07-11 : import fichier → zone CV du wizard ; **reste : pré-remplissage du profil maître**, dépend de la vue Profil maître)*
+- [x] **Import CV existant** (PDF/texte) → pré-remplissage du profil maître *(livré 2026-07-11 : import fichier → zone CV du wizard **et** bloc « CV complet » de la vue Profil ; le matching et le copilote s'en servent automatiquement)*
   - Anti-mur d'onboarding : valeur visible en < 5 min
 - [x] **Import offre** — copier-coller texte (l'URL n'est qu'une référence saisie, **jamais fetchée** — règle « aucun réseau sortant »)
 - [x] **Bouton « Importer un fichier » sur chaque zone de texte** (CV, offre, profil LinkedIn) *(ajout 2026-07-02 ; livré 2026-07-11 — `POST /api/extract`, pypdf)*
   - Extraction de texte **locale** (pypdf : PDF + .txt) côté FastAPI — le fichier ne quitte jamais la machine.
   - Le texte extrait atterrit dans le champ, **visible et éditable avant toute analyse** — même contrat que le copier-coller, qui reste toujours disponible (fallback universel).
   - Un seul endpoint générique réutilisé par les trois champs. **Hors Lite** (gel : zéro backend).
-- [ ] **Profil maître simple** — source de vérité, champs essentiels uniquement
-- [ ] **Banque de preuves simple** — texte, lien, document (GitHub = *un type* de preuve parmi d'autres)
+- [x] **Profil maître simple** — source de vérité, champs essentiels uniquement *(livré 2026-07-11 : vue « Profil & Preuves »)*
+- [x] **Banque de preuves simple** — texte, lien, document (GitHub = *un type* de preuve parmi d'autres) *(livré 2026-07-11 : faits ↔ preuves liés, pièce jointe locale sous `<data>/proofs/`, embarquée dans le backup ZIP)*
 - [x] **Matching mots-clés sans LLM** — fréquence, couverture des exigences de l'offre
 - [ ] **Adaptation contrôlée** — 3 niveaux *(fait : manuelle + copilote 4 intentions ; **reste : niveau clé API utilisateur**)* :
   - Manuelle (sans IA, toujours disponible)

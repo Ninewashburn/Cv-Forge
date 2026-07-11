@@ -11,5 +11,10 @@ export const routes: Routes = [
     path: 'atelier',
     loadComponent: () => import('./features/wizard/wizard').then((m) => m.Wizard),
   },
+  {
+    path: 'profil',
+    loadComponent: () =>
+      import('./features/profile/profile-page').then((m) => m.ProfilePage),
+  },
   { path: '**', redirectTo: '' },
 ];

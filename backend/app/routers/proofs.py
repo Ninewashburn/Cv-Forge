@@ -1,6 +1,7 @@
-"""CRUD de la banque de preuves."""
+"""CRUD de la banque de preuves + pièce jointe (stockée dans le dossier de données)."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.db import get_session
@@ -35,3 +36,25 @@ def update_proof(
 @router.delete("/{proof_id}", status_code=204)
 def delete_proof(proof_id: str, session: Session = Depends(get_session)) -> None:
     proof_service.soft_delete_proof(session, proof_id)
+
+
+@router.put("/{proof_id}/file", response_model=ProofRead)
+async def attach_file(
+    proof_id: str, file: UploadFile, session: Session = Depends(get_session)
+) -> ProofRead:
+    """Attache la pièce jointe (une par preuve — remplace l'existante). 100 % local."""
+    content = await file.read()
+    try:
+        proof = proof_service.attach_file(
+            session, proof_id, file.filename or "document", content
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return ProofRead.model_validate(proof)
+
+
+@router.get("/{proof_id}/file")
+def download_file(proof_id: str, session: Session = Depends(get_session)) -> FileResponse:
+    """Renvoie la pièce jointe telle quelle (téléchargement/aperçu navigateur)."""
+    path, display_name = proof_service.attached_file(session, proof_id)
+    return FileResponse(path, filename=display_name)
