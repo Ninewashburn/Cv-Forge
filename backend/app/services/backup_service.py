@@ -15,8 +15,13 @@ from pathlib import Path
 
 from app.core.config import DB_FILENAME, resolve_data_dir
 from app.core.db import reset_engine, run_migrations
+from app.services.llm_service import CONFIG_FILENAME as LLM_CONFIG_FILENAME
 
 _SQLITE_MAGIC = b"SQLite format 3\x00"
+
+# La base est ajoutée à part (copie cohérente) ; la clé API est un SECRET,
+# pas une donnée de candidature — elle ne part jamais dans une archive.
+_EXCLUDED_FROM_EXPORT = {DB_FILENAME, LLM_CONFIG_FILENAME}
 
 
 def export_backup() -> tuple[bytes, str]:
@@ -28,9 +33,9 @@ def export_backup() -> tuple[bytes, str]:
         db_path = data_dir / DB_FILENAME
         if db_path.exists():
             archive.writestr(DB_FILENAME, _consistent_db_copy(db_path))
-        # Tout le reste du dossier (fichiers de preuves…), base exclue.
+        # Tout le reste du dossier (fichiers de preuves…), base et secrets exclus.
         for path in sorted(data_dir.rglob("*")):
-            if path.is_file() and path.name != DB_FILENAME:
+            if path.is_file() and path.name not in _EXCLUDED_FROM_EXPORT:
                 archive.write(path, path.relative_to(data_dir).as_posix())
 
     stamp = datetime.now(UTC).strftime("%Y-%m-%d")
@@ -61,8 +66,9 @@ def import_backup(content: bytes) -> None:
 
     for name in names:
         member = Path(name)
-        # Garde-fou zip-slip : jamais d'écriture hors du dossier de données.
-        if member.is_absolute() or ".." in member.parts or name == DB_FILENAME:
+        # Garde-fou zip-slip + secrets : jamais d'écriture hors du dossier de
+        # données, et un backup ne restaure jamais une clé API.
+        if member.is_absolute() or ".." in member.parts or name in _EXCLUDED_FROM_EXPORT:
             continue
         target = data_dir / member
         if name.endswith("/"):

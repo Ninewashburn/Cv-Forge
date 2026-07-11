@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  AdaptResult,
   CopilotPrompt,
   CopilotPromptRequest,
   CvVariant,
@@ -52,6 +53,12 @@ export class OfferService {
   /** Prompt verrouillé anti-hallucination (kind : adapter/auditer/muscler/accrocher). */
   copilotPrompt(id: string, body: CopilotPromptRequest = {}): Observable<CopilotPrompt> {
     return this.http.post<CopilotPrompt>(`${this.base}/${id}/copilot-prompt`, body);
+  }
+
+  /** Niveau clé API : adaptation directe chez le fournisseur (seul appel réseau
+   *  sortant de CVForge, déclenché explicitement). Réponse = proposition. */
+  adapt(id: string, body: CopilotPromptRequest = {}): Observable<AdaptResult> {
+    return this.http.post<AdaptResult>(`${this.base}/${id}/adapt`, body);
   }
 
   /** Avec `adapted_text` : variante portant l'adaptation validée du wizard.

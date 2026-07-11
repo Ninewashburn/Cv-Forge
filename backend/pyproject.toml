@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Backend local-first pour CVForge"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=0.100,<1",
     "fastapi>=0.124,<1",
     "uvicorn[standard]>=0.38,<1",
     "sqlalchemy>=2.0.43,<3",

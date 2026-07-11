@@ -1,10 +1,12 @@
 """Offres d'emploi : CRUD (texte collé uniquement) + analyse, matching, copilote."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.db import get_session
 from app.schemas import (
+    AdaptRequest,
+    AdaptResult,
     CopilotPromptRead,
     CopilotPromptRequest,
     CvVariantRead,
@@ -15,7 +17,7 @@ from app.schemas import (
     OfferUpdate,
     VariantCreateRequest,
 )
-from app.services import analysis_service, copilot_service, offer_service, variant_service
+from app.services import analysis_service, copilot_service, llm_service, offer_service, variant_service
 
 router = APIRouter(prefix="/api/offers", tags=["offers"])
 
@@ -73,6 +75,25 @@ def copilot_prompt(
     return CopilotPromptRead.model_validate(
         copilot_service.build_prompt(session, offer_id, data.text, data.kind)
     )
+
+
+@router.post("/{offer_id}/adapt", response_model=AdaptResult)
+def adapt_with_api_key(
+    offer_id: str, data: AdaptRequest, session: Session = Depends(get_session)
+) -> AdaptResult:
+    """Niveau 2 : adaptation directe via la clé API de l'utilisateur.
+
+    Seul appel réseau sortant de CVForge, déclenché explicitement. Prompt
+    système anti-hallucination imposé ; la réponse est une proposition à
+    valider dans l'Avant/Après."""
+    try:
+        return AdaptResult.model_validate(
+            llm_service.adapt(session, offer_id, data.text, data.kind)
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except llm_service.LlmError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @router.post("/{offer_id}/variants", response_model=CvVariantRead, status_code=201)

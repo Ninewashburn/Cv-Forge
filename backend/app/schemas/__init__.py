@@ -12,6 +12,7 @@ from app.schemas.common import (
 )
 from app.schemas.extract import ExtractedText
 from app.schemas.fact import FactCreate, FactRead, FactUpdate
+from app.schemas.llm import AdaptRequest, AdaptResult, LlmConfigRead, LlmConfigWrite
 from app.schemas.matching import (
     CopilotPromptRead,
     CopilotPromptRequest,
@@ -36,6 +37,8 @@ from app.schemas.variant import (
 )
 
 __all__ = [
+    "AdaptRequest",
+    "AdaptResult",
     "ApplicationCreate",
     "ApplicationRead",
     "ApplicationStatus",
@@ -52,6 +55,8 @@ __all__ = [
     "FactType",
     "FactUpdate",
     "GeneratedSentenceRead",
+    "LlmConfigRead",
+    "LlmConfigWrite",
     "MasterProfileCreate",
     "MasterProfileRead",
     "MasterProfileUpdate",

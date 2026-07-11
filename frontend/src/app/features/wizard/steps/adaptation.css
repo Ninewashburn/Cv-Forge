@@ -43,6 +43,40 @@ h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px; }
   resize: vertical;
 }
 
+/* Niveau clé API */
+.key-input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: 13px var(--mono);
+  background: #FDFDFB;
+}
+.key-input:focus { outline: 2px solid var(--ember); outline-offset: 0; border-color: transparent; }
+.key-state { font-size: 13.5px; }
+.key-state code { font: 12px var(--mono); background: #F4F4F0; padding: 2px 6px; border-radius: 4px; }
+
+.consent-box {
+  border: 1px dashed #C9C8C0;
+  border-radius: 10px;
+  background: #FAFAF8;
+  padding: 12px 14px;
+}
+.consent-what { font: 13px/1.6 var(--sans); color: var(--ink); }
+.consent-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 13px var(--sans);
+  cursor: pointer;
+  margin: 4px 0 2px;
+}
+.consent-check input { accent-color: var(--ember); }
+.api-hint { font: 12.5px/1.5 var(--sans); color: var(--muted); margin: 10px 0 0; }
+.hint { font: 12.5px var(--sans); color: var(--muted); }
+
 /* Grille d'adaptation */
 .adapt-grid {
   display: grid;

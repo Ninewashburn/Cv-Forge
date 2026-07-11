@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 
-import { MatchingResult, PromptKind } from '../../../core/models';
+import { LlmService } from '../../../core/api';
+import { LlmConfig, MatchingResult, PromptKind } from '../../../core/models';
 import { WizardStore } from '../wizard-store';
 
 interface PromptIntent {
@@ -20,6 +21,7 @@ interface PromptIntent {
 })
 export class AdaptationStep {
   protected readonly store = inject(WizardStore);
+  private readonly llm = inject(LlmService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly live = signal<MatchingResult | null>(null);
@@ -27,6 +29,15 @@ export class AdaptationStep {
   protected readonly promptBusy = signal(false);
   protected readonly copyHint = signal('');
   protected readonly kind = signal<PromptKind>('adapter');
+
+  // --- Niveau clé API (niveau 2) -----------------------------------------
+  protected readonly llmConfig = signal<LlmConfig | null>(null);
+  protected readonly keyInput = signal('');
+  protected readonly savingKey = signal(false);
+  /** Consentement explicite : coché à chaque session, jamais présumé. */
+  protected readonly consent = signal(false);
+  protected readonly adapting = signal(false);
+  protected readonly apiHint = signal('');
 
   protected readonly intents: readonly PromptIntent[] = [
     { kind: 'adapter', label: 'Adapter', hint: "Reformuler le CV pour l'offre (défaut)" },
@@ -45,6 +56,77 @@ export class AdaptationStep {
         takeUntilDestroyed(),
       )
       .subscribe((result) => this.live.set(result));
+
+    this.reloadLlmConfig();
+  }
+
+  private reloadLlmConfig(): void {
+    this.llm
+      .getConfig()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (config) => this.llmConfig.set(config),
+        error: () => this.llmConfig.set(null),
+      });
+  }
+
+  protected saveKey(): void {
+    const key = this.keyInput().trim();
+    if (!key || this.savingKey()) return;
+    this.savingKey.set(true);
+    this.apiHint.set('');
+    this.llm
+      .saveConfig(key)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (config) => {
+          this.savingKey.set(false);
+          this.keyInput.set(''); // la clé ne reste jamais dans le navigateur
+          this.llmConfig.set(config);
+          this.apiHint.set('Clé enregistrée sur ta machine (jamais dans le navigateur).');
+        },
+        error: (err: { error?: { detail?: string } }) => {
+          this.savingKey.set(false);
+          this.apiHint.set(err.error?.detail ?? 'Enregistrement de la clé impossible.');
+        },
+      });
+  }
+
+  protected removeKey(): void {
+    if (!window.confirm('Retirer ta clé API de cette machine ?')) return;
+    this.llm
+      .removeConfig()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.consent.set(false);
+        this.apiHint.set('');
+        this.reloadLlmConfig();
+      });
+  }
+
+  protected runAdapt(): void {
+    if (this.adapting() || !this.consent() || !this.llmConfig()?.configured) return;
+    this.adapting.set(true);
+    this.apiHint.set('');
+    this.store
+      .adaptWithApi(this.kind())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.adapting.set(false);
+          // Proposition, jamais appliquée en silence : elle remplace le champ
+          // éditable, et l'export reste verrouillé tant que l'Avant/Après
+          // n'a pas été validé (porte d'intégrité du store).
+          this.store.adaptedText.set(result.adapted_text);
+          this.apiHint.set(
+            `Proposition de ${result.model} reçue — vérifie chaque changement dans l'Avant / Après.`,
+          );
+        },
+        error: (err: { error?: { detail?: string } }) => {
+          this.adapting.set(false);
+          this.apiHint.set(err.error?.detail ?? 'Appel au fournisseur impossible.');
+        },
+      });
   }
 
   protected preparePrompt(): void {

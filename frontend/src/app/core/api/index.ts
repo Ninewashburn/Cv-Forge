@@ -6,3 +6,4 @@ export * from './variant.service';
 export * from './application.service';
 export * from './backup.service';
 export * from './extract.service';
+export * from './llm.service';

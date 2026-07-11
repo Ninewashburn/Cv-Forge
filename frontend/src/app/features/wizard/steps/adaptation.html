@@ -45,6 +45,74 @@
   </div>
 </details>
 
+<details class="copilote">
+  <summary>Ma clé API — adaptation directe, sans copier-coller (avancé)</summary>
+  <div class="copilote-body">
+    @if (llmConfig(); as config) {
+      @if (!config.configured) {
+        <p>
+          Avec ta propre clé API Anthropic (Claude), CVForge envoie le prompt verrouillé et
+          récupère la proposition directement. La clé est enregistrée <strong>sur ta machine</strong>,
+          côté application — jamais dans le navigateur, jamais dans tes backups.
+        </p>
+        <div class="row">
+          <input
+            #apiKey
+            class="key-input"
+            type="password"
+            [value]="keyInput()"
+            (input)="keyInput.set(apiKey.value)"
+            placeholder="sk-ant-…"
+            autocomplete="off"
+            aria-label="Clé API Anthropic"
+          />
+          <button
+            type="button"
+            class="btn btn-ghost"
+            [disabled]="savingKey() || !keyInput().trim()"
+            (click)="saveKey()"
+          >
+            {{ savingKey() ? 'Enregistrement…' : 'Enregistrer la clé' }}
+          </button>
+        </div>
+      } @else {
+        <p class="key-state">
+          Clé enregistrée ({{ config.key_hint }}) — modèle <code>{{ config.model }}</code>.
+          <button type="button" class="btn-link" (click)="removeKey()">Retirer la clé</button>
+        </p>
+
+        <div class="consent-box">
+          <p class="consent-what">
+            <strong>Ce qui sera envoyé à Anthropic :</strong> ton CV original et le texte de
+            l'offre — rien d'autre (pas ton profil LinkedIn, pas tes preuves). Les données
+            envoyées via API ne servent pas à l'entraînement des modèles.
+          </p>
+          <label class="consent-check">
+            <input type="checkbox" [checked]="consent()" (change)="consent.set(!consent())" />
+            J'ai compris ce qui est envoyé, et je le déclenche moi-même.
+          </label>
+          <div class="row">
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!consent() || adapting()"
+              (click)="runAdapt()"
+            >
+              {{ adapting() ? 'Appel en cours… (jusqu’à une minute)' : 'Envoyer et récupérer la proposition' }}
+            </button>
+            <span class="hint">Intention : celle sélectionnée dans le mode copilote ci-dessus.</span>
+          </div>
+        </div>
+      }
+      @if (apiHint()) {
+        <p class="api-hint">{{ apiHint() }}</p>
+      }
+    } @else {
+      <p class="hint">Configuration indisponible — le backend est-il lancé ?</p>
+    }
+  </div>
+</details>
+
 <div class="adapt-grid">
   <div>
     <div class="pane-label"><span>CV ORIGINAL — LECTURE SEULE</span></div>

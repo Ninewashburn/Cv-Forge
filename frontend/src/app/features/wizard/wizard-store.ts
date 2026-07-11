@@ -4,6 +4,7 @@ import { EMPTY, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { ApplicationService, OfferService, VariantService } from '../../core/api';
 import {
+  AdaptResult,
   Application,
   ApplicationStatus,
   CopilotPrompt,
@@ -176,6 +177,13 @@ export class WizardStore {
   buildPrompt(kind: PromptKind): Observable<CopilotPrompt> {
     if (!this.offerId) return EMPTY;
     return this.offers.copilotPrompt(this.offerId, { text: this.cvText(), kind });
+  }
+
+  /** Niveau clé API : même contrat que le copilote (CV original, mêmes intentions),
+   *  mais l'appel part directement chez le fournisseur avec la clé de l'utilisateur. */
+  adaptWithApi(kind: PromptKind): Observable<AdaptResult> {
+    if (!this.offerId) return EMPTY;
+    return this.offers.adapt(this.offerId, { text: this.cvText(), kind });
   }
 
   /** À l'entrée dans l'Avant/Après : si le couple (original, adapté) a changé,
