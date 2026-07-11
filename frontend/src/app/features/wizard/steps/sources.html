@@ -6,7 +6,25 @@
 
 <div class="sources">
   <div class="card">
-    <label for="offre">Offre d'emploi</label>
+    <div class="label-row">
+      <label for="offre">Offre d'emploi</label>
+      <button
+        type="button"
+        class="btn-import"
+        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        [disabled]="importing() !== null"
+        (click)="offreFile.click()"
+      >
+        {{ importing() === 'offer' ? 'Lecture…' : '📄 Importer un fichier' }}
+      </button>
+      <input
+        #offreFile
+        type="file"
+        accept=".pdf,.txt,.md,application/pdf,text/plain"
+        hidden
+        (change)="onImportFile('offer', offreFile)"
+      />
+    </div>
     <textarea
       id="offre"
       #offre
@@ -17,7 +35,25 @@
   </div>
 
   <div class="card">
-    <label for="cv">Ton CV — source de vérité</label>
+    <div class="label-row">
+      <label for="cv">Ton CV — source de vérité</label>
+      <button
+        type="button"
+        class="btn-import"
+        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        [disabled]="importing() !== null"
+        (click)="cvFile.click()"
+      >
+        {{ importing() === 'cv' ? 'Lecture…' : '📄 Importer un fichier' }}
+      </button>
+      <input
+        #cvFile
+        type="file"
+        accept=".pdf,.txt,.md,application/pdf,text/plain"
+        hidden
+        (change)="onImportFile('cv', cvFile)"
+      />
+    </div>
     <textarea
       id="cv"
       #cv
@@ -28,13 +64,36 @@
   </div>
 </div>
 
+@if (importError()) {
+  <p class="import-err">{{ importError() }}</p>
+}
+
 <details class="reveal">
   <summary>Profil LinkedIn — optionnel, pour repérer ce qui manque</summary>
   <div class="reveal-body">
     <p class="li-tip">
-      Colle le texte de ton profil LinkedIn. Il n'est <strong>jamais exporté</strong> : il sert
-      seulement à révéler ce que ton CV oublie — c'est toi qui décides quoi ajouter.
+      Colle le texte de ton profil LinkedIn — ou importe directement le PDF obtenu via
+      « Plus → Enregistrer au format PDF » sur ton profil. Il n'est <strong>jamais exporté</strong> :
+      il sert seulement à révéler ce que ton CV oublie — c'est toi qui décides quoi ajouter.
     </p>
+    <div class="label-row li-import-row">
+      <button
+        type="button"
+        class="btn-import"
+        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        [disabled]="importing() !== null"
+        (click)="linkedinFile.click()"
+      >
+        {{ importing() === 'linkedin' ? 'Lecture…' : '📄 Importer un fichier' }}
+      </button>
+      <input
+        #linkedinFile
+        type="file"
+        accept=".pdf,.txt,.md,application/pdf,text/plain"
+        hidden
+        (change)="onImportFile('linkedin', linkedinFile)"
+      />
+    </div>
     <textarea
       #linkedin
       [value]="store.linkedinText()"

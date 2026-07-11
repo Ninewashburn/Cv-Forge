@@ -4,7 +4,7 @@
 
 **Corollaire :** la V1 embarque son propre instrument de mesure (micro-tracking). Sans mesure, le statement est un slogan.
 
-**Dernière mise à jour :** 2026-07-08
+**Dernière mise à jour :** 2026-07-11
 **Statut :** V0 tranché — prêt pour Claude Code (voir CLAUDE.md)
 **Maquettes :** les schémas d'interface = vision cible (North Star, V3+). Le périmètre de build reste la section V1, exclusivement.
 
@@ -73,10 +73,10 @@
 
 ### Features
 
-- [ ] **Import CV existant** (PDF/texte) → pré-remplissage du profil maître
+- [ ] **Import CV existant** (PDF/texte) *(fait 2026-07-11 : import fichier → zone CV du wizard ; **reste : pré-remplissage du profil maître**, dépend de la vue Profil maître)*
   - Anti-mur d'onboarding : valeur visible en < 5 min
 - [x] **Import offre** — copier-coller texte (l'URL n'est qu'une référence saisie, **jamais fetchée** — règle « aucun réseau sortant »)
-- [ ] **Bouton « Importer un fichier » sur chaque zone de texte** (CV, offre, profil LinkedIn) *(ajout 2026-07-02)*
+- [x] **Bouton « Importer un fichier » sur chaque zone de texte** (CV, offre, profil LinkedIn) *(ajout 2026-07-02 ; livré 2026-07-11 — `POST /api/extract`, pypdf)*
   - Extraction de texte **locale** (pypdf : PDF + .txt) côté FastAPI — le fichier ne quitte jamais la machine.
   - Le texte extrait atterrit dans le champ, **visible et éditable avant toute analyse** — même contrat que le copier-coller, qui reste toujours disponible (fallback universel).
   - Un seul endpoint générique réutilisé par les trois champs. **Hors Lite** (gel : zéro backend).

@@ -19,6 +19,7 @@ from app.core.db import run_migrations
 from app.routers import (
     applications_router,
     backup_router,
+    extract_router,
     facts_router,
     offers_router,
     profile_router,
@@ -65,6 +66,7 @@ def create_app() -> FastAPI:
     app.include_router(variants_router)
     app.include_router(applications_router)
     app.include_router(backup_router)
+    app.include_router(extract_router)
 
     # Phase 5 — single process : FastAPI sert le build Angular sur la même
     # origine. Les routes /api ci-dessus restent prioritaires ; toute autre URL

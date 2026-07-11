@@ -5,3 +5,4 @@ export * from './offer.service';
 export * from './variant.service';
 export * from './application.service';
 export * from './backup.service';
+export * from './extract.service';

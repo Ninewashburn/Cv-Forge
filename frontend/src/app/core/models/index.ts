@@ -6,3 +6,4 @@ export * from './offer.model';
 export * from './variant.model';
 export * from './matching.model';
 export * from './application.model';
+export * from './extract.model';

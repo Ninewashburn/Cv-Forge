@@ -10,6 +10,7 @@ from app.schemas.common import (
     SentenceStatus,
     VariantStatus,
 )
+from app.schemas.extract import ExtractedText
 from app.schemas.fact import FactCreate, FactRead, FactUpdate
 from app.schemas.matching import (
     CopilotPromptRead,
@@ -45,6 +46,7 @@ __all__ = [
     "CvVariantCreate",
     "CvVariantRead",
     "CvVariantUpdate",
+    "ExtractedText",
     "FactCreate",
     "FactRead",
     "FactType",
