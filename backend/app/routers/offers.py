@@ -17,7 +17,13 @@ from app.schemas import (
     OfferUpdate,
     VariantCreateRequest,
 )
-from app.services import analysis_service, copilot_service, llm_service, offer_service, variant_service
+from app.services import (
+    analysis_service,
+    copilot_service,
+    llm_service,
+    offer_service,
+    variant_service,
+)
 
 router = APIRouter(prefix="/api/offers", tags=["offers"])
 

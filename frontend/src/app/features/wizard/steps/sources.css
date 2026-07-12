@@ -1,17 +1,49 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
-h2 { font: 700 23px/1.25 var(--serif); margin: 0 0 8px; }
-.lead { color: var(--muted); font-size: 14.5px; margin: 0 0 18px; max-width: 680px; }
+h2 {
+  font: 700 23px/1.25 var(--serif);
+  margin: 0 0 8px;
+}
+.lead {
+  color: var(--muted);
+  font-size: 14.5px;
+  margin: 0 0 18px;
+  max-width: 680px;
+}
 
-.sources { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 840px) { .sources { grid-template-columns: 1fr; } }
+.sources {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 840px) {
+  .sources {
+    grid-template-columns: 1fr;
+  }
+}
 
-label { font: 600 13px var(--sans); display: block; margin-bottom: 8px; }
+label {
+  font: 600 13px var(--sans);
+  display: block;
+  margin-bottom: 8px;
+}
 
 /* Ligne label + « Importer un fichier » (extraction locale, fallback copier-coller). */
-.label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.label-row label { margin-bottom: 8px; }
-.li-import-row { justify-content: flex-start; margin-bottom: 8px; }
+.label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.label-row label {
+  margin-bottom: 8px;
+}
+.li-import-row {
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
 
 .btn-import {
   background: none;
@@ -23,10 +55,20 @@ label { font: 600 13px var(--sans); display: block; margin-bottom: 8px; }
   cursor: pointer;
   white-space: nowrap;
 }
-.btn-import:hover:not(:disabled) { border-color: var(--ember); color: var(--ember); }
-.btn-import:disabled { opacity: 0.55; cursor: default; }
+.btn-import:hover:not(:disabled) {
+  border-color: var(--ember);
+  color: var(--ember);
+}
+.btn-import:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
 
-.import-err { font: 12.5px var(--sans); color: var(--del); margin: 10px 0 0; }
+.import-err {
+  font: 12.5px var(--sans);
+  color: var(--del);
+  margin: 10px 0 0;
+}
 
 textarea {
   width: 100%;
@@ -41,15 +83,19 @@ textarea {
   padding: 12px 14px;
   font: 13.5px/1.6 var(--mono);
   color: var(--ink);
-  background: #FDFDFB;
+  background: #fdfdfb;
 }
-textarea:focus { outline: 2px solid var(--ember); outline-offset: 0; border-color: transparent; }
+textarea:focus {
+  outline: 2px solid var(--ember);
+  outline-offset: 0;
+  border-color: transparent;
+}
 
 .reveal {
   margin-top: 16px;
-  border: 1px dashed #C9C8C0;
+  border: 1px dashed #c9c8c0;
   border-radius: 10px;
-  background: #FAFAF8;
+  background: #fafaf8;
 }
 .reveal summary {
   cursor: pointer;
@@ -57,16 +103,43 @@ textarea:focus { outline: 2px solid var(--ember); outline-offset: 0; border-colo
   padding: 14px 18px;
   font: 600 14px var(--sans);
 }
-.reveal summary::-webkit-details-marker { display: none; }
-.reveal summary::before { content: "▸ "; color: var(--ember); }
-.reveal[open] summary::before { content: "▾ "; }
-.reveal-body { padding: 0 18px 16px; }
-.reveal-body textarea { min-height: 140px; max-height: 45vh; background: #FCFCFA; }
-.li-tip { font: 12.5px/1.5 var(--sans); color: var(--muted); margin: 0 0 10px; }
+.reveal summary::-webkit-details-marker {
+  display: none;
+}
+.reveal summary::before {
+  content: '▸ ';
+  color: var(--ember);
+}
+.reveal[open] summary::before {
+  content: '▾ ';
+}
+.reveal-body {
+  padding: 0 18px 16px;
+}
+.reveal-body textarea {
+  min-height: 140px;
+  max-height: 45vh;
+  background: #fcfcfa;
+}
+.li-tip {
+  font: 12.5px/1.5 var(--sans);
+  color: var(--muted);
+  margin: 0 0 10px;
+}
 
-.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
-.spacer { flex: 1; }
-.samples { margin-top: 16px; }
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.spacer {
+  flex: 1;
+}
+.samples {
+  margin-top: 16px;
+}
 
 .btn-link {
   background: none;
@@ -78,12 +151,33 @@ textarea:focus { outline: 2px solid var(--ember); outline-offset: 0; border-colo
   cursor: pointer;
 }
 
-.err { font: 12.5px var(--sans); color: var(--del); }
-.footer-row { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px; }
+.err {
+  font: 12.5px var(--sans);
+  color: var(--del);
+}
+.footer-row {
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 16px;
+}
 
 /* Mini-FAQ confiance — réassurance au moment du doute (contenu statique). */
-.faq-trust { margin-top: 20px; }
-.faq { margin: 0; }
-.faq dt { font: 600 13.5px var(--sans); color: var(--ink); margin: 12px 0 4px; }
-.faq dt:first-of-type { margin-top: 0; }
-.faq dd { margin: 0; font: 13px/1.6 var(--sans); color: var(--muted); }
+.faq-trust {
+  margin-top: 20px;
+}
+.faq {
+  margin: 0;
+}
+.faq dt {
+  font: 600 13.5px var(--sans);
+  color: var(--ink);
+  margin: 12px 0 4px;
+}
+.faq dt:first-of-type {
+  margin-top: 0;
+}
+.faq dd {
+  margin: 0;
+  font: 13px/1.6 var(--sans);
+  color: var(--muted);
+}

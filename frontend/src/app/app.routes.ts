@@ -13,8 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'profil',
-    loadComponent: () =>
-      import('./features/profile/profile-page').then((m) => m.ProfilePage),
+    loadComponent: () => import('./features/profile/profile-page').then((m) => m.ProfilePage),
   },
   { path: '**', redirectTo: '' },
 ];

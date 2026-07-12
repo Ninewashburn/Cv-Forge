@@ -39,9 +39,7 @@ export class AvantApresStep {
   }
 
   protected readonly confirmedCount = computed(() => this.store.confirmedAdditions().size);
-  protected readonly allConfirmed = computed(
-    () => this.confirmedCount() >= this.additions.length,
-  );
+  protected readonly allConfirmed = computed(() => this.confirmedCount() >= this.additions.length);
 
   protected isConfirmed(index: number): boolean {
     return this.store.confirmedAdditions().has(index);

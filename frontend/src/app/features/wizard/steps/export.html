@@ -1,7 +1,7 @@
 <h2>Ton CV adapté est prêt</h2>
 <p class="lead">
-  Chaque ajout a été confirmé « vrai et prouvable » dans l'Avant / Après. Le PDF est généré
-  sur ta machine — rien ne part sur un serveur.
+  Chaque ajout a été confirmé « vrai et prouvable » dans l'Avant / Après. Le PDF est généré sur ta
+  machine — rien ne part sur un serveur.
 </p>
 
 <div class="card">
@@ -42,7 +42,10 @@
       C'est la mesure qui compte : cette candidature a-t-elle donné une réponse, un entretien ?
     </p>
     <div class="track-item">
-      <span class="meta">{{ application.sent_at | date: 'dd/MM/yyyy' }} — {{ store.offer()?.title || 'Offre' }}</span>
+      <span class="meta"
+        >{{ application.sent_at | date: 'dd/MM/yyyy' }} —
+        {{ store.offer()?.title || 'Offre' }}</span
+      >
       <select
         #statusSelect
         [value]="application.status"
@@ -58,5 +61,7 @@
 }
 
 <div class="row footer-row">
-  <button type="button" class="btn btn-ghost" (click)="store.goTo(4)">← Revoir l'avant / après</button>
+  <button type="button" class="btn btn-ghost" (click)="store.goTo(4)">
+    ← Revoir l'avant / après
+  </button>
 </div>

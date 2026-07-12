@@ -15,7 +15,7 @@ import { WizardStore } from '../wizard-store';
 export class ExportStep {
   protected readonly store = inject(WizardStore);
 
-  protected readonly statuses: ReadonlyArray<{ value: ApplicationStatus; label: string }> = [
+  protected readonly statuses: readonly { value: ApplicationStatus; label: string }[] = [
     { value: 'envoyee', label: 'Envoyée' },
     { value: 'reponse', label: 'Réponse reçue' },
     { value: 'entretien', label: 'Entretien obtenu' },

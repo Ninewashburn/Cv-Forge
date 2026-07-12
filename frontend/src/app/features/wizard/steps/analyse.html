@@ -7,7 +7,10 @@
 
   <div class="card">
     <div class="score-board">
-      <div class="score-num"><span>{{ a.scoreCv }}</span><small>%</small></div>
+      <div class="score-num">
+        <span>{{ a.scoreCv }}</span
+        ><small>%</small>
+      </div>
       <div class="score-meta">
         <div class="verdict">{{ verdict(a.scoreCv) }}</div>
         <div class="score-track">
@@ -15,8 +18,8 @@
         </div>
         @if (a.hasLinkedin && a.scorePotential !== null) {
           <div class="potential">
-            CV seul : <span class="hl">{{ a.scoreCv }}%</span> ·
-            CV + ce que tu peux légitimement ajouter depuis LinkedIn :
+            CV seul : <span class="hl">{{ a.scoreCv }}%</span> · CV + ce que tu peux légitimement
+            ajouter depuis LinkedIn :
             <span class="hl">{{ a.scorePotential }}%</span>
             <span class="li-note">(potentiel — jamais un score envoyé)</span>
           </div>
@@ -28,7 +31,9 @@
       <div class="kw-title">✓ COUVERT PAR TON CV</div>
       <div class="chips">
         @for (k of onCv(); track k.keyword) {
-          <span class="chip chip-ok">✓ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+          <span class="chip chip-ok"
+            >✓ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span
+          >
         } @empty {
           <span class="hint">Aucun mot-clé couvert.</span>
         }
@@ -37,10 +42,14 @@
 
     @if (a.hasLinkedin) {
       <div class="kw-group">
-        <div class="kw-title">↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV — À AJOUTER SI PROUVABLE</div>
+        <div class="kw-title">
+          ↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV — À AJOUTER SI PROUVABLE
+        </div>
         <div class="chips">
           @for (k of onLinkedin(); track k.keyword) {
-            <span class="chip chip-li">↗ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+            <span class="chip chip-li"
+              >↗ {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span
+            >
           } @empty {
             <span class="hint">Rien de plus à révéler depuis ton LinkedIn.</span>
           }
@@ -50,11 +59,15 @@
 
     <div class="kw-group">
       <div class="kw-title">
-        {{ a.hasLinkedin ? '? ABSENT DU CV ET DE LINKEDIN — NE PAS INVENTER' : '? ABSENT DE TON CV' }}
+        {{
+          a.hasLinkedin ? '? ABSENT DU CV ET DE LINKEDIN — NE PAS INVENTER' : '? ABSENT DE TON CV'
+        }}
       </div>
       <div class="chips">
         @for (k of nowhere(); track k.keyword) {
-          <span class="chip chip-none">? {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span>
+          <span class="chip chip-none"
+            >? {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span
+          >
         } @empty {
           <span class="hint">Rien ne manque — couverture totale.</span>
         }
@@ -68,7 +81,9 @@
     </div>
 
     <div class="row">
-      <button type="button" class="btn btn-ghost" (click)="store.goTo(1)">← Revoir les sources</button>
+      <button type="button" class="btn btn-ghost" (click)="store.goTo(1)">
+        ← Revoir les sources
+      </button>
       <span class="spacer"></span>
       <button type="button" class="btn btn-primary" (click)="store.goTo(3)">
         Commencer l'adaptation

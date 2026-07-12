@@ -1,36 +1,63 @@
 /* Design « papier » de CVForge — tokens partagés (portés de la version Lite). */
 :root {
   color-scheme: light;
-  --paper: #F4F4F0;
-  --card: #FFFFFF;
-  --ink: #1C1B17;
-  --muted: #6B6A60;
-  --line: #E1E0D8;
-  --ember: #C8430D;
-  --ember-dark: #A23509;
-  --ember-soft: #FBEDE4;
-  --ok: #1E6F47;
-  --ok-soft: #E6F2EB;
-  --warn: #8A5800;
-  --warn-soft: #FBF2DF;
-  --del: #A93226;
-  --del-soft: #F9E8E6;
-  --serif: "Charter", "Bitstream Charter", Georgia, "Times New Roman", serif;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  --paper: #f4f4f0;
+  --card: #ffffff;
+  --ink: #1c1b17;
+  --muted: #6b6a60;
+  --line: #e1e0d8;
+  --ember: #c8430d;
+  --ember-dark: #a23509;
+  --ember-soft: #fbede4;
+  --ok: #1e6f47;
+  --ok-soft: #e6f2eb;
+  --warn: #8a5800;
+  --warn-soft: #fbf2df;
+  --del: #a93226;
+  --del-soft: #f9e8e6;
+  --serif: 'Charter', 'Bitstream Charter', Georgia, 'Times New Roman', serif;
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body { background: var(--paper); color: var(--ink); font: 16px/1.55 var(--sans); }
-::selection { background: var(--ember-soft); }
-a { color: var(--ember); }
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 var(--sans);
+}
+::selection {
+  background: var(--ember-soft);
+}
+a {
+  color: var(--ember);
+}
 
-:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; border-radius: 3px; }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
 /* Utilitaires partagés (repris tels quels dans les features). */
-.wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+.wrap {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
 .card {
   background: var(--card);
@@ -39,8 +66,17 @@ a { color: var(--ember); }
   padding: 18px;
 }
 
-.eyebrow { font: 700 11px var(--mono); letter-spacing: .14em; color: var(--ember); margin: 0 0 6px; }
-h1, h2, h3 { font-family: var(--serif); }
+.eyebrow {
+  font: 700 11px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--ember);
+  margin: 0 0 6px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+}
 
 .btn {
   border-radius: 8px;
@@ -51,14 +87,25 @@ h1, h2, h3 { font-family: var(--serif); }
   text-decoration: none;
   display: inline-block;
 }
-.btn-primary { background: var(--ember); color: #fff; }
-.btn-primary:hover { background: var(--ember-dark); }
-.btn-ghost { background: var(--card); border-color: var(--line); color: var(--ink); }
-.btn-ghost:hover { border-color: var(--ink); }
+.btn-primary {
+  background: var(--ember);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--ember-dark);
+}
+.btn-ghost {
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn-ghost:hover {
+  border-color: var(--ink);
+}
 
 .badge {
   font: 600 10.5px/1 var(--mono);
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   color: var(--muted);
   border: 1px solid var(--line);
   background: var(--card);
@@ -67,4 +114,7 @@ h1, h2, h3 { font-family: var(--serif); }
   display: inline-block;
 }
 
-.hint { font: 12.5px var(--sans); color: var(--muted); }
+.hint {
+  font: 12.5px var(--sans);
+  color: var(--muted);
+}

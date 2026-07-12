@@ -178,10 +178,22 @@ export class ProfilePage {
         error: (err: { error?: { detail?: string } }) => {
           this.importingCv.set(false);
           this.profileHint.set(
-            err.error?.detail ?? 'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
+            err.error?.detail ??
+              'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
           );
         },
       });
+  }
+
+  /** Sans cast : la valeur du <select> est validée contre la liste des types. */
+  protected onFactTypeChange(value: string): void {
+    const match = FACT_TYPES.find((t) => t.value === value);
+    if (match) this.factType.set(match.value);
+  }
+
+  protected onProofTypeChange(value: string): void {
+    const match = PROOF_TYPES.find((t) => t.value === value);
+    if (match) this.proofType.set(match.value);
   }
 
   // ------------------------------------------------------------ faits

@@ -7,7 +7,10 @@ def _create_offer(client, raw_text="Offre de test Angular pour export complet"):
 
 # Lignes consécutives SANS ligne vide : c'est le cas qui piégeait multi_cell
 # (curseur laissé au bord droit) — une ligne vide masquait le bug via ln().
-def _manual_variant(client, offer_id, text="Mon CV adapté et validé.\nExpérience Angular.\nLigne trois."):
+_DEFAULT_TEXT = "Mon CV adapté et validé.\nExpérience Angular.\nLigne trois."
+
+
+def _manual_variant(client, offer_id, text=_DEFAULT_TEXT):
     response = client.post(f"/api/offers/{offer_id}/variants", json={"adapted_text": text})
     assert response.status_code == 201
     return response.json()

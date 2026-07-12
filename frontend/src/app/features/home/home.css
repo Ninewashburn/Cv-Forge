@@ -1,23 +1,56 @@
 /* Page de lecture : elle se limite elle-même (le shell, lui, est fluide). */
-:host { display: block; padding-top: 26px; max-width: 1012px; margin-inline: auto; }
+:host {
+  display: block;
+  padding-top: 26px;
+  max-width: 1012px;
+  margin-inline: auto;
+}
 
-h2 { font: 700 26px/1.25 var(--serif); margin: 0 0 12px; max-width: 720px; }
-.lead { color: var(--muted); font-size: 15px; margin: 0 0 24px; max-width: 680px; }
+h2 {
+  font: 700 26px/1.25 var(--serif);
+  margin: 0 0 12px;
+  max-width: 720px;
+}
+.lead {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0 0 24px;
+  max-width: 680px;
+}
 
-.status-card { max-width: 680px; }
+.status-card {
+  max-width: 680px;
+}
 
-.status-line { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
 .status-line code {
   font: 12.5px var(--mono);
-  background: #F4F4F0;
+  background: #f4f4f0;
   padding: 2px 6px;
   border-radius: 4px;
 }
 
-.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
-.status-card[data-state='loading'] .dot { background: var(--warn); }
-.status-card[data-state='connected'] .dot { background: var(--ok); }
-.status-card[data-state='error'] .dot { background: var(--del); }
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.status-card[data-state='loading'] .dot {
+  background: var(--warn);
+}
+.status-card[data-state='connected'] .dot {
+  background: var(--ok);
+}
+.status-card[data-state='error'] .dot {
+  background: var(--del);
+}
 
 .profile-peek {
   display: grid;
@@ -28,14 +61,45 @@ h2 { font: 700 26px/1.25 var(--serif); margin: 0 0 12px; max-width: 720px; }
   border-top: 1px solid var(--line);
   font-size: 13.5px;
 }
-.profile-peek dt { color: var(--muted); font-weight: 600; }
-.profile-peek dd { margin: 0; }
-.profile-peek code { font: 12px var(--mono); color: var(--muted); }
+.profile-peek dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+.profile-peek dd {
+  margin: 0;
+}
+.profile-peek code {
+  font: 12px var(--mono);
+  color: var(--muted);
+}
 
-.cta-row { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+.cta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
 
-.backup-card { max-width: 680px; margin-top: 20px; }
-.backup-card h3 { font: 700 16px var(--serif); margin: 0 0 4px; }
-.backup-card .sub { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
-.backup-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.restore-label { cursor: pointer; }
+.backup-card {
+  max-width: 680px;
+  margin-top: 20px;
+}
+.backup-card h3 {
+  font: 700 16px var(--serif);
+  margin: 0 0 4px;
+}
+.backup-card .sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.backup-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.restore-label {
+  cursor: pointer;
+}

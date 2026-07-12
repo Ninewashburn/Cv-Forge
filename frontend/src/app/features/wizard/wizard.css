@@ -1,4 +1,7 @@
-:host { display: block; padding-top: 20px; }
+:host {
+  display: block;
+  padding-top: 20px;
+}
 
 .steps {
   display: flex;
@@ -24,18 +27,39 @@
 
 .step .n {
   font: 700 10.5px var(--mono);
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
   display: block;
   margin-bottom: 3px;
 }
 
-.step .t { font: 600 13px var(--sans); display: block; white-space: nowrap; }
+.step .t {
+  font: 600 13px var(--sans);
+  display: block;
+  white-space: nowrap;
+}
 
-.step.current { background: var(--ink); color: #fff; }
-.step.current .n { color: #E8B23A; }
-.step.done .n { color: var(--ok); }
-.step:not([disabled]):not(.current):hover { background: #ECECE6; }
-.step[disabled] { opacity: .45; cursor: not-allowed; }
+.step.current {
+  background: var(--ink);
+  color: #fff;
+}
+.step.current .n {
+  color: #e8b23a;
+}
+.step.done .n {
+  color: var(--ok);
+}
+.step:not([disabled]):not(.current):hover {
+  background: #ecece6;
+}
+.step[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
-.soon { text-align: center; }
-.soon h2 { font: 700 20px var(--serif); margin: 0 0 6px; }
+.soon {
+  text-align: center;
+}
+.soon h2 {
+  font: 700 20px var(--serif);
+  margin: 0 0 6px;
+}

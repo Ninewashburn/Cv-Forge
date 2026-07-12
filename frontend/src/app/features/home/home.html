@@ -2,18 +2,24 @@
 <h2>Candidater comme on code : avec méthode, traçabilité, sans bullshit.</h2>
 <p class="lead">
   Colle une offre et ton CV dans l'Atelier : matching sans IA, adaptation contrôlée,
-  <strong>Avant / Après</strong> où chaque ajout est confirmé « vrai et prouvable »,
-  export PDF et suivi de candidature. Tout se passe sur ta machine.
+  <strong>Avant / Après</strong> où chaque ajout est confirmé « vrai et prouvable », export PDF et
+  suivi de candidature. Tout se passe sur ta machine.
 </p>
 
 <div class="card status-card" [attr.data-state]="state()">
   <div class="status-line">
     <span class="dot"></span>
     @switch (state()) {
-      @case ('loading') { <span>Connexion à l'API locale…</span> }
-      @case ('connected') { <span>Application locale prête — tes données sont sur ta machine.</span> }
+      @case ('loading') {
+        <span>Connexion à l'API locale…</span>
+      }
+      @case ('connected') {
+        <span>Application locale prête — tes données sont sur ta machine.</span>
+      }
       @case ('error') {
-        <span>API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></span>
+        <span
+          >API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></span
+        >
       }
     }
   </div>
@@ -23,7 +29,9 @@
       <dt>Profil maître</dt>
       <dd>{{ p.headline || "(en-tête vide — à remplir dans l'Atelier)" }}</dd>
       <dt>Identifiant</dt>
-      <dd><code>{{ p.id }}</code></dd>
+      <dd>
+        <code>{{ p.id }}</code>
+      </dd>
     </dl>
   }
 </div>
@@ -36,8 +44,8 @@
 <div class="card backup-card">
   <h3>Tes données t'appartiennent</h3>
   <p class="sub">
-    Emporte tout dans un fichier ZIP (base + preuves), ou restaure un backup existant.
-    Aucune donnée n'est envoyée où que ce soit.
+    Emporte tout dans un fichier ZIP (base + preuves), ou restaure un backup existant. Aucune donnée
+    n'est envoyée où que ce soit.
   </p>
   <div class="backup-row">
     <a class="btn btn-ghost" [href]="backup.exportUrl">⬇ Exporter mes données (ZIP)</a>

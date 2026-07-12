@@ -62,9 +62,9 @@ def run_migrations() -> None:
     lancer lui-même. Chemins résolus via ``app_dir()`` — fonctionne en dev
     comme dans l'exe PyInstaller (V1.5).
     """
-    from alembic import command
     from alembic.config import Config
 
+    from alembic import command
     from app.core.config import app_dir
 
     cfg = Config(str(app_dir() / "alembic.ini"))

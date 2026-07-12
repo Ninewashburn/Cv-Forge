@@ -33,9 +33,11 @@ export class Home {
     const file = input.files?.[0];
     input.value = ''; // permet de resélectionner le même fichier
     if (!file || this.restoring()) return;
-    if (!window.confirm(
-      'Restaurer ce backup ? TOUTES les données actuelles seront remplacées par celles de l’archive.',
-    )) {
+    if (
+      !window.confirm(
+        'Restaurer ce backup ? TOUTES les données actuelles seront remplacées par celles de l’archive.',
+      )
+    ) {
       return;
     }
     this.restoring.set(true);

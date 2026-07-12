@@ -47,7 +47,8 @@ export class SourcesStep {
         error: (err: { error?: { detail?: string } }) => {
           this.importing.set(null);
           this.importError.set(
-            err.error?.detail ?? 'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
+            err.error?.detail ??
+              'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
           );
         },
       });

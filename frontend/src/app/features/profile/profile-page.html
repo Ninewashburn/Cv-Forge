@@ -1,9 +1,9 @@
 <p class="eyebrow">SOURCE DE VÉRITÉ</p>
 <h2>Ton profil maître & ta banque de preuves</h2>
 <p class="lead">
-  Tout ce qui est écrit ici doit être <strong>vrai et prouvable en entretien</strong>.
-  C'est la matière première que l'Atelier adapte ensuite à chaque offre — rien d'autre
-  ne sera jamais inventé à ta place.
+  Tout ce qui est écrit ici doit être <strong>vrai et prouvable en entretien</strong>. C'est la
+  matière première que l'Atelier adapte ensuite à chaque offre — rien d'autre ne sera jamais inventé
+  à ta place.
 </p>
 
 @switch (state()) {
@@ -11,7 +11,9 @@
     <p class="hint">Chargement depuis ta base locale…</p>
   }
   @case ('error') {
-    <p class="err">API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></p>
+    <p class="err">
+      API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code>
+    </p>
   }
   @case ('ready') {
     <!-- ============================================= Profil maître -->
@@ -26,8 +28,13 @@
         </label>
         <label>
           En-tête (métier en une ligne)
-          <input #hl [value]="headline()" (input)="headline.set(hl.value)"
-                 placeholder="Ex. Développeur full-stack Angular / Python" autocomplete="off" />
+          <input
+            #hl
+            [value]="headline()"
+            (input)="headline.set(hl.value)"
+            placeholder="Ex. Développeur full-stack Angular / Python"
+            autocomplete="off"
+          />
         </label>
         <label>
           Email
@@ -39,8 +46,13 @@
         </label>
         <label>
           Localisation
-          <input #lo [value]="location()" (input)="location.set(lo.value)"
-                 placeholder="Ex. Clermont-Ferrand / télétravail" autocomplete="off" />
+          <input
+            #lo
+            [value]="location()"
+            (input)="location.set(lo.value)"
+            placeholder="Ex. Clermont-Ferrand / télétravail"
+            autocomplete="off"
+          />
         </label>
         <label>
           Liens (un par ligne — GitHub, portfolio…)
@@ -52,7 +64,9 @@
         </label>
         <div class="full">
           <div class="label-row">
-            <span class="field-label">Ton CV complet (le matching et le copilote s'en servent automatiquement)</span>
+            <span class="field-label"
+              >Ton CV complet (le matching et le copilote s'en servent automatiquement)</span
+            >
             <button
               type="button"
               class="btn-import"
@@ -81,7 +95,12 @@
       </div>
 
       <div class="row">
-        <button type="button" class="btn btn-primary" [disabled]="savingProfile()" (click)="saveProfile()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="savingProfile()"
+          (click)="saveProfile()"
+        >
           {{ savingProfile() ? 'Enregistrement…' : 'Enregistrer le profil' }}
         </button>
         @if (profileHint()) {
@@ -96,15 +115,15 @@
       <section>
         <h3>Faits de ton parcours</h3>
         <p class="sub">
-          Expériences, compétences, projets… Coche « prouvable » quand une preuve l'appuie :
-          c'est ce que le matching et l'adaptation utiliseront en priorité.
+          Expériences, compétences, projets… Coche « prouvable » quand une preuve l'appuie : c'est
+          ce que le matching et l'adaptation utiliseront en priorité.
         </p>
 
         <div class="card form-card">
           <div class="form-row">
             <label>
               Type
-              <select #ft [value]="factType()" (change)="factType.set($any(ft.value))">
+              <select #ft [value]="factType()" (change)="onFactTypeChange(ft.value)">
                 @for (t of factTypes; track t.value) {
                   <option [value]="t.value">{{ t.label }}</option>
                 }
@@ -112,25 +131,42 @@
             </label>
             <label class="grow">
               Titre
-              <input #fti [value]="factTitle()" (input)="factTitle.set(fti.value)"
-                     placeholder="Ex. Refonte du site vitrine en Angular" autocomplete="off" />
+              <input
+                #fti
+                [value]="factTitle()"
+                (input)="factTitle.set(fti.value)"
+                placeholder="Ex. Refonte du site vitrine en Angular"
+                autocomplete="off"
+              />
             </label>
           </div>
           <label>
             Détail (factuel — ce que tu as fait, mesuré si tu l'as mesuré)
-            <textarea #ftc rows="3" [value]="factContent()" (input)="factContent.set(ftc.value)"></textarea>
+            <textarea
+              #ftc
+              rows="3"
+              [value]="factContent()"
+              (input)="factContent.set(ftc.value)"
+            ></textarea>
           </label>
           <label>
             Mots-clés (séparés par des virgules)
-            <input #ftt [value]="factTags()" (input)="factTags.set(ftt.value)"
-                   placeholder="angular, typescript, accessibilité" autocomplete="off" />
+            <input
+              #ftt
+              [value]="factTags()"
+              (input)="factTags.set(ftt.value)"
+              placeholder="angular, typescript, accessibilité"
+              autocomplete="off"
+            />
           </label>
           <div class="row">
             <button type="button" class="btn btn-primary" (click)="submitFact()">
               {{ editingFactId() ? 'Enregistrer le fait' : 'Ajouter ce fait' }}
             </button>
             @if (editingFactId()) {
-              <button type="button" class="btn btn-ghost" (click)="cancelFactEdit()">Annuler</button>
+              <button type="button" class="btn btn-ghost" (click)="cancelFactEdit()">
+                Annuler
+              </button>
             }
             @if (factHint()) {
               <span class="hint">{{ factHint() }}</span>
@@ -146,8 +182,16 @@
             <div class="item-head">
               <span class="badge">{{ typeLabel(fact.type) }}</span>
               <strong class="title">{{ fact.title }}</strong>
-              <label class="provable" [class.on]="fact.validated" title="Une preuve de la banque appuie ce fait">
-                <input type="checkbox" [checked]="fact.validated" (change)="toggleValidated(fact)" />
+              <label
+                class="provable"
+                [class.on]="fact.validated"
+                title="Une preuve de la banque appuie ce fait"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="fact.validated"
+                  (change)="toggleValidated(fact)"
+                />
                 prouvable
               </label>
             </div>
@@ -161,7 +205,9 @@
               <span class="spacer"></span>
               <span class="hint">{{ proofCountOf(fact) }} preuve(s)</span>
               <button type="button" class="btn-link" (click)="startFactEdit(fact)">Modifier</button>
-              <button type="button" class="btn-link danger" (click)="removeFact(fact)">Supprimer</button>
+              <button type="button" class="btn-link danger" (click)="removeFact(fact)">
+                Supprimer
+              </button>
             </div>
           </article>
         }
@@ -171,15 +217,15 @@
       <section>
         <h3>Banque de preuves</h3>
         <p class="sub">
-          Une note, un lien (GitHub, article…) ou un document (attestation, certificat).
-          Relie chaque preuve aux faits qu'elle appuie.
+          Une note, un lien (GitHub, article…) ou un document (attestation, certificat). Relie
+          chaque preuve aux faits qu'elle appuie.
         </p>
 
         <div class="card form-card">
           <div class="form-row">
             <label>
               Type
-              <select #pt [value]="proofType()" (change)="proofType.set($any(pt.value))">
+              <select #pt [value]="proofType()" (change)="onProofTypeChange(pt.value)">
                 @for (t of proofTypes; track t.value) {
                   <option [value]="t.value">{{ t.label }}</option>
                 }
@@ -187,14 +233,24 @@
             </label>
             <label class="grow">
               Titre
-              <input #pti [value]="proofTitle()" (input)="proofTitle.set(pti.value)"
-                     placeholder="Ex. Dépôt GitHub du projet" autocomplete="off" />
+              <input
+                #pti
+                [value]="proofTitle()"
+                (input)="proofTitle.set(pti.value)"
+                placeholder="Ex. Dépôt GitHub du projet"
+                autocomplete="off"
+              />
             </label>
           </div>
           <label>
             {{ proofType() === 'link' ? 'Adresse du lien' : 'Contenu / description' }}
-            <textarea #ptc rows="2" [value]="proofContent()" (input)="proofContent.set(ptc.value)"
-                      [placeholder]="proofType() === 'link' ? 'https://…' : 'Ce que cette preuve montre…'"></textarea>
+            <textarea
+              #ptc
+              rows="2"
+              [value]="proofContent()"
+              (input)="proofContent.set(ptc.value)"
+              [placeholder]="proofType() === 'link' ? 'https://…' : 'Ce que cette preuve montre…'"
+            ></textarea>
           </label>
           @if (facts().length > 0) {
             <fieldset class="link-facts">
@@ -216,7 +272,9 @@
               {{ editingProofId() ? 'Enregistrer la preuve' : 'Ajouter cette preuve' }}
             </button>
             @if (editingProofId()) {
-              <button type="button" class="btn btn-ghost" (click)="cancelProofEdit()">Annuler</button>
+              <button type="button" class="btn btn-ghost" (click)="cancelProofEdit()">
+                Annuler
+              </button>
             }
             @if (proofHint()) {
               <span class="hint">{{ proofHint() }}</span>
@@ -225,7 +283,9 @@
         </div>
 
         @if (proofs().length === 0) {
-          <p class="empty">Aucune preuve pour l'instant — un lien GitHub, une attestation, une note suffisent.</p>
+          <p class="empty">
+            Aucune preuve pour l'instant — un lien GitHub, une attestation, une note suffisent.
+          </p>
         }
         @for (proof of proofs(); track proof.id) {
           <article class="card item" [class.editing]="editingProofId() === proof.id">
@@ -235,7 +295,9 @@
             </div>
             @if (proof.type === 'link' && proof.content) {
               <p class="body">
-                <a [href]="proof.content" target="_blank" rel="noopener noreferrer">{{ proof.content }}</a>
+                <a [href]="proof.content" target="_blank" rel="noopener noreferrer">{{
+                  proof.content
+                }}</a>
               </p>
             } @else if (proof.content) {
               <p class="body">{{ proof.content }}</p>
@@ -255,7 +317,13 @@
               }
               <span class="spacer"></span>
               <label class="btn-link attach">
-                {{ attachingId() === proof.id ? 'Envoi…' : proof.file_name ? 'Remplacer la pièce' : 'Joindre un fichier' }}
+                {{
+                  attachingId() === proof.id
+                    ? 'Envoi…'
+                    : proof.file_name
+                      ? 'Remplacer la pièce'
+                      : 'Joindre un fichier'
+                }}
                 <input
                   #attach
                   type="file"
@@ -264,8 +332,12 @@
                   (change)="onAttachFile(proof, attach)"
                 />
               </label>
-              <button type="button" class="btn-link" (click)="startProofEdit(proof)">Modifier</button>
-              <button type="button" class="btn-link danger" (click)="removeProof(proof)">Supprimer</button>
+              <button type="button" class="btn-link" (click)="startProofEdit(proof)">
+                Modifier
+              </button>
+              <button type="button" class="btn-link danger" (click)="removeProof(proof)">
+                Supprimer
+              </button>
             </div>
           </article>
         }
