@@ -503,7 +503,10 @@ details.copilote[open] summary::before { content: "▾ " }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px
+  gap: 8px;
+  /* Hauteur fixe : le lien "Repartir de l'original" ne doit pas rendre la
+     colonne de droite plus haute que celle de gauche (decalage du textarea). */
+  min-height: 26px
 }
 
 .live-panel {
