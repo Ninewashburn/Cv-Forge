@@ -1,4 +1,4 @@
-"""Tests de resolve_data_dir() — l'ordre de résolution est un contrat (CLAUDE.md)."""
+"""Tests de resolve_data_dir() - l'ordre de résolution est un contrat (CLAUDE.md)."""
 
 from pathlib import Path
 

@@ -9,7 +9,7 @@ from app.schemas.common import ReadBase
 
 class OfferCreate(BaseModel):
     """Import V1 : texte collé uniquement. ``source_url`` est une référence
-    saisie par l'utilisateur — jamais fetchée (aucun appel réseau sortant)."""
+    saisie par l'utilisateur - jamais fetchée (aucun appel réseau sortant)."""
 
     raw_text: str = Field(min_length=1)
     title: str = ""

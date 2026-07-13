@@ -2,7 +2,7 @@
 
 Chaque phrase générée provient d'un fait (``source_fact_ids``) et hérite de
 ses preuves (``source_proof_ids``). La validation rejette toute phrase sans
-source — règle produit non négociable, appliquée côté serveur.
+source - règle produit non négociable, appliquée côté serveur.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ REJECTION_REASON_NO_SOURCE = "Sans source : aucune référence à un fait valid�
 
 
 def validate_sentences(sentences: list[GeneratedSentence]) -> None:
-    """Applique la règle anti-hallucination : pas de source → rejetée.
+    """Applique la règle anti-hallucination : pas de source > rejetée.
 
     Pose le statut explicitement (le default de colonne n'existe qu'au flush)."""
     for sentence in sentences:
@@ -83,7 +83,7 @@ def generate_variant(session: Session, offer_id: str) -> CvVariant:
 
 def create_manual_variant(session: Session, offer_id: str, adapted_text: str) -> CvVariant:
     """Variante portée par le wizard : le texte « après » a été validé ajout par
-    ajout dans l'Avant/Après — il arrive donc déjà ``validated``."""
+    ajout dans l'Avant/Après - il arrive donc déjà ``validated``."""
     offer = _ensure_analyzed(session, offer_id)
     profile = get_or_create_profile(session)
     keywords = [tuple(kw) for kw in offer.keywords]

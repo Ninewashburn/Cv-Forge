@@ -4,7 +4,7 @@
 
 **Corollaire :** la V1 embarque son propre instrument de mesure (micro-tracking). Sans mesure, le statement est un slogan.
 
-**Dernière mise à jour :** 2026-07-11
+**Dernière mise à jour :** 2026-07-12
 **Statut :** V0 tranché — prêt pour Claude Code (voir CLAUDE.md)
 **Maquettes :** les schémas d'interface = vision cible (North Star, V3+). Le périmètre de build reste la section V1, exclusivement.
 
@@ -156,6 +156,7 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
   - **NE PAS utiliser le mode remote** (`vice scan`) : il lance de vraies attaques (brute force, injection SQL, scan de ports) et vise des apps serveur. CVForge est local-first **sans serveur** → non applicable, et juridiquement à éviter sur toute URL non strictement auto-hébergée (GitHub Pages = infra GitHub incluse).
   - **Point de vigilance prioritaire — l'Avant/Après (Diff Viewer)** : il met en forme du texte collé par l'utilisateur. C'est **LA vraie surface d'attaque** de CVForge (pas l'infra, qui n'existe pas). Vérifier qu'aucune XSS ne passe. *Côté Angular V1 : l'interpolation `{{ }}` échappe par défaut ; ne JAMAIS passer le texte utilisateur brut à `[innerHTML]` sans DomSanitizer.* Côté Lite : la fonction `esc()` joue ce rôle.
   - **Bonus open source** : badge de sécurité VICE (score A–F) + GitHub Action sur les PR → signal de confiance vérifiable sur le README, cohérent avec la promesse « vos données sont en sécurité ». À activer quand le repo passe public.
+- [ ] **Convention anti-tells IA — outillage** *(ajout 2026-07-12 ; règle complète dans CLAUDE.md)* — aucun caractère « signature IA » (tirets cadratins, ellipse unique, quotes courbes, flèches) dans les textes visibles ; les accents français ne sont jamais touchés par le lint. *(fait 2026-07-12 : purge des sources frontend + backend, script `npm run lint:tells` ; **reste : hook pre-commit qui bloque le commit + règle ESLint dédiée** pour l'attraper au lint)*
 - [ ] **Export DOCX basique** *(remonté de V3 — beaucoup de RH exigent encore Word)*
 - [ ] **Packaging desktop — exe portable façon ADWCleaner** : PyInstaller `--onefile` (Python + FastAPI + build Angular dans un seul exécutable). Double-clic → serveur local → navigateur. **Données : résolues par `resolve_data_dir()` (câblée dès V1)** — défaut `~/.cvforge/` (mode installé, données préservées si on remplace l'exe) ; mode portable activé par un marqueur `cvforge.portable` à côté de l'exe → données dans `./data/` qui voyagent sur la clé USB. Le même binaire fait les deux. Option fenêtre native : pywebview (WebView2). Signature de code à prévoir contre SmartScreen (Azure Trusted Signing ~10 $/mois). Pas d'UPX (faux positifs antivirus). Tauri abandonné — plus nécessaire.
 

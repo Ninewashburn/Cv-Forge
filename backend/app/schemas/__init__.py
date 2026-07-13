@@ -1,4 +1,4 @@
-"""Schémas I/O Pydantic v2 — contrat de l'API CVForge."""
+"""Schémas I/O Pydantic v2 - contrat de l'API CVForge."""
 
 from app.schemas.application import ApplicationCreate, ApplicationRead, ApplicationUpdate
 from app.schemas.common import (

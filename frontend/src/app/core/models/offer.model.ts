@@ -1,6 +1,6 @@
 import { Timestamped } from './common.model';
 
-/** Mot-clé pondéré : [terme, fréquence] — format renvoyé par l'analyse. */
+/** Mot-clé pondéré : [terme, fréquence] - format renvoyé par l'analyse. */
 export type WeightedKeyword = [string, number];
 
 export interface Offer extends Timestamped {

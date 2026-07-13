@@ -11,11 +11,11 @@
       <button
         type="button"
         class="btn-import"
-        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        title="PDF ou fichier texte (.txt) - lu sur ta machine, rien ne sort"
         [disabled]="importing() !== null"
         (click)="offreFile.click()"
       >
-        {{ importing() === 'offer' ? 'Lecture…' : '📄 Importer un fichier' }}
+        {{ importing() === 'offer' ? 'Lecture...' : '📄 Importer un fichier' }}
       </button>
       <input
         #offreFile
@@ -30,21 +30,21 @@
       #offre
       [value]="store.offerText()"
       (input)="store.offerText.set(offre.value)"
-      placeholder="Colle ici le texte complet de l'offre…"
+      placeholder="Colle ici le texte complet de l'offre..."
     ></textarea>
   </div>
 
   <div class="card">
     <div class="label-row">
-      <label for="cv">Ton CV — source de vérité</label>
+      <label for="cv">Ton CV - source de vérité</label>
       <button
         type="button"
         class="btn-import"
-        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        title="PDF ou fichier texte (.txt) - lu sur ta machine, rien ne sort"
         [disabled]="importing() !== null"
         (click)="cvFile.click()"
       >
-        {{ importing() === 'cv' ? 'Lecture…' : '📄 Importer un fichier' }}
+        {{ importing() === 'cv' ? 'Lecture...' : '📄 Importer un fichier' }}
       </button>
       <input
         #cvFile
@@ -59,7 +59,7 @@
       #cv
       [value]="store.cvText()"
       (input)="store.cvText.set(cv.value)"
-      placeholder="Colle ici le contenu de ton CV…"
+      placeholder="Colle ici le contenu de ton CV..."
     ></textarea>
   </div>
 </div>
@@ -69,22 +69,22 @@
 }
 
 <details class="reveal">
-  <summary>Profil LinkedIn — optionnel, pour repérer ce qui manque</summary>
+  <summary>Profil LinkedIn - optionnel, pour repérer ce qui manque</summary>
   <div class="reveal-body">
     <p class="li-tip">
-      Colle le texte de ton profil LinkedIn — ou importe directement le PDF obtenu via « Plus →
+      Colle le texte de ton profil LinkedIn - ou importe directement le PDF obtenu via « Plus >
       Enregistrer au format PDF » sur ton profil. Il n'est <strong>jamais exporté</strong> : il sert
-      seulement à révéler ce que ton CV oublie — c'est toi qui décides quoi ajouter.
+      seulement à révéler ce que ton CV oublie - c'est toi qui décides quoi ajouter.
     </p>
     <div class="label-row li-import-row">
       <button
         type="button"
         class="btn-import"
-        title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+        title="PDF ou fichier texte (.txt) - lu sur ta machine, rien ne sort"
         [disabled]="importing() !== null"
         (click)="linkedinFile.click()"
       >
-        {{ importing() === 'linkedin' ? 'Lecture…' : '📄 Importer un fichier' }}
+        {{ importing() === 'linkedin' ? 'Lecture...' : '📄 Importer un fichier' }}
       </button>
       <input
         #linkedinFile
@@ -98,16 +98,16 @@
       #linkedin
       [value]="store.linkedinText()"
       (input)="store.linkedinText.set(linkedin.value)"
-      placeholder="Colle ici le texte de ton profil LinkedIn (optionnel)…"
+      placeholder="Colle ici le texte de ton profil LinkedIn (optionnel)..."
     ></textarea>
   </div>
 </details>
 
 <div class="row samples">
   <span class="hint">Un doute ? Charge un exemple :</span>
-  <button type="button" class="btn-link" (click)="store.loadSample('dev')">Exemple — dev</button>
+  <button type="button" class="btn-link" (click)="store.loadSample('dev')">Exemple - dev</button>
   <button type="button" class="btn-link" (click)="store.loadSample('gestion')">
-    Exemple — hors tech
+    Exemple - hors tech
   </button>
 </div>
 
@@ -123,17 +123,17 @@
     [disabled]="!store.canAnalyse() || store.busy()"
     (click)="store.analyse()"
   >
-    {{ store.busy() ? 'Analyse…' : 'Analyser le matching' }}
+    {{ store.busy() ? 'Analyse...' : 'Analyser le matching' }}
   </button>
 </div>
 
 <details class="reveal faq-trust">
-  <summary>Où vont mes données ? — réponses rapides</summary>
+  <summary>Où vont mes données ? - réponses rapides</summary>
   <div class="reveal-body">
     <dl class="faq">
       <dt>Où vont mes données ?</dt>
       <dd>
-        Nulle part. CVForge tourne entièrement sur ta machine et y enregistre tes données — aucun
+        Nulle part. CVForge tourne entièrement sur ta machine et y enregistre tes données - aucun
         serveur distant, pas de compte, pas de collecte. Si tu utilises ton propre ChatGPT ou
         Claude, c'est toi qui y colles ton texte, en le sachant : CVForge, lui, n'envoie jamais
         rien.
@@ -142,7 +142,7 @@
       <dd>
         CVForge est une application locale : tu la lances sur ton ordinateur et elle s'ouvre dans
         ton navigateur. Pas de compte, pas d'abonnement. Une version à emporter partout (clé USB)
-        viendra ensuite — l'esprit restera le même.
+        viendra ensuite - l'esprit restera le même.
       </dd>
       <dt>Est-ce que ça écrit mon CV à ma place ?</dt>
       <dd>

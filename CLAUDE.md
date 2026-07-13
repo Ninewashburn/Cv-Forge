@@ -78,6 +78,20 @@ Note privacy à afficher à l'utilisateur : les données envoyées via **API** n
 
 ---
 
+## Convention — Anti-tells IA (textes visibles)
+
+CVForge vend l'anti-bullshit : son code ne doit pas trahir une génération IA. Dans toute chaîne destinée à l'affichage (templates Angular, constantes de texte, messages d'erreur backend, contenus statiques) :
+
+- Trait d'union simple `-` (ou deux-points / parenthèses pour une incise). JAMAIS de tiret cadratin `—` ni demi-cadratin `–`.
+- Apostrophe droite `'` et guillemets droits `"`. Pas les courbes. Exception : les guillemets français « » sont AUTORISÉS (vrais caractères FR).
+- Trois points ASCII `...`, jamais l'ellipse unique `…`.
+- Pas de flèches décoratives (`→ ← ⇒`) dans les textes UI (ok dans les diagrammes/docs).
+- ⚠️ **Les lettres accentuées (é è à ç ù â ê î ô û ë ï ü œ æ) sont SACRÉES** : aucun remplacement automatique ne doit jamais les toucher. Le lint ne cible QUE la liste ci-dessus.
+- Si un de ces caractères doit exister **fonctionnellement** dans le code (ex. table de translittération PDF qui les convertit), l'écrire en échappement `\uXXXX`, jamais en clair.
+- Garde-fou : `npm run lint:tells` (frontend). Cette règle vaut aussi pour `backend/` (messages utilisateur, prompts).
+
+---
+
 ## Definition of Done — V1
 
 - 0 erreur TypeScript, 0 warning ESLint non justifié.

@@ -39,7 +39,7 @@ class VariantStatus(StrEnum):
 
 
 class ApplicationStatus(StrEnum):
-    """Micro-tracking V1 — mêmes statuts que CVForge Lite."""
+    """Micro-tracking V1 - mêmes statuts que CVForge Lite."""
 
     ENVOYEE = "envoyee"
     REPONSE = "reponse"

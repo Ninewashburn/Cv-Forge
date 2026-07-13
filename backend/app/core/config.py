@@ -4,7 +4,7 @@ Point d'accès UNIQUE au chemin des données (règle CLAUDE.md : jamais de
 chemin en dur ailleurs dans le code). Ordre de résolution :
 
 1. Variable d'environnement ``CVFORGE_DATA`` ;
-2. Marqueur ``cvforge.portable`` à côté de l'application → données dans
+2. Marqueur ``cvforge.portable`` à côté de l'application > données dans
    ``./data/`` (mode clé USB, activé en V1.5 avec l'exe PyInstaller) ;
 3. Défaut : ``~/.cvforge/``.
 

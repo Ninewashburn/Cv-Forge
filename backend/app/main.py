@@ -1,4 +1,4 @@
-"""CVForge — application FastAPI locale.
+"""CVForge - application FastAPI locale.
 
 Point d'entrée V1 : ``uvicorn app.main:app``. Au démarrage, la base est
 créée/migrée automatiquement (l'utilisateur ne lance jamais de migration).
@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="CVForge API",
         version="0.1.0",
-        description="API locale de CVForge — local-first, aucune donnée ne sort.",
+        description="API locale de CVForge - local-first, aucune donnée ne sort.",
         lifespan=lifespan,
     )
 
@@ -70,7 +70,7 @@ def create_app() -> FastAPI:
     app.include_router(extract_router)
     app.include_router(llm_router)
 
-    # Phase 5 — single process : FastAPI sert le build Angular sur la même
+    # Phase 5 - single process : FastAPI sert le build Angular sur la même
     # origine. Les routes /api ci-dessus restent prioritaires ; toute autre URL
     # sert le fichier demandé s'il existe, sinon index.html (fallback SPA pour
     # les liens profonds comme /atelier). Sans build : mode API seule.

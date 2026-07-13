@@ -42,7 +42,7 @@ def delete_proof(proof_id: str, session: Session = Depends(get_session)) -> None
 async def attach_file(
     proof_id: str, file: UploadFile, session: Session = Depends(get_session)
 ) -> ProofRead:
-    """Attache la pièce jointe (une par preuve — remplace l'existante). 100 % local."""
+    """Attache la pièce jointe (une par preuve - remplace l'existante). 100 % local."""
     content = await file.read()
     try:
         proof = proof_service.attach_file(

@@ -1,4 +1,4 @@
-"""Environnement Alembic — l'URL de la base vient TOUJOURS de resolve_data_dir()."""
+"""Environnement Alembic - l'URL de la base vient TOUJOURS de resolve_data_dir()."""
 
 from logging.config import fileConfig
 

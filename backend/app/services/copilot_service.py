@@ -1,4 +1,4 @@
-"""Mode copilote — bibliothèque de prompts verrouillés.
+"""Mode copilote - bibliothèque de prompts verrouillés.
 
 Quatre intentions (spec canonique : ``docs/specs/copilot_prompts.md``), un
 pattern commun : **ce qui manque n'est jamais ajouté**, il est listé « À
@@ -46,7 +46,7 @@ AUDITER_TEMPLATE = """Tu es un recruteur exigeant pour le poste ci-dessous. Anal
 {cv_text}"""
 
 MUSCLER_TEMPLATE = """Reformule les expériences de ce CV pour les rendre plus percutantes. RÈGLES :
-1. Verbes d'action, résultat en tête de phrase — UNIQUEMENT à partir des faits déjà présents dans le CV.
+1. Verbes d'action, résultat en tête de phrase - UNIQUEMENT à partir des faits déjà présents dans le CV.
 2. INTERDIT d'ajouter un chiffre, un pourcentage ou un résultat absent du CV. Si une réalisation gagnerait à être chiffrée, ne l'invente pas : liste-la dans « À chiffrer par le candidat » à la fin.
 3. Pas de superlatifs, pas de mots creux.
 

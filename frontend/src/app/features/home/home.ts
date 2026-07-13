@@ -35,7 +35,7 @@ export class Home {
     if (!file || this.restoring()) return;
     if (
       !window.confirm(
-        'Restaurer ce backup ? TOUTES les données actuelles seront remplacées par celles de l’archive.',
+        "Restaurer ce backup ? TOUTES les données actuelles seront remplacées par celles de l'archive.",
       )
     ) {
       return;
@@ -48,7 +48,7 @@ export class Home {
       .subscribe({
         next: () => {
           this.restoring.set(false);
-          this.backupHint.set('Backup restauré — tes données ont été remplacées.');
+          this.backupHint.set('Backup restauré - tes données ont été remplacées.');
           this.loadProfile();
         },
         error: (err: { error?: { detail?: string } }) => {

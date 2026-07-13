@@ -73,7 +73,7 @@ def test_copilot_prompt_is_locked_and_complete(client):
         f"/api/offers/{offer['id']}/copilot-prompt", json={"text": CV_TEXT}
     ).json()
     prompt = body["prompt"]
-    assert "Tu n'inventes JAMAIS" in prompt  # kind absent → ADAPTER par défaut
+    assert "Tu n'inventes JAMAIS" in prompt  # kind absent > ADAPTER par défaut
     assert OFFER_TEXT in prompt
     assert CV_TEXT in prompt
     assert "kubernetes" in body["missing_keywords"]
@@ -109,7 +109,7 @@ def test_copilot_prompt_rejects_unknown_kind(client):
         f"/api/offers/{offer['id']}/copilot-prompt",
         json={"text": CV_TEXT, "kind": "ats-boost"},
     )
-    assert response.status_code == 422  # intention hors bibliothèque → refusée
+    assert response.status_code == 422  # intention hors bibliothèque > refusée
 
 
 # ------------------------------------------------------------- variantes

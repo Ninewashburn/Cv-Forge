@@ -1,4 +1,4 @@
-"""Backup ZIP — incarnation de « tes données t'appartiennent » (exigence V1).
+"""Backup ZIP - incarnation de « tes données t'appartiennent » (exigence V1).
 
 Export : archive du dossier de données (base copiée de façon cohérente via
 l'API de backup SQLite, + fichiers de preuves). Import : restauration complète,
@@ -20,7 +20,7 @@ from app.services.llm_service import CONFIG_FILENAME as LLM_CONFIG_FILENAME
 _SQLITE_MAGIC = b"SQLite format 3\x00"
 
 # La base est ajoutée à part (copie cohérente) ; la clé API est un SECRET,
-# pas une donnée de candidature — elle ne part jamais dans une archive.
+# pas une donnée de candidature - elle ne part jamais dans une archive.
 _EXCLUDED_FROM_EXPORT = {DB_FILENAME, LLM_CONFIG_FILENAME}
 
 
@@ -33,7 +33,7 @@ def export_backup() -> tuple[bytes, str]:
         db_path = data_dir / DB_FILENAME
         if db_path.exists():
             archive.writestr(DB_FILENAME, _consistent_db_copy(db_path))
-        # Tout le reste du dossier (fichiers de preuves…), base et secrets exclus.
+        # Tout le reste du dossier (fichiers de preuves...), base et secrets exclus.
         for path in sorted(data_dir.rglob("*")):
             if path.is_file() and path.name not in _EXCLUDED_FROM_EXPORT:
                 archive.write(path, path.relative_to(data_dir).as_posix())
@@ -45,7 +45,7 @@ def export_backup() -> tuple[bytes, str]:
 def import_backup(content: bytes) -> None:
     """Restaure un backup : valide l'archive puis remplace les données.
 
-    Lève ``ValueError`` (→ 400) si l'archive n'est pas un backup CVForge.
+    Lève ``ValueError`` (> 400) si l'archive n'est pas un backup CVForge.
     """
     try:
         archive = zipfile.ZipFile(io.BytesIO(content))

@@ -30,7 +30,7 @@ export class ProofService {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
 
-  /** Attache la pièce jointe (une par preuve — remplace l'existante). 100 % local. */
+  /** Attache la pièce jointe (une par preuve - remplace l'existante). 100 % local. */
   attachFile(id: string, file: File): Observable<Proof> {
     const form = new FormData();
     form.append('file', file);

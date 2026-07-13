@@ -2,7 +2,7 @@
   <h2>Matching offre / CV</h2>
   <p class="lead">
     Couverture des mots-clés de l'offre par ton CV.
-    <span class="nolm">CALCULÉ SANS IA — 100% LOCAL</span>
+    <span class="nolm">CALCULÉ SANS IA - 100% LOCAL</span>
   </p>
 
   <div class="card">
@@ -21,7 +21,7 @@
             CV seul : <span class="hl">{{ a.scoreCv }}%</span> · CV + ce que tu peux légitimement
             ajouter depuis LinkedIn :
             <span class="hl">{{ a.scorePotential }}%</span>
-            <span class="li-note">(potentiel — jamais un score envoyé)</span>
+            <span class="li-note">(potentiel - jamais un score envoyé)</span>
           </div>
         }
       </div>
@@ -43,7 +43,7 @@
     @if (a.hasLinkedin) {
       <div class="kw-group">
         <div class="kw-title">
-          ↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV — À AJOUTER SI PROUVABLE
+          ↗ SUR TON LINKEDIN, PAS ENCORE SUR LE CV - À AJOUTER SI PROUVABLE
         </div>
         <div class="chips">
           @for (k of onLinkedin(); track k.keyword) {
@@ -60,7 +60,7 @@
     <div class="kw-group">
       <div class="kw-title">
         {{
-          a.hasLinkedin ? '? ABSENT DU CV ET DE LINKEDIN — NE PAS INVENTER' : '? ABSENT DE TON CV'
+          a.hasLinkedin ? '? ABSENT DU CV ET DE LINKEDIN - NE PAS INVENTER' : '? ABSENT DE TON CV'
         }}
       </div>
       <div class="chips">
@@ -69,7 +69,7 @@
             >? {{ k.keyword }} <span class="f">×{{ k.frequency }}</span></span
           >
         } @empty {
-          <span class="hint">Rien ne manque — couverture totale.</span>
+          <span class="hint">Rien ne manque - couverture totale.</span>
         }
       </div>
     </div>
@@ -77,12 +77,12 @@
     <div class="callout">
       <strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question :
       ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Sinon, ne
-      l'ajoute pas — un entretien le révélera.
+      l'ajoute pas - un entretien le révélera.
     </div>
 
     <div class="row">
       <button type="button" class="btn btn-ghost" (click)="store.goTo(1)">
-        ← Revoir les sources
+        < Revoir les sources
       </button>
       <span class="spacer"></span>
       <button type="button" class="btn btn-primary" (click)="store.goTo(3)">

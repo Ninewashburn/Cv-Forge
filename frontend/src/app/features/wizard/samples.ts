@@ -28,12 +28,12 @@ Angular et Spring Boot sont au coeur de notre stack.`,
 Caen · lina.carvalho@mail.fr · github.com/linacarvalho
 
 EXPÉRIENCE
-Développeuse fullstack - Atelier Numérique (2023–2026)
+Développeuse fullstack - Atelier Numérique (2023-2026)
 - Développement d'un dashboard de supervision en Angular et TypeScript
 - API REST en Spring Boot, base PostgreSQL, conteneurisation Docker
 - Tests unitaires (JUnit, Jasmine), revues de code, méthode Scrum
 
-Développeuse junior - WebFabrik (2022–2023)
+Développeuse junior - WebFabrik (2022-2023)
 - Sites e-commerce, intégration responsive, corrections de bugs
 
 FORMATION
@@ -67,7 +67,7 @@ Profil :
 Rouen · k.bensaid@mail.fr
 
 EXPÉRIENCE
-Assistant de gestion - Transports Lemaire (2021–2026)
+Assistant de gestion - Transports Lemaire (2021-2026)
 - Facturation clients et fournisseurs, établissement des devis
 - Relances clients et suivi des règlements
 - Saisie comptable dans l'ERP Sage, rapprochements bancaires

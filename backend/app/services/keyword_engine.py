@@ -1,4 +1,4 @@
-"""Moteur de mots-clés sans LLM — porté du prototype CVForge Lite (app.js).
+"""Moteur de mots-clés sans LLM - porté du prototype CVForge Lite (app.js).
 
 Fonctions pures (aucune DB, aucun réseau) : extraction de mots-clés pondérés
 par fréquence (unigrammes + bigrammes), et couverture d'un texte par rapport

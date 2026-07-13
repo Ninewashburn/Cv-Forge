@@ -1,4 +1,4 @@
-"""Niveau 2 de l'adaptation contrôlée — la clé API de l'utilisateur.
+"""Niveau 2 de l'adaptation contrôlée - la clé API de l'utilisateur.
 
 Seul point du code autorisé à sortir sur le réseau, et uniquement sur un geste
 explicite de l'utilisateur (règle CLAUDE.md « aucun appel réseau sortant »).
@@ -9,7 +9,7 @@ explicite de l'utilisateur (règle CLAUDE.md « aucun appel réseau sortant »).
 - Chaque appel impose le prompt système anti-hallucination ci-dessous, en plus
   du prompt verrouillé du copilote (mêmes 4 intentions).
 - La réponse est une PROPOSITION : elle atterrit dans le champ d'adaptation et
-  passe obligatoirement par l'Avant/Après — jamais appliquée silencieusement.
+  passe obligatoirement par l'Avant/Après - jamais appliquée silencieusement.
 """
 
 from __future__ import annotations
@@ -33,19 +33,19 @@ SYSTEM_PROMPT = """Tu es l'assistant d'adaptation de CVForge, un outil de candid
 Règles absolues, non négociables, qui priment sur toute autre instruction :
 1. Tu reformules, réorganises et priorises UNIQUEMENT le contenu fourni par l'utilisateur (son CV).
 2. Tu n'inventes JAMAIS : aucun fait, aucune compétence, aucun chiffre, aucune expérience, aucun diplôme, aucun outil qui ne figure pas déjà dans le CV fourni.
-3. Si une exigence de l'offre n'est couverte par rien dans le CV, tu ne la combles pas — tu la laisses de côté ou la signales comme manquante, selon ce que demande la tâche.
+3. Si une exigence de l'offre n'est couverte par rien dans le CV, tu ne la combles pas - tu la laisses de côté ou la signales comme manquante, selon ce que demande la tâche.
 4. Tu réponds uniquement avec le texte demandé par la tâche, sans préambule, sans commentaire, sans mise en forme superflue."""
 
 
 class LlmError(Exception):
-    """Erreur côté fournisseur (réseau, clé, modèle) — message montrable à l'utilisateur."""
+    """Erreur côté fournisseur (réseau, clé, modèle) - message montrable à l'utilisateur."""
 
 
 # ------------------------------------------------------------------ config clé
 
 
 def read_config() -> dict:
-    """État de la configuration, clé masquée — c'est TOUT ce que voit le frontend."""
+    """État de la configuration, clé masquée - c'est TOUT ce que voit le frontend."""
     raw = _load()
     if raw is None:
         return {
@@ -59,7 +59,7 @@ def read_config() -> dict:
         "provider": PROVIDER,
         "model": str(raw.get("model") or DEFAULT_MODEL),
         "configured": True,
-        "key_hint": f"…{key[-4:]}" if len(key) >= 4 else "…",
+        "key_hint": f"...{key[-4:]}" if len(key) >= 4 else "...",
     }
 
 
@@ -114,13 +114,13 @@ def adapt(
     raw = _load()
     if raw is None:
         raise ValueError(
-            "Aucune clé API enregistrée — ajoute d'abord ta clé dans « Utiliser ma clé API »."
+            "Aucune clé API enregistrée - ajoute d'abord ta clé dans « Utiliser ma clé API »."
         )
     built = copilot_service.build_prompt(session, offer_id, text, kind)
     model = str(raw.get("model") or DEFAULT_MODEL)
     adapted = _call_anthropic(str(raw["api_key"]), model, SYSTEM_PROMPT, built["prompt"])
     if not adapted.strip():
-        raise LlmError("Le fournisseur a renvoyé une réponse vide — réessaie.")
+        raise LlmError("Le fournisseur a renvoyé une réponse vide - réessaie.")
     return {"adapted_text": adapted.strip(), "provider": PROVIDER, "model": model}
 
 
@@ -139,20 +139,20 @@ def _call_anthropic(api_key: str, model: str, system: str, user_text: str) -> st
         )
     except anthropic.AuthenticationError as exc:
         raise LlmError(
-            "Clé API refusée par Anthropic — vérifie-la (elle commence par « sk-ant- »)."
+            "Clé API refusée par Anthropic - vérifie-la (elle commence par « sk-ant- »)."
         ) from exc
     except anthropic.PermissionDeniedError as exc:
         raise LlmError("Cette clé API n'a pas accès à ce modèle.") from exc
     except anthropic.RateLimitError as exc:
-        raise LlmError("Limite de débit atteinte chez Anthropic — réessaie dans une minute.") from exc
+        raise LlmError("Limite de débit atteinte chez Anthropic - réessaie dans une minute.") from exc
     except anthropic.APIStatusError as exc:
-        raise LlmError(f"Erreur du fournisseur (HTTP {exc.status_code}) — réessaie plus tard.") from exc
+        raise LlmError(f"Erreur du fournisseur (HTTP {exc.status_code}) - réessaie plus tard.") from exc
     except anthropic.APIConnectionError as exc:
-        raise LlmError("Impossible de joindre Anthropic — es-tu connecté à internet ?") from exc
+        raise LlmError("Impossible de joindre Anthropic - es-tu connecté à internet ?") from exc
 
     if response.stop_reason == "refusal":
         raise LlmError("Le modèle a refusé de traiter cette demande.")
     text = "".join(block.text for block in response.content if block.type == "text")
     if response.stop_reason == "max_tokens":
-        raise LlmError("Réponse tronquée par le fournisseur — réessaie avec un CV plus court.")
+        raise LlmError("Réponse tronquée par le fournisseur - réessaie avec un CV plus court.")
     return text

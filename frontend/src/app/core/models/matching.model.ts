@@ -17,7 +17,7 @@ export interface CopilotPrompt {
   missing_keywords: string[];
 }
 
-/** Corps des appels matching / copilote : texte à comparer (absent → profil maître). */
+/** Corps des appels matching / copilote : texte à comparer (absent > profil maître). */
 export interface MatchRequest {
   text?: string | null;
 }

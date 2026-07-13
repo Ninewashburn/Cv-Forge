@@ -4,7 +4,7 @@ import { addedSegments, diffStats, lcsDiff, paneSegments, PaneSegment, tokensOf 
 import { WizardStore } from '../wizard-store';
 
 /**
- * Étape 4 — Avant / Après ⭐ (nom interne : Diff Viewer).
+ * Étape 4 - Avant / Après ⭐ (nom interne : Diff Viewer).
  * Chaque passage ajouté doit être confirmé « vrai et prouvable » avant l'export.
  * Rendu par interpolation uniquement : le texte collé ne peut pas injecter de HTML.
  */
@@ -33,7 +33,7 @@ export class AvantApresStep {
     this.additions = ops ? addedSegments(ops) : [];
     this.stats = ops ? diffStats(ops) : { added: 0, removed: 0 };
 
-    // La porte d'export s'ouvre quand tout est confirmé — et seulement si le
+    // La porte d'export s'ouvre quand tout est confirmé - et seulement si le
     // diff a pu être vérifié (passage par l'Avant/Après obligatoire).
     effect(() => this.store.exportReady.set(!this.tooLong && this.allConfirmed()));
   }

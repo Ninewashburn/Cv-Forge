@@ -1,4 +1,4 @@
-"""Banque de preuves : CRUD + liaisons N–N vers les faits + pièce jointe locale."""
+"""Banque de preuves : CRUD + liaisons N-N vers les faits + pièce jointe locale."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from app.schemas import ProofCreate, ProofUpdate
 from app.services.errors import NotFoundError
 from app.services.fact_service import get_fact
 
-# Pièces jointes rangées sous <data>/proofs/ — le backup ZIP les embarque déjà.
+# Pièces jointes rangées sous <data>/proofs/ - le backup ZIP les embarque déjà.
 PROOFS_DIR_NAME = "proofs"
 MAX_FILE_BYTES = 25 * 1024 * 1024
 

@@ -59,7 +59,7 @@ def run_migrations() -> None:
     """Amène la base au dernier schéma (``alembic upgrade head``).
 
     Appelée au démarrage de l'app : l'utilisateur n'a jamais de migration à
-    lancer lui-même. Chemins résolus via ``app_dir()`` — fonctionne en dev
+    lancer lui-même. Chemins résolus via ``app_dir()`` - fonctionne en dev
     comme dans l'exe PyInstaller (V1.5).
     """
     from alembic.config import Config

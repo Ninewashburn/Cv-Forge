@@ -29,7 +29,7 @@ def test_config_roundtrip_never_exposes_key(client):
 
     saved = _save_key(client).json()
     assert saved["configured"] is True
-    assert saved["key_hint"] == "…abcd"
+    assert saved["key_hint"] == "...abcd"
     # La clé complète n'apparaît nulle part dans la réponse.
     assert "sk-ant-test-0000abcd" not in str(saved)
 
@@ -80,7 +80,7 @@ def test_adapt_calls_provider_with_system_prompt(client, monkeypatch):
 
 def test_adapt_provider_error_is_502(client, monkeypatch):
     def fake_call(api_key, model, system, user_text):
-        raise llm_service.LlmError("Clé API refusée par Anthropic — vérifie-la.")
+        raise llm_service.LlmError("Clé API refusée par Anthropic - vérifie-la.")
 
     monkeypatch.setattr(llm_service, "_call_anthropic", fake_call)
     _save_key(client)

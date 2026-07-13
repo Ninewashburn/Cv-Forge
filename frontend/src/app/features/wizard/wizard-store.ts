@@ -65,12 +65,12 @@ export class WizardStore {
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
 
-  /** Texte « après » — édité à la main ou collé depuis l'IA de l'utilisateur. */
+  /** Texte « après » - édité à la main ou collé depuis l'IA de l'utilisateur. */
   readonly adaptedText = signal('');
   /** Index des passages ajoutés confirmés « vrai et prouvable » (étape Avant/Après). */
   readonly confirmedAdditions = signal<ReadonlySet<number>>(new Set());
 
-  /** Vrai quand l'Avant/Après a été validé en entier — condition d'accès à l'Export. */
+  /** Vrai quand l'Avant/Après a été validé en entier - condition d'accès à l'Export. */
   readonly exportReady = signal(false);
   readonly variant = signal<CvVariant | null>(null);
   readonly application = signal<Application | null>(null);
@@ -136,7 +136,7 @@ export class WizardStore {
           this.exportBusy.set(false);
         },
         error: () => {
-          this.exportError.set('Export impossible — le backend est-il lancé sur :8000 ?');
+          this.exportError.set('Export impossible - le backend est-il lancé sur :8000 ?');
           this.exportBusy.set(false);
         },
       });
@@ -187,7 +187,7 @@ export class WizardStore {
   }
 
   /** À l'entrée dans l'Avant/Après : si le couple (original, adapté) a changé,
-   *  toutes les confirmations retombent — on ne valide jamais un diff périmé. */
+   *  toutes les confirmations retombent - on ne valide jamais un diff périmé. */
   syncDiffSignature(): void {
     const signature = `${this.cvText()}\u0000${this.adaptedText()}`;
     if (signature !== this.diffSignature) {
@@ -242,7 +242,7 @@ export class WizardStore {
           this.step.set(2);
         },
         error: () => {
-          this.error.set('Analyse impossible — le backend est-il lancé sur :8000 ?');
+          this.error.set('Analyse impossible - le backend est-il lancé sur :8000 ?');
           this.busy.set(false);
         },
       });

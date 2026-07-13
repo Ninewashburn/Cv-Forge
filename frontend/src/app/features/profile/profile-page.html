@@ -2,13 +2,13 @@
 <h2>Ton profil maître & ta banque de preuves</h2>
 <p class="lead">
   Tout ce qui est écrit ici doit être <strong>vrai et prouvable en entretien</strong>. C'est la
-  matière première que l'Atelier adapte ensuite à chaque offre — rien d'autre ne sera jamais inventé
+  matière première que l'Atelier adapte ensuite à chaque offre - rien d'autre ne sera jamais inventé
   à ta place.
 </p>
 
 @switch (state()) {
   @case ('loading') {
-    <p class="hint">Chargement depuis ta base locale…</p>
+    <p class="hint">Chargement depuis ta base locale...</p>
   }
   @case ('error') {
     <p class="err">
@@ -55,7 +55,7 @@
           />
         </label>
         <label>
-          Liens (un par ligne — GitHub, portfolio…)
+          Liens (un par ligne - GitHub, portfolio...)
           <textarea #lk rows="2" [value]="linksText()" (input)="linksText.set(lk.value)"></textarea>
         </label>
         <label class="full">
@@ -70,11 +70,11 @@
             <button
               type="button"
               class="btn-import"
-              title="PDF ou fichier texte (.txt) — lu sur ta machine, rien ne sort"
+              title="PDF ou fichier texte (.txt) - lu sur ta machine, rien ne sort"
               [disabled]="importingCv()"
               (click)="cvImportFile.click()"
             >
-              {{ importingCv() ? 'Lecture…' : '📄 Importer un fichier' }}
+              {{ importingCv() ? 'Lecture...' : '📄 Importer un fichier' }}
             </button>
             <input
               #cvImportFile
@@ -89,7 +89,7 @@
             rows="8"
             [value]="rawImportText()"
             (input)="rawImportText.set(raw.value)"
-            placeholder="Importe ton CV (PDF/TXT) ou colle son texte ici…"
+            placeholder="Importe ton CV (PDF/TXT) ou colle son texte ici..."
           ></textarea>
         </div>
       </div>
@@ -101,7 +101,7 @@
           [disabled]="savingProfile()"
           (click)="saveProfile()"
         >
-          {{ savingProfile() ? 'Enregistrement…' : 'Enregistrer le profil' }}
+          {{ savingProfile() ? 'Enregistrement...' : 'Enregistrer le profil' }}
         </button>
         @if (profileHint()) {
           <span class="hint">{{ profileHint() }}</span>
@@ -115,7 +115,7 @@
       <section>
         <h3>Faits de ton parcours</h3>
         <p class="sub">
-          Expériences, compétences, projets… Coche « prouvable » quand une preuve l'appuie : c'est
+          Expériences, compétences, projets... Coche « prouvable » quand une preuve l'appuie : c'est
           ce que le matching et l'adaptation utiliseront en priorité.
         </p>
 
@@ -141,7 +141,7 @@
             </label>
           </div>
           <label>
-            Détail (factuel — ce que tu as fait, mesuré si tu l'as mesuré)
+            Détail (factuel - ce que tu as fait, mesuré si tu l'as mesuré)
             <textarea
               #ftc
               rows="3"
@@ -175,7 +175,7 @@
         </div>
 
         @if (facts().length === 0) {
-          <p class="empty">Aucun fait pour l'instant — commence par ce que tu sais prouver.</p>
+          <p class="empty">Aucun fait pour l'instant - commence par ce que tu sais prouver.</p>
         }
         @for (fact of facts(); track fact.id) {
           <article class="card item" [class.editing]="editingFactId() === fact.id">
@@ -217,7 +217,7 @@
       <section>
         <h3>Banque de preuves</h3>
         <p class="sub">
-          Une note, un lien (GitHub, article…) ou un document (attestation, certificat). Relie
+          Une note, un lien (GitHub, article...) ou un document (attestation, certificat). Relie
           chaque preuve aux faits qu'elle appuie.
         </p>
 
@@ -249,7 +249,9 @@
               rows="2"
               [value]="proofContent()"
               (input)="proofContent.set(ptc.value)"
-              [placeholder]="proofType() === 'link' ? 'https://…' : 'Ce que cette preuve montre…'"
+              [placeholder]="
+                proofType() === 'link' ? 'https://...' : 'Ce que cette preuve montre...'
+              "
             ></textarea>
           </label>
           @if (facts().length > 0) {
@@ -284,7 +286,7 @@
 
         @if (proofs().length === 0) {
           <p class="empty">
-            Aucune preuve pour l'instant — un lien GitHub, une attestation, une note suffisent.
+            Aucune preuve pour l'instant - un lien GitHub, une attestation, une note suffisent.
           </p>
         }
         @for (proof of proofs(); track proof.id) {
@@ -319,7 +321,7 @@
               <label class="btn-link attach">
                 {{
                   attachingId() === proof.id
-                    ? 'Envoi…'
+                    ? 'Envoi...'
                     : proof.file_name
                       ? 'Remplacer la pièce'
                       : 'Joindre un fichier'

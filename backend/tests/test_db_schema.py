@@ -55,7 +55,7 @@ def test_soft_delete_sets_deleted_at(session):
     session.commit()
     assert profile.is_deleted
     assert profile.deleted_at is not None
-    # La ligne existe toujours physiquement — jamais de DELETE.
+    # La ligne existe toujours physiquement - jamais de DELETE.
     assert session.get(MasterProfile, profile.id) is not None
 
 

@@ -1,4 +1,4 @@
-"""Tests de l'API V1 : profil, faits, preuves, offres — CRUD et soft delete."""
+"""Tests de l'API V1 : profil, faits, preuves, offres - CRUD et soft delete."""
 
 
 def test_health(client):
@@ -62,7 +62,7 @@ def test_delete_is_soft_row_stays_in_database(client):
         row = conn.execute(
             text("SELECT deleted_at FROM fact WHERE id = :id"), {"id": fact_id}
         ).one_or_none()
-    assert row is not None, "la ligne a été effacée physiquement — interdit (sync V3)"
+    assert row is not None, "la ligne a été effacée physiquement - interdit (sync V3)"
     assert row.deleted_at is not None
 
 
@@ -122,7 +122,7 @@ def test_proof_delete_hides_link_on_fact(client):
 def test_offer_title_defaults_to_first_line(client):
     offer = client.post(
         "/api/offers",
-        json={"raw_text": "Développeur Fullstack (H/F) - CDI\nReste de l'offre…"},
+        json={"raw_text": "Développeur Fullstack (H/F) - CDI\nReste de l'offre..."},
     ).json()
     assert offer["title"] == "Développeur Fullstack (H/F) - CDI"
 

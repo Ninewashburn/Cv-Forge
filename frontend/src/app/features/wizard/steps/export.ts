@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ApplicationStatus } from '../../../core/models';
 import { WizardStore } from '../wizard-store';
 
-/** Étape 5 : export PDF + micro-suivi (réponse ? entretien ? — 3 clics max). */
+/** Étape 5 : export PDF + micro-suivi (réponse ? entretien ? - 3 clics max). */
 @Component({
   selector: 'cvforge-export',
   imports: [DatePipe],

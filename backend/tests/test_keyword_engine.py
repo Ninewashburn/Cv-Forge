@@ -83,7 +83,7 @@ def test_coverage_realistic_cv_vs_offer():
     result = coverage(extract_keywords(OFFER), CV)
     assert 0 < result["score"] < 100
     missing = {r["keyword"] for r in result["results"] if not r["covered"]}
-    # Kubernetes est absent du CV — ici sous forme de bigramme « docker
+    # Kubernetes est absent du CV - ici sous forme de bigramme « docker
     # kubernetes » (répété 2× dans l'offre, il absorbe ses composants).
     assert any("kubernetes" in keyword for keyword in missing)
 

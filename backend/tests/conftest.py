@@ -8,7 +8,7 @@ from app.core import db as core_db
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    """Client HTTP sur une app neuve : CVFORGE_DATA → tmp, migrations réelles
+    """Client HTTP sur une app neuve : CVFORGE_DATA > tmp, migrations réelles
     exécutées par le lifespan au démarrage."""
     monkeypatch.setenv("CVFORGE_DATA", str(tmp_path))
     core_db.reset_engine()

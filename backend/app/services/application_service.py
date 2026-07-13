@@ -1,4 +1,4 @@
-"""Micro-suivi des candidatures — l'instrument de mesure du MVP statement."""
+"""Micro-suivi des candidatures - l'instrument de mesure du MVP statement."""
 
 from __future__ import annotations
 

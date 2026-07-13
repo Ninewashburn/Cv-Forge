@@ -1,4 +1,4 @@
-"""Offres d'emploi : CRUD (texte collé uniquement — aucun fetch réseau).
+"""Offres d'emploi : CRUD (texte collé uniquement - aucun fetch réseau).
 
 L'analyse (mots-clés, matching) arrive en Phase 2 avec les moteurs.
 """

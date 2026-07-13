@@ -1,4 +1,4 @@
-"""Routers HTTP — fins : validation I/O et délégation aux services."""
+"""Routers HTTP - fins : validation I/O et délégation aux services."""
 
 from app.routers.applications import router as applications_router
 from app.routers.backup import router as backup_router

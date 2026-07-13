@@ -1,4 +1,4 @@
-"""Tables CVForge V1 — cœur du parcours : profil → preuves → offre → variante.
+"""Tables CVForge V1 - cœur du parcours : profil > preuves > offre > variante.
 
 Principe de traçabilité (anti-hallucination) : chaque
 :class:`GeneratedSentence` référence les faits (``source_fact_ids``) et
@@ -28,14 +28,14 @@ class MasterProfile(Base, SyncReadyMixin):
     location: Mapped[str] = mapped_column(String(200), nullable=False, default="")
     links: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    # Texte brut du CV importé (PDF/collage) — conservé pour re-parsing et Avant/Après.
+    # Texte brut du CV importé (PDF/collage) - conservé pour re-parsing et Avant/Après.
     raw_import_text: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     facts: Mapped[list["Fact"]] = relationship(back_populates="profile")
 
 
 class Fact(Base, SyncReadyMixin):
-    """Fait validé du parcours (expérience, compétence, projet, formation…)."""
+    """Fait validé du parcours (expérience, compétence, projet, formation...)."""
 
     __tablename__ = "fact"
 
@@ -79,7 +79,7 @@ class Proof(Base, SyncReadyMixin):
 
 
 class ProofFact(Base, SyncReadyMixin):
-    """Liaison N–N fait ↔ preuve (table à part entière : sync-ready + soft delete)."""
+    """Liaison N-N fait ↔ preuve (table à part entière : sync-ready + soft delete)."""
 
     __tablename__ = "proof_fact"
     __table_args__ = (UniqueConstraint("proof_id", "fact_id", name="uq_proof_fact"),)
@@ -99,9 +99,9 @@ class Offer(Base, SyncReadyMixin):
     title: Mapped[str] = mapped_column(String(300), nullable=False, default="")
     company: Mapped[str] = mapped_column(String(200), nullable=False, default="")
     raw_text: Mapped[str] = mapped_column(Text, nullable=False)
-    # Référence saisie par l'utilisateur — jamais fetchée (aucun appel réseau).
+    # Référence saisie par l'utilisateur - jamais fetchée (aucun appel réseau).
     source_url: Mapped[str | None] = mapped_column(String(2000), nullable=True)
-    # Analyse : mots-clés pondérés [[mot, fréquence], …] et extractions.
+    # Analyse : mots-clés pondérés [[mot, fréquence], ...] et extractions.
     keywords: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     required_skills: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     optional_skills: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
@@ -111,7 +111,7 @@ class Offer(Base, SyncReadyMixin):
 
 
 class CvVariant(Base, SyncReadyMixin):
-    """Variante de CV adaptée à une offre — ce que l'Avant/Après compare et valide."""
+    """Variante de CV adaptée à une offre - ce que l'Avant/Après compare et valide."""
 
     __tablename__ = "cv_variant"
 

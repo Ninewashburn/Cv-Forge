@@ -1,4 +1,4 @@
-"""Backup ZIP : export/import complet des données — « tes données t'appartiennent »."""
+"""Backup ZIP : export/import complet des données - « tes données t'appartiennent »."""
 
 from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import Response

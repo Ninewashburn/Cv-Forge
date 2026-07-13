@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class MatchRequest(BaseModel):
-    """Texte à matcher contre l'offre. Absent → contenu du profil maître."""
+    """Texte à matcher contre l'offre. Absent > contenu du profil maître."""
 
     text: str | None = None
 
@@ -24,7 +24,7 @@ class PromptKind(StrEnum):
 
 
 class CopilotPromptRequest(BaseModel):
-    """Texte de CV (absent → profil maître) + intention choisie."""
+    """Texte de CV (absent > profil maître) + intention choisie."""
 
     text: str | None = None
     kind: PromptKind = PromptKind.ADAPTER

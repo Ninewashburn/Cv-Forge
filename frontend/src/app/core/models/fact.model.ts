@@ -18,7 +18,7 @@ export interface FactCreate {
   tags?: string[];
   validated?: boolean;
   position?: number;
-  /** Absent → rattaché au profil maître (V1 : un seul profil). */
+  /** Absent > rattaché au profil maître (V1 : un seul profil). */
   profile_id?: string | null;
 }
 

@@ -1,4 +1,4 @@
-<p class="eyebrow">CVFORGE V1 — LOCAL-FIRST</p>
+<p class="eyebrow">CVFORGE V1 - LOCAL-FIRST</p>
 <h2>Candidater comme on code : avec méthode, traçabilité, sans bullshit.</h2>
 <p class="lead">
   Colle une offre et ton CV dans l'Atelier : matching sans IA, adaptation contrôlée,
@@ -11,10 +11,10 @@
     <span class="dot"></span>
     @switch (state()) {
       @case ('loading') {
-        <span>Connexion à l'API locale…</span>
+        <span>Connexion à l'API locale...</span>
       }
       @case ('connected') {
-        <span>Application locale prête — tes données sont sur ta machine.</span>
+        <span>Application locale prête - tes données sont sur ta machine.</span>
       }
       @case ('error') {
         <span
@@ -27,7 +27,7 @@
   @if (profile(); as p) {
     <dl class="profile-peek">
       <dt>Profil maître</dt>
-      <dd>{{ p.headline || "(en-tête vide — à remplir dans l'Atelier)" }}</dd>
+      <dd>{{ p.headline || "(en-tête vide - à remplir dans l'Atelier)" }}</dd>
       <dt>Identifiant</dt>
       <dd>
         <code>{{ p.id }}</code>
@@ -38,7 +38,7 @@
 
 <div class="cta-row">
   <a routerLink="/atelier" class="btn btn-primary">Ouvrir l'Atelier</a>
-  <span class="hint">Rien ne sort de ta machine — tout est local.</span>
+  <span class="hint">Rien ne sort de ta machine - tout est local.</span>
 </div>
 
 <div class="card backup-card">
@@ -50,7 +50,7 @@
   <div class="backup-row">
     <a class="btn btn-ghost" [href]="backup.exportUrl">⬇ Exporter mes données (ZIP)</a>
     <label class="btn btn-ghost restore-label">
-      {{ restoring() ? 'Restauration…' : '⬆ Restaurer un backup' }}
+      {{ restoring() ? 'Restauration...' : '⬆ Restaurer un backup' }}
       <input
         #restoreInput
         type="file"

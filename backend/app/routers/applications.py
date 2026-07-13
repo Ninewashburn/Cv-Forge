@@ -1,4 +1,4 @@
-"""Micro-suivi des candidatures : réponse ? entretien ? — 3 clics max."""
+"""Micro-suivi des candidatures : réponse ? entretien ? - 3 clics max."""
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session

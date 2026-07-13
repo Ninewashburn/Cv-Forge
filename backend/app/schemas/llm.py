@@ -6,7 +6,7 @@ from app.schemas.matching import PromptKind
 
 
 class LlmConfigRead(BaseModel):
-    """État de la configuration — la clé n'est JAMAIS renvoyée, seulement un indice."""
+    """État de la configuration - la clé n'est JAMAIS renvoyée, seulement un indice."""
 
     provider: str
     model: str
@@ -22,14 +22,14 @@ class LlmConfigWrite(BaseModel):
 
 
 class AdaptRequest(BaseModel):
-    """CV à adapter (absent → profil maître) + intention, comme le copilote."""
+    """CV à adapter (absent > profil maître) + intention, comme le copilote."""
 
     text: str | None = None
     kind: PromptKind = PromptKind.ADAPTER
 
 
 class AdaptResult(BaseModel):
-    """Proposition du fournisseur — à valider dans l'Avant/Après, jamais auto-appliquée."""
+    """Proposition du fournisseur - à valider dans l'Avant/Après, jamais auto-appliquée."""
 
     adapted_text: str
     provider: str

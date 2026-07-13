@@ -1,4 +1,4 @@
-"""Profil maître — V1 : un profil unique, créé au premier accès."""
+"""Profil maître - V1 : un profil unique, créé au premier accès."""
 
 from __future__ import annotations
 

@@ -1,11 +1,11 @@
-<h2>Adapte ton CV — le score évolue en direct</h2>
+<h2>Adapte ton CV - le score évolue en direct</h2>
 <p class="lead">
   Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule le matching
-  à chaque pause de frappe — sans IA, 100&nbsp;% local.
+  à chaque pause de frappe - sans IA, 100&nbsp;% local.
 </p>
 
 <details class="copilote">
-  <summary>Mode copilote — utilise ton propre ChatGPT ou Claude</summary>
+  <summary>Mode copilote - utilise ton propre ChatGPT ou Claude</summary>
   <div class="copilote-body">
     <p>
       CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le,
@@ -34,7 +34,7 @@
         [disabled]="promptBusy()"
         (click)="preparePrompt()"
       >
-        {{ promptBusy() ? 'Préparation…' : 'Préparer le prompt verrouillé' }}
+        {{ promptBusy() ? 'Préparation...' : 'Préparer le prompt verrouillé' }}
       </button>
       @if (promptText()) {
         <button type="button" class="btn btn-ghost" (click)="copyPrompt()">Copier le prompt</button>
@@ -57,14 +57,14 @@
 </details>
 
 <details class="copilote">
-  <summary>Ma clé API — adaptation directe, sans copier-coller (avancé)</summary>
+  <summary>Ma clé API - adaptation directe, sans copier-coller (avancé)</summary>
   <div class="copilote-body">
     @if (llmConfig(); as config) {
       @if (!config.configured) {
         <p>
           Avec ta propre clé API Anthropic (Claude), CVForge envoie le prompt verrouillé et récupère
           la proposition directement. La clé est enregistrée <strong>sur ta machine</strong>, côté
-          application — jamais dans le navigateur, jamais dans tes backups.
+          application - jamais dans le navigateur, jamais dans tes backups.
         </p>
         <div class="row">
           <input
@@ -73,7 +73,7 @@
             type="password"
             [value]="keyInput()"
             (input)="keyInput.set(apiKey.value)"
-            placeholder="sk-ant-…"
+            placeholder="sk-ant-..."
             autocomplete="off"
             aria-label="Clé API Anthropic"
           />
@@ -83,12 +83,12 @@
             [disabled]="savingKey() || !keyInput().trim()"
             (click)="saveKey()"
           >
-            {{ savingKey() ? 'Enregistrement…' : 'Enregistrer la clé' }}
+            {{ savingKey() ? 'Enregistrement...' : 'Enregistrer la clé' }}
           </button>
         </div>
       } @else {
         <p class="key-state">
-          Clé enregistrée ({{ config.key_hint }}) — modèle <code>{{ config.model }}</code
+          Clé enregistrée ({{ config.key_hint }}) - modèle <code>{{ config.model }}</code
           >.
           <button type="button" class="btn-link" (click)="removeKey()">Retirer la clé</button>
         </p>
@@ -96,7 +96,7 @@
         <div class="consent-box">
           <p class="consent-what">
             <strong>Ce qui sera envoyé à Anthropic :</strong> ton CV original et le texte de l'offre
-            — rien d'autre (pas ton profil LinkedIn, pas tes preuves). Les données envoyées via API
+            - rien d'autre (pas ton profil LinkedIn, pas tes preuves). Les données envoyées via API
             ne servent pas à l'entraînement des modèles.
           </p>
           <label class="consent-check">
@@ -112,7 +112,7 @@
             >
               {{
                 adapting()
-                  ? 'Appel en cours… (jusqu’à une minute)'
+                  ? "Appel en cours... (jusqu'à une minute)"
                   : 'Envoyer et récupérer la proposition'
               }}
             </button>
@@ -126,20 +126,20 @@
         <p class="api-hint">{{ apiHint() }}</p>
       }
     } @else {
-      <p class="hint">Configuration indisponible — le backend est-il lancé ?</p>
+      <p class="hint">Configuration indisponible - le backend est-il lancé ?</p>
     }
   </div>
 </details>
 
 <div class="adapt-grid">
   <div>
-    <div class="pane-label"><span>CV ORIGINAL — LECTURE SEULE</span></div>
+    <div class="pane-label"><span>CV ORIGINAL - LECTURE SEULE</span></div>
     <textarea readonly [value]="store.cvText()" aria-label="CV original"></textarea>
   </div>
 
   <div>
     <div class="pane-label">
-      <span>CV ADAPTÉ — ÉDITABLE</span>
+      <span>CV ADAPTÉ - ÉDITABLE</span>
       <button type="button" class="btn-link" (click)="resetAdapted()">
         Repartir de l'original
       </button>
@@ -170,7 +170,7 @@
         }
       </div>
     } @else {
-      <p class="hint">Calcul en cours…</p>
+      <p class="hint">Calcul en cours...</p>
     }
     <p class="live-note">
       Rappel : n'ajoute que du prouvable. L'étape suivante « Avant / Après » vérifiera chaque ajout.
@@ -179,7 +179,7 @@
 </div>
 
 <div class="row footer-row">
-  <button type="button" class="btn btn-ghost" (click)="store.goTo(2)">← Analyse complète</button>
+  <button type="button" class="btn btn-ghost" (click)="store.goTo(2)">< Analyse complète</button>
   <span class="spacer"></span>
   <button
     type="button"

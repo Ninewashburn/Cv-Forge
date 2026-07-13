@@ -1,4 +1,4 @@
-"""Analyse d'offre et matching — sans LLM, 100 % local."""
+"""Analyse d'offre et matching - sans LLM, 100 % local."""
 
 from __future__ import annotations
 

@@ -20,10 +20,10 @@ def _post(client, filename: str, content: bytes, content_type: str = "applicatio
 
 
 def test_txt_utf8_roundtrip(client):
-    response = _post(client, "cv.txt", "Développeur Angular — 5 ans".encode(), "text/plain")
+    response = _post(client, "cv.txt", "Développeur Angular - 5 ans".encode(), "text/plain")
     assert response.status_code == 200
     body = response.json()
-    assert body["text"] == "Développeur Angular — 5 ans"
+    assert body["text"] == "Développeur Angular - 5 ans"
     assert body["filename"] == "cv.txt"
 
 

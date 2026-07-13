@@ -1,9 +1,9 @@
 /**
- * Diff mot à mot (LCS), porté de CVForge Lite — fonctions pures, zéro DOM.
+ * Diff mot à mot (LCS), porté de CVForge Lite - fonctions pures, zéro DOM.
  *
  * Sécurité : la sortie est une liste de segments TYPÉS rendus par interpolation
  * Angular (`{{ }}`), jamais par `innerHTML`. L'échappement du texte collé par
- * l'utilisateur est donc garanti par le framework (cf. ROADMAP — audit V1.5).
+ * l'utilisateur est donc garanti par le framework (cf. ROADMAP - audit V1.5).
  */
 
 export type DiffKind = 'same' | 'removed' | 'added';
@@ -95,7 +95,7 @@ export function paneSegments(ops: DiffOp[], side: 'left' | 'right'): PaneSegment
   return segments;
 }
 
-/** Passages ajoutés consécutifs — à confirmer « vrai et prouvable » un par un. */
+/** Passages ajoutés consécutifs - à confirmer « vrai et prouvable » un par un. */
 export function addedSegments(ops: DiffOp[]): string[] {
   const segments: string[] = [];
   let current: string[] = [];

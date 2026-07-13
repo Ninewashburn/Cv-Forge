@@ -1,4 +1,4 @@
-"""Extraction de texte locale — bouton « Importer un fichier » des zones du wizard."""
+"""Extraction de texte locale - bouton « Importer un fichier » des zones du wizard."""
 
 from fastapi import APIRouter, HTTPException, UploadFile
 
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/extract", tags=["extract"])
 
 @router.post("", response_model=ExtractedText)
 async def extract(file: UploadFile) -> ExtractedText:
-    """Texte brut d'un fichier PDF ou texte — extraction 100 % locale (pypdf).
+    """Texte brut d'un fichier PDF ou texte - extraction 100 % locale (pypdf).
 
     Endpoint générique unique pour les trois zones (offre, CV, profil LinkedIn) :
     le texte renvoyé atterrit dans le champ, éditable avant toute analyse."""

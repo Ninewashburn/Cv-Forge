@@ -1,4 +1,4 @@
-"""Configuration du niveau clé API — la clé vit côté backend, jamais côté navigateur."""
+"""Configuration du niveau clé API - la clé vit côté backend, jamais côté navigateur."""
 
 from fastapi import APIRouter, HTTPException
 
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/llm", tags=["llm"])
 
 @router.get("/config", response_model=LlmConfigRead)
 def get_config() -> LlmConfigRead:
-    """État de la configuration (clé masquée — seuls 4 caractères d'indice)."""
+    """État de la configuration (clé masquée - seuls 4 caractères d'indice)."""
     return LlmConfigRead.model_validate(llm_service.read_config())
 
 

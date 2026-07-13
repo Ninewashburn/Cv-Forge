@@ -12,7 +12,7 @@ interface PromptIntent {
   readonly hint: string;
 }
 
-/** Étape 3 : adaptation contrôlée — édition manuelle + mode copilote (4 intentions). */
+/** Étape 3 : adaptation contrôlée - édition manuelle + mode copilote (4 intentions). */
 @Component({
   selector: 'cvforge-adaptation',
   templateUrl: './adaptation.html',
@@ -41,7 +41,7 @@ export class AdaptationStep {
 
   protected readonly intents: readonly PromptIntent[] = [
     { kind: 'adapter', label: 'Adapter', hint: "Reformuler le CV pour l'offre (défaut)" },
-    { kind: 'auditer', label: 'Auditer', hint: 'Critique de recruteur — ne réécrit rien' },
+    { kind: 'auditer', label: 'Auditer', hint: 'Critique de recruteur - ne réécrit rien' },
     { kind: 'muscler', label: 'Muscler', hint: "Verbes d'action, sans inventer de chiffres" },
     { kind: 'accrocher', label: 'Accrocher', hint: 'Accroche 3 lignes, que du vérifiable' },
   ];
@@ -119,7 +119,7 @@ export class AdaptationStep {
           // n'a pas été validé (porte d'intégrité du store).
           this.store.adaptedText.set(result.adapted_text);
           this.apiHint.set(
-            `Proposition de ${result.model} reçue — vérifie chaque changement dans l'Avant / Après.`,
+            `Proposition de ${result.model} reçue - vérifie chaque changement dans l'Avant / Après.`,
           );
         },
         error: (err: { error?: { detail?: string } }) => {
@@ -142,7 +142,7 @@ export class AdaptationStep {
           this.promptBusy.set(false);
         },
         error: () => {
-          this.copyHint.set('Erreur — backend indisponible ?');
+          this.copyHint.set('Erreur - backend indisponible ?');
           this.promptBusy.set(false);
         },
       });
@@ -151,9 +151,9 @@ export class AdaptationStep {
   protected async copyPrompt(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.promptText());
-      this.copyHint.set('Copié — colle-le dans ton IA.');
+      this.copyHint.set('Copié - colle-le dans ton IA.');
     } catch {
-      this.copyHint.set('Copie impossible — sélectionne le texte à la main.');
+      this.copyHint.set('Copie impossible - sélectionne le texte à la main.');
     }
   }
 

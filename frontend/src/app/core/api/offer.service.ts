@@ -45,7 +45,7 @@ export class OfferService {
     return this.http.post<Offer>(`${this.base}/${id}/analyze`, {});
   }
 
-  /** Couverture des mots-clés par un texte (absent → profil maître). Sans LLM. */
+  /** Couverture des mots-clés par un texte (absent > profil maître). Sans LLM. */
   matching(id: string, body: MatchRequest = {}): Observable<MatchingResult> {
     return this.http.post<MatchingResult>(`${this.base}/${id}/matching`, body);
   }

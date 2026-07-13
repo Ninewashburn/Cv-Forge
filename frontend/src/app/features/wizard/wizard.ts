@@ -8,8 +8,8 @@ import { SourcesStep } from './steps/sources';
 import { WizardStore } from './wizard-store';
 
 /**
- * Atelier (parcours guidé) — le core loop V1 complet :
- * Sources → Analyse → Adaptation → Avant/Après → Export PDF + micro-suivi.
+ * Atelier (parcours guidé) - le core loop V1 complet :
+ * Sources > Analyse > Adaptation > Avant/Après > Export PDF + micro-suivi.
  */
 @Component({
   selector: 'cvforge-wizard',

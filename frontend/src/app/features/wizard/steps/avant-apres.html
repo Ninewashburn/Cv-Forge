@@ -75,8 +75,8 @@
             >
               {{
                 isConfirmed($index)
-                  ? '✓ CONFIRMÉ — VRAI ET PROUVABLE'
-                  : 'CONFIRMER — VRAI ET PROUVABLE ?'
+                  ? '✓ CONFIRMÉ - VRAI ET PROUVABLE'
+                  : 'CONFIRMER - VRAI ET PROUVABLE ?'
               }}
             </button>
           </div>
@@ -84,12 +84,12 @@
       </div>
     } @else {
       <div class="all-good">
-        Aucun contenu ajouté — uniquement des reformulations ou suppressions. Rien à confirmer.
+        Aucun contenu ajouté - uniquement des reformulations ou suppressions. Rien à confirmer.
       </div>
     }
 
     <div class="gate">
-      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">← Modifier encore</button>
+      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">< Modifier encore</button>
       <span class="spacer"></span>
       @if (additions.length > 0) {
         <span class="gate-count" [class.ok]="allConfirmed()">

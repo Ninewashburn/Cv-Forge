@@ -6,7 +6,7 @@ def _create_offer(client, raw_text="Offre de test Angular pour export complet"):
 
 
 # Lignes consécutives SANS ligne vide : c'est le cas qui piégeait multi_cell
-# (curseur laissé au bord droit) — une ligne vide masquait le bug via ln().
+# (curseur laissé au bord droit) - une ligne vide masquait le bug via ln().
 _DEFAULT_TEXT = "Mon CV adapté et validé.\nExpérience Angular.\nLigne trois."
 
 
@@ -48,8 +48,12 @@ def test_variant_pdf_is_downloadable(client):
 
 def test_pdf_survives_non_latin1_characters(client):
     offer = _create_offer(client)
+    # Caractères en \uXXXX (convention anti-tells) : ce sont des ENTRÉES de test,
+    # elles simulent du texte collé par l'utilisateur avec typographie riche.
     variant = _manual_variant(
-        client, offer["id"], "Cœur d'œuvre — budget 10 000 €… “projet” ★"
+        client,
+        offer["id"],
+        "Cœur d'œuvre \u2014 budget 10 000 €\u2026 \u201cprojet\u201d ★",
     )
     response = client.get(f"/api/variants/{variant['id']}/pdf")
     assert response.status_code == 200

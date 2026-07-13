@@ -13,7 +13,7 @@ import { Fact, FactType, Proof, ProofType } from '../../core/models';
 
 type PageState = 'loading' | 'ready' | 'error';
 
-/** Étiquettes UI en français — les valeurs restent les enums de l'API. */
+/** Étiquettes UI en français - les valeurs restent les enums de l'API. */
 const FACT_TYPES: readonly { value: FactType; label: string }[] = [
   { value: 'experience', label: 'Expérience' },
   { value: 'skill', label: 'Compétence' },
@@ -55,10 +55,10 @@ export class ProfilePage {
   protected readonly email = signal('');
   protected readonly phone = signal('');
   protected readonly location = signal('');
-  /** Un lien par ligne (GitHub, portfolio, LinkedIn…). */
+  /** Un lien par ligne (GitHub, portfolio, LinkedIn...). */
   protected readonly linksText = signal('');
   protected readonly summary = signal('');
-  /** CV complet importé/collé — le matching et le copilote s'en servent automatiquement. */
+  /** CV complet importé/collé - le matching et le copilote s'en servent automatiquement. */
   protected readonly rawImportText = signal('');
   protected readonly profileHint = signal('');
   protected readonly savingProfile = signal(false);
@@ -150,11 +150,11 @@ export class ProfilePage {
       .subscribe({
         next: () => {
           this.savingProfile.set(false);
-          this.profileHint.set('Profil enregistré — sur ta machine, nulle part ailleurs.');
+          this.profileHint.set('Profil enregistré - sur ta machine, nulle part ailleurs.');
         },
         error: () => {
           this.savingProfile.set(false);
-          this.profileHint.set('Enregistrement impossible — l’API locale répond-elle ?');
+          this.profileHint.set("Enregistrement impossible - l'API locale répond-elle ?");
         },
       });
   }
@@ -173,7 +173,7 @@ export class ProfilePage {
         next: ({ text }) => {
           this.importingCv.set(false);
           this.rawImportText.set(text);
-          this.profileHint.set('Texte extrait — vérifie-le puis enregistre le profil.');
+          this.profileHint.set('Texte extrait - vérifie-le puis enregistre le profil.');
         },
         error: (err: { error?: { detail?: string } }) => {
           this.importingCv.set(false);
@@ -268,7 +268,7 @@ export class ProfilePage {
       .subscribe(() => {
         if (this.editingFactId() === fact.id) this.cancelFactEdit();
         this.reloadFacts();
-        this.reloadProofs(); // les liaisons preuve → fait ont pu changer
+        this.reloadProofs(); // les liaisons preuve > fait ont pu changer
       });
   }
 

@@ -1,8 +1,8 @@
-"""Extraction de texte locale (PDF, texte brut) — le fichier ne quitte jamais la machine.
+"""Extraction de texte locale (PDF, texte brut) - le fichier ne quitte jamais la machine.
 
 Sert le bouton « Importer un fichier » des trois zones du wizard (offre, CV,
 profil LinkedIn). Un seul point d'entrée générique : ``extract_text``. Le texte
-extrait est renvoyé tel quel au champ, visible et éditable avant toute analyse —
+extrait est renvoyé tel quel au champ, visible et éditable avant toute analyse -
 même contrat que le copier-coller, qui reste le fallback universel.
 """
 
@@ -39,7 +39,7 @@ def extract_text(filename: str | None, content: bytes) -> str:
     if name.endswith(_TEXT_EXTENSIONS) or not name:
         return _from_plain_text(content)
     raise ValueError(
-        f"Format non pris en charge — PDF ou fichier texte (.txt). {_FALLBACK_HINT}"
+        f"Format non pris en charge - PDF ou fichier texte (.txt). {_FALLBACK_HINT}"
     )
 
 
@@ -50,21 +50,21 @@ def _from_pdf(content: bytes) -> str:
             # Certains PDF sont « chiffrés » avec un mot de passe vide (protection copie).
             try:
                 reader.decrypt("")
-            except Exception as exc:  # noqa: BLE001 — pypdf lève des types variés ici
+            except Exception as exc:  # noqa: BLE001 - pypdf lève des types variés ici
                 raise ValueError(
-                    "Ce PDF est protégé par mot de passe — déverrouille-le d'abord. "
+                    "Ce PDF est protégé par mot de passe - déverrouille-le d'abord. "
                     + _FALLBACK_HINT
                 ) from exc
         pages = [(page.extract_text() or "").strip() for page in reader.pages]
     except ValueError:
         raise
-    except Exception as exc:  # noqa: BLE001 — tout PDF cassé = message utilisateur
+    except Exception as exc:  # noqa: BLE001 - tout PDF cassé = message utilisateur
         raise ValueError(f"Ce PDF est illisible ou corrompu. {_FALLBACK_HINT}") from exc
 
     text = _tidy("\n\n".join(p for p in pages if p))
     if not text:
         raise ValueError(
-            "Aucun texte trouvé dans ce PDF — c'est probablement un document scanné "
+            "Aucun texte trouvé dans ce PDF - c'est probablement un document scanné "
             f"(image). {_FALLBACK_HINT}"
         )
     return text
