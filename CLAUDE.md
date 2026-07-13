@@ -88,7 +88,7 @@ CVForge vend l'anti-bullshit : son code ne doit pas trahir une génération IA. 
 - Pas de flèches décoratives (`→ ← ⇒`) dans les textes UI (ok dans les diagrammes/docs).
 - ⚠️ **Les lettres accentuées (é è à ç ù â ê î ô û ë ï ü œ æ) sont SACRÉES** : aucun remplacement automatique ne doit jamais les toucher. Le lint ne cible QUE la liste ci-dessus.
 - Si un de ces caractères doit exister **fonctionnellement** dans le code (ex. table de translittération PDF qui les convertit), l'écrire en échappement `\uXXXX`, jamais en clair.
-- Garde-fou : `npm run lint:tells` (frontend). Cette règle vaut aussi pour `backend/` (messages utilisateur, prompts).
+- Garde-fou : `npm run lint:tells` — couvre `frontend/src` ET `prototypes/` (ts/html/json/md/css/js). Cette règle vaut aussi pour `backend/` (messages utilisateur, prompts).
 
 ---
 

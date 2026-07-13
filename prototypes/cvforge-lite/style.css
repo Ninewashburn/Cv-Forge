@@ -339,7 +339,7 @@ label { font: 600 13px var(--sans); display: block; margin-bottom: 8px }
 
 .samples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px }
 
-/* Champ LinkedIn — dépliant « révélation », visuellement distinct du CV */
+/* Champ LinkedIn - dépliant « révélation », visuellement distinct du CV */
 details.reveal {
   margin-top: 24px;
   border: 1px dashed #C9C8C0;
@@ -364,7 +364,7 @@ details.reveal[open] summary::before { content: "▾ " }
 .reveal-body textarea { min-height: 120px; background: #FCFCFA }
 .li-tip { font: 12.5px/1.5 var(--sans); color: var(--muted); margin: 0 0 10px }
 
-/* Mini-FAQ confiance (réassurance au moment du doute — contenu statique) */
+/* Mini-FAQ confiance (réassurance au moment du doute - contenu statique) */
 details.faq-trust { margin-top: 20px }
 .faq { margin: 0 }
 .faq dt { font: 600 13.5px var(--sans); color: var(--ink); margin: 12px 0 4px }

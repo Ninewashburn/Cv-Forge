@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CVForge — Prototype V1</title>
+<title>CVForge - Prototype V1</title>
 <style>
   :root{
     --paper:#F4F4F0; --card:#FFFFFF; --ink:#1C1B17; --muted:#6B6A60; --line:#E1E0D8;
@@ -181,18 +181,18 @@
 
 <main class="wrap">
 
-  <!-- ===================== ÉTAPE 1 — CV ===================== -->
+  <!-- ===================== ÉTAPE 1 - CV ===================== -->
   <section data-step="1">
-    <p class="eyebrow">ÉTAPE 01 — SOURCE DE VÉRITÉ</p>
+    <p class="eyebrow">ÉTAPE 01 - SOURCE DE VÉRITÉ</p>
     <h2>Colle ton CV</h2>
     <p class="lead">Le texte de ton CV est la seule matière première autorisée. Rien ne sera inventé à partir d'ailleurs.</p>
     <div class="card">
       <label for="cvInput">Texte du CV</label>
-      <textarea id="cvInput" placeholder="Colle ici le contenu de ton CV (copier-coller depuis ton PDF ou ton document)…"></textarea>
+      <textarea id="cvInput" placeholder="Colle ici le contenu de ton CV (copier-coller depuis ton PDF ou ton document)..."></textarea>
       <div class="row">
         <div class="samples">
-          <button class="btn-link" type="button" data-sample="cv-dev">Exemple — dev</button>
-          <button class="btn-link" type="button" data-sample="cv-gestion">Exemple — hors tech</button>
+          <button class="btn-link" type="button" data-sample="cv-dev">Exemple - dev</button>
+          <button class="btn-link" type="button" data-sample="cv-gestion">Exemple - hors tech</button>
         </div>
         <div class="spacer"></div>
         <span class="hint" id="cvHint">Minimum ~40 caractères</span>
@@ -201,18 +201,18 @@
     </div>
   </section>
 
-  <!-- ===================== ÉTAPE 2 — OFFRE ===================== -->
+  <!-- ===================== ÉTAPE 2 - OFFRE ===================== -->
   <section data-step="2">
-    <p class="eyebrow">ÉTAPE 02 — LA CIBLE</p>
+    <p class="eyebrow">ÉTAPE 02 - LA CIBLE</p>
     <h2>Colle l'offre d'emploi</h2>
     <p class="lead">Copie le texte de l'annonce depuis LinkedIn, Indeed, HelloWork ou n'importe où. Le texte brut suffit.</p>
     <div class="card">
       <label for="offreInput">Texte de l'offre</label>
-      <textarea id="offreInput" placeholder="Colle ici le texte complet de l'offre d'emploi…"></textarea>
+      <textarea id="offreInput" placeholder="Colle ici le texte complet de l'offre d'emploi..."></textarea>
       <div class="row">
         <div class="samples">
-          <button class="btn-link" type="button" data-sample="offre-dev">Exemple — dev</button>
-          <button class="btn-link" type="button" data-sample="offre-gestion">Exemple — hors tech</button>
+          <button class="btn-link" type="button" data-sample="offre-dev">Exemple - dev</button>
+          <button class="btn-link" type="button" data-sample="offre-gestion">Exemple - hors tech</button>
         </div>
         <div class="spacer"></div>
         <span class="hint" id="offreHint">Minimum ~40 caractères</span>
@@ -221,11 +221,11 @@
     </div>
   </section>
 
-  <!-- ===================== ÉTAPE 3 — MATCHING ===================== -->
+  <!-- ===================== ÉTAPE 3 - MATCHING ===================== -->
   <section data-step="3">
-    <p class="eyebrow">ÉTAPE 03 — ÉTAT DES LIEUX</p>
+    <p class="eyebrow">ÉTAPE 03 - ÉTAT DES LIEUX</p>
     <h2>Matching offre / CV</h2>
-    <p class="lead">Analyse par fréquence des mots-clés de l'offre, comparée à ton CV. <span class="nolm">CALCULÉ SANS IA — 100% LOCAL</span></p>
+    <p class="lead">Analyse par fréquence des mots-clés de l'offre, comparée à ton CV. <span class="nolm">CALCULÉ SANS IA - 100% LOCAL</span></p>
     <div class="card">
       <div class="score-board">
         <div class="score-num"><span id="scoreVal">0</span><small>%</small></div>
@@ -243,23 +243,23 @@
         <div class="kw-title">? ABSENT DE TON CV</div>
         <div class="chips" id="chipsMiss"></div>
       </div>
-      <div class="callout"><strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question : ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Si non, ne l'ajoute pas — un entretien le révélera.</div>
+      <div class="callout"><strong>Manquant ≠ à inventer.</strong> Pour chaque mot-clé absent, pose-toi la question : ai-je une preuve réelle (projet, formation, expérience) ? Si oui, ajoute-la. Si non, ne l'ajoute pas - un entretien le révélera.</div>
       <div class="row">
-        <button class="btn btn-ghost" type="button" data-go="2">← Revoir l'offre</button>
+        <button class="btn btn-ghost" type="button" data-go="2">< Revoir l'offre</button>
         <div class="spacer"></div>
         <button class="btn btn-primary" type="button" data-go="4">Adapter le CV</button>
       </div>
     </div>
   </section>
 
-  <!-- ===================== ÉTAPE 4 — ADAPTATION ===================== -->
+  <!-- ===================== ÉTAPE 4 - ADAPTATION ===================== -->
   <section data-step="4">
-    <p class="eyebrow">ÉTAPE 04 — ADAPTATION CONTRÔLÉE</p>
-    <h2>Adapte ton CV — à la main ou avec ton IA</h2>
+    <p class="eyebrow">ÉTAPE 04 - ADAPTATION CONTRÔLÉE</p>
+    <h2>Adapte ton CV - à la main ou avec ton IA</h2>
     <p class="lead">Deux voies, même règle : on reformule et on réorganise, on n'invente rien. Le Diff vérifiera tout à l'étape suivante.</p>
 
     <div class="copilote">
-      <h3>Mode copilote — utilise ton propre ChatGPT ou Claude</h3>
+      <h3>Mode copilote - utilise ton propre ChatGPT ou Claude</h3>
       <p>CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le, colle-le dans ton IA, puis rapporte uniquement le CV adapté dans la colonne de droite. Aucune clé API, aucun coût.</p>
       <div class="row" style="margin-top:0">
         <button class="btn btn-ghost" id="btnPrompt" type="button">Préparer le prompt verrouillé</button>
@@ -275,26 +275,26 @@
 
     <div class="panes">
       <div>
-        <div class="pane-label"><span>CV ORIGINAL — LECTURE SEULE</span></div>
+        <div class="pane-label"><span>CV ORIGINAL - LECTURE SEULE</span></div>
         <textarea id="cvOriginalView" readonly aria-label="CV original"></textarea>
       </div>
       <div>
-        <div class="pane-label"><span>CV ADAPTÉ — ÉDITABLE</span>
+        <div class="pane-label"><span>CV ADAPTÉ - ÉDITABLE</span>
           <button class="btn-link" id="btnResetAdapted" type="button">Repartir de l'original</button></div>
         <textarea id="adaptedInput" aria-label="CV adapté" placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."></textarea>
       </div>
     </div>
 
     <div class="row">
-      <button class="btn btn-ghost" type="button" data-go="3">← Matching</button>
+      <button class="btn btn-ghost" type="button" data-go="3">< Matching</button>
       <div class="spacer"></div>
       <button class="btn btn-primary" type="button" data-go="5">Vérifier dans le Diff</button>
     </div>
   </section>
 
-  <!-- ===================== ÉTAPE 5 — DIFF & EXPORT ===================== -->
+  <!-- ===================== ÉTAPE 5 - DIFF & EXPORT ===================== -->
   <section data-step="5">
-    <p class="eyebrow">ÉTAPE 05 — LA PREUVE PAR LE DIFF</p>
+    <p class="eyebrow">ÉTAPE 05 - LA PREUVE PAR LE DIFF</p>
     <h2>Qu'est-ce qui a changé, exactement ?</h2>
     <p class="lead">Chaque mot ajouté ou retiré est tracé. Avant d'exporter, tu confirmes que chaque ajout est vrai et prouvable. C'est le contrat CVForge.</p>
 
@@ -316,10 +316,10 @@
         <p class="sub">Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document, expérience) ? En V1 réelle, chaque confirmation se reliera à ta banque de preuves.</p>
         <div id="segsList"></div>
       </div>
-      <div class="all-good" id="noAdds" hidden>Aucun contenu ajouté — uniquement des reformulations ou suppressions. Rien à confirmer.</div>
+      <div class="all-good" id="noAdds" hidden>Aucun contenu ajouté - uniquement des reformulations ou suppressions. Rien à confirmer.</div>
 
       <div class="gate">
-        <button class="btn btn-ghost" type="button" data-go="4">← Modifier encore</button>
+        <button class="btn btn-ghost" type="button" data-go="4">< Modifier encore</button>
         <div class="spacer"></div>
         <span class="gate-count" id="gateCount"></span>
         <button class="btn btn-primary" id="btnExport" type="button">Exporter en PDF</button>
@@ -328,7 +328,7 @@
 
     <div class="track" id="trackBlock" hidden>
       <h3>Suivi de candidature</h3>
-      <p>Micro-tracking du prototype — données en mémoire uniquement, perdues au rechargement. La V1 réelle persiste en SQLite local.</p>
+      <p>Micro-tracking du prototype - données en mémoire uniquement, perdues au rechargement. La V1 réelle persiste en SQLite local.</p>
       <div id="trackList"></div>
     </div>
   </section>
@@ -354,16 +354,16 @@ const S = { step:1, cv:"", offre:"", adapted:"", matching:null,
 /* ============ Données d'exemple ============ */
 const SAMPLES = {
 "cv-dev":
-`Lina Carvalho — Développeuse Fullstack
+`Lina Carvalho - Développeuse Fullstack
 Caen · lina.carvalho@mail.fr · github.com/linacarvalho
 
 EXPÉRIENCE
-Développeuse fullstack — Atelier Numérique (2023–2026)
+Développeuse fullstack - Atelier Numérique (2023-2026)
 - Développement d'un dashboard de supervision en Angular et TypeScript
 - API REST en Spring Boot, base PostgreSQL, conteneurisation Docker
 - Tests unitaires (JUnit, Jasmine), revues de code, méthode Scrum
 
-Développeuse junior — WebFabrik (2022–2023)
+Développeuse junior - WebFabrik (2022-2023)
 - Sites e-commerce, intégration responsive, corrections de bugs
 
 PROJETS
@@ -374,24 +374,24 @@ FORMATION
 Titre professionnel Concepteur Développeur d'Applications (2022)`,
 
 "cv-gestion":
-`Karim Bensaïd — Assistant de gestion
+`Karim Bensaïd - Assistant de gestion
 Rouen · k.bensaid@mail.fr
 
 EXPÉRIENCE
-Assistant de gestion — Transports Lemaire (2021–2026)
+Assistant de gestion - Transports Lemaire (2021-2026)
 - Facturation clients et fournisseurs, établissement des devis
 - Relances clients et suivi des règlements
 - Saisie comptable dans l'ERP Sage, rapprochements bancaires
 - Accueil téléphonique et gestion du courrier
 
-Employé administratif — Mairie de Rouen (2019–2021)
+Employé administratif - Mairie de Rouen (2019-2021)
 - Gestion des dossiers, archivage, mise à jour des tableaux Excel
 
 FORMATION
 BTS Gestion de la PME (2019)`,
 
 "offre-dev":
-`Développeur Fullstack Angular / Spring Boot (H/F) — CDI, Caen
+`Développeur Fullstack Angular / Spring Boot (H/F) - CDI, Caen
 Nous recherchons un développeur fullstack pour renforcer notre équipe produit.
 
 Vos missions :
@@ -407,7 +407,7 @@ Profil :
 Angular et Spring Boot sont au cœur de notre stack.`,
 
 "offre-gestion":
-`Assistant administratif et commercial (H/F) — CDI, Rouen
+`Assistant administratif et commercial (H/F) - CDI, Rouen
 PME du secteur logistique, nous recherchons un assistant polyvalent.
 
 Vos missions :
@@ -544,7 +544,7 @@ document.querySelectorAll("[data-sample]").forEach(b=>{
   });
 });
 
-/* ============ Étape 3 — rendu matching ============ */
+/* ============ Étape 3 - rendu matching ============ */
 function renderMatching(){
   const kws = keywords(S.offre);
   S.matching = coverage(kws, S.cv);
@@ -552,16 +552,16 @@ function renderMatching(){
   $("scoreVal").textContent = score;
   $("scoreFill").style.width = score+"%";
   $("scoreVerdict").textContent =
-    score>=75 ? "Bonne couverture — l'adaptation servira surtout à prioriser." :
-    score>=50 ? "Couverture partielle — vérifie les manquants un par un." :
-                "Couverture faible — cette offre est-elle vraiment la bonne cible ?";
+    score>=75 ? "Bonne couverture - l'adaptation servira surtout à prioriser." :
+    score>=50 ? "Couverture partielle - vérifie les manquants un par un." :
+                "Couverture faible - cette offre est-elle vraiment la bonne cible ?";
   const chip = (r)=>`<span class="chip ${r.hit?"chip-ok":"chip-miss"}">${r.hit?"✓":"?"} ${esc(r.k)} <span class="f">×${r.f}</span></span>`;
   const ok = res.filter(r=>r.hit), miss = res.filter(r=>!r.hit);
   $("chipsOk").innerHTML  = ok.length  ? ok.map(chip).join("")  : '<span class="hint">Aucun mot-clé couvert.</span>';
-  $("chipsMiss").innerHTML= miss.length? miss.map(chip).join(""): '<span class="hint">Rien ne manque — couverture totale.</span>';
+  $("chipsMiss").innerHTML= miss.length? miss.map(chip).join(""): '<span class="hint">Rien ne manque - couverture totale.</span>';
 }
 
-/* ============ Étape 4 — adaptation & copilote ============ */
+/* ============ Étape 4 - adaptation & copilote ============ */
 function enterAdaptation(){
   $("cvOriginalView").value = S.cv;
   if(!S.adapted.trim()){ S.adapted = S.cv; $("adaptedInput").value = S.cv; }
@@ -586,7 +586,7 @@ Réponds en deux blocs : d'abord le CV adapté seul, puis la liste « À vérifi
 === OFFRE D'EMPLOI ===
 ${S.offre}
 
-=== CV — SOURCE DE VÉRITÉ UNIQUE ===
+=== CV - SOURCE DE VÉRITÉ UNIQUE ===
 ${S.cv}
 
 === MOTS-CLÉS DE L'OFFRE ABSENTS DU CV (NE PAS AJOUTER) ===
@@ -602,10 +602,10 @@ $("btnCopy").addEventListener("click", async ()=>{
   const t = $("promptText");
   try { await navigator.clipboard.writeText(t.value); }
   catch(e){ t.focus(); t.select(); document.execCommand("copy"); }
-  $("copyHint").textContent = "Copié — colle-le dans ton IA.";
+  $("copyHint").textContent = "Copié - colle-le dans ton IA.";
 });
 
-/* ============ Étape 5 — diff, confirmations, export ============ */
+/* ============ Étape 5 - diff, confirmations, export ============ */
 function renderDiff(){
   const ops = lcsDiff(tokensOf(S.cv), tokensOf(S.adapted));
   const sig = S.cv + "\u0000" + S.adapted;
@@ -655,7 +655,7 @@ function renderSegs(){
     const b = document.createElement("button"); b.type="button"; b.className="confirm";
     const paint = ()=>{ const on=S.confirmed.has(i);
       b.classList.toggle("on",on);
-      b.textContent = on ? "✓ CONFIRMÉ — VRAI ET PROUVABLE" : "CONFIRMER — VRAI ET PROUVABLE ?";
+      b.textContent = on ? "✓ CONFIRMÉ - VRAI ET PROUVABLE" : "CONFIRMER - VRAI ET PROUVABLE ?";
       b.setAttribute("aria-pressed", on); };
     b.addEventListener("click", ()=>{ S.confirmed.has(i)?S.confirmed.delete(i):S.confirmed.add(i); paint(); gate(); });
     paint();
@@ -688,7 +688,7 @@ function renderTracking(){
   S.exports.forEach((e,i)=>{
     const row=document.createElement("div"); row.className="track-item";
     const meta=document.createElement("div"); meta.className="meta";
-    meta.textContent = e.date+" — "+e.title;
+    meta.textContent = e.date+" - "+e.title;
     const sel=document.createElement("select");
     [["envoyee","Envoyée"],["reponse","Réponse reçue"],["entretien","Entretien obtenu"],["refus","Refus"]]
       .forEach(([v,l])=>{ const o=document.createElement("option"); o.value=v; o.textContent=l;

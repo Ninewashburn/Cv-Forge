@@ -18,12 +18,12 @@
 Caen · lina.carvalho@mail.fr · github.com/linacarvalho
 
 EXPÉRIENCE
-Développeuse fullstack - Atelier Numérique (2023–2026)
+Développeuse fullstack - Atelier Numérique (2023-2026)
 - Développement d'un dashboard de supervision en Angular et TypeScript
 - API REST en Spring Boot, base PostgreSQL, conteneurisation Docker
 - Tests unitaires (JUnit, Jasmine), revues de code, méthode Scrum
 
-Développeuse junior - WebFabrik (2022–2023)
+Développeuse junior - WebFabrik (2022-2023)
 - Sites e-commerce, intégration responsive, corrections de bugs
 
 PROJETS
@@ -38,13 +38,13 @@ Titre professionnel Concepteur Développeur d'Applications (2022)`,
 Rouen · k.bensaid@mail.fr
 
 EXPÉRIENCE
-Assistant de gestion - Transports Lemaire (2021–2026)
+Assistant de gestion - Transports Lemaire (2021-2026)
 - Facturation clients et fournisseurs, établissement des devis
 - Relances clients et suivi des règlements
 - Saisie comptable dans l'ERP Sage, rapprochements bancaires
 - Accueil téléphonique et gestion du courrier
 
-Employé administratif - Mairie de Rouen (2019–2021)
+Employé administratif - Mairie de Rouen (2019-2021)
 - Gestion des dossiers, archivage, mise à jour des tableaux Excel
 
 FORMATION
@@ -558,7 +558,7 @@ ${missing.length ? missing.join(", ") : "(aucun)"}`;
       { n: 1, fill: true, title: "Les deux matières premières", text: "On a chargé un exemple : une offre d'emploi et un CV. Tout reste éditable à la main." },
       { n: 2, title: "Matching offre / CV", text: "La couverture des mots-clés de l'offre est calculée localement, sans IA." },
       { n: 3, title: "Adaptation en direct", text: "Tu modifies le CV au centre ; le score se recalcule à chaque frappe, dans le panneau de droite." },
-      { n: 4, title: "Avant / après — tu vois tout, tu valides tout", text: "Chaque ajout est tracé. Tu confirmes qu'il est vrai et prouvable avant d'exporter." },
+      { n: 4, title: "Avant / après - tu vois tout, tu valides tout", text: "Chaque ajout est tracé. Tu confirmes qu'il est vrai et prouvable avant d'exporter." },
     ];
     let i = -1, box = null;
 
@@ -580,7 +580,7 @@ ${missing.length ? missing.join(", ") : "(aucun)"}`;
          <p>${s.text}</p>
          <div class="tour-actions">
            <button type="button" class="tour-skip">Passer</button>
-           <button type="button" class="tour-next">${last ? "Terminer" : "Suivant →"}</button>
+           <button type="button" class="tour-next">${last ? "Terminer" : "Suivant >"}</button>
          </div>`;
       box.querySelector(".tour-skip").addEventListener("click", end);
       box.querySelector(".tour-next").addEventListener("click", () => last ? end() : show(i + 1));

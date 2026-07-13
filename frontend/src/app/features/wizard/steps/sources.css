@@ -74,7 +74,7 @@ textarea {
   width: 100%;
   /* Hauteur pilotée par l'écran, pas par une constante (layout « établi »). */
   min-height: clamp(240px, 52vh, 720px);
-  /* Auto-grow avec le contenu (progressive enhancement — Chrome/Edge). */
+  /* Auto-grow avec le contenu (progressive enhancement - Chrome/Edge). */
   field-sizing: content;
   max-height: 78vh;
   resize: vertical;
@@ -161,7 +161,7 @@ textarea:focus {
   padding-top: 16px;
 }
 
-/* Mini-FAQ confiance — réassurance au moment du doute (contenu statique). */
+/* Mini-FAQ confiance - réassurance au moment du doute (contenu statique). */
 .faq-trust {
   margin-top: 20px;
 }
