@@ -172,6 +172,9 @@ h2 {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  /* Hauteur fixe : sans elle, le bouton « Repartir de l'original » rend la
+     colonne de droite plus haute que celle de gauche et decale son textarea. */
+  min-height: 26px;
 }
 
 textarea {
