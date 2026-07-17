@@ -3,6 +3,26 @@
   padding-top: 20px;
 }
 
+.atelier-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.btn-link {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font: 600 12px var(--sans);
+  padding: 4px 2px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.btn-link:hover {
+  color: var(--del);
+}
+
 .steps {
   display: flex;
   gap: 6px;

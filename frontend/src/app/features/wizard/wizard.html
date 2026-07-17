@@ -1,4 +1,9 @@
-<p class="eyebrow">ATELIER - PARCOURS GUIDÉ</p>
+<div class="atelier-head">
+  <p class="eyebrow">ATELIER - PARCOURS GUIDÉ</p>
+  @if (store.hasUnsavedWork() || store.application()) {
+    <button type="button" class="btn-link" (click)="restart()">Recommencer à zéro</button>
+  }
+</div>
 
 <nav class="steps" aria-label="Étapes du parcours">
   @for (s of steps; track s.n) {

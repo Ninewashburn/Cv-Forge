@@ -35,10 +35,12 @@ export interface Analysis {
 const MIN_CHARS = 40;
 
 /**
- * État partagé du parcours (scopé au composant Wizard, donc réinitialisé à
- * chaque entrée dans l'Atelier). Toute la logique sans IA passe par l'API.
+ * État partagé du parcours. Fourni à la racine : un détour par une autre page
+ * (Profil & Preuves...) ne perd plus le travail en cours - avant, quitter
+ * l'Atelier détruisait tout silencieusement. « Recommencer » redonne une page
+ * blanche. Toute la logique sans IA passe par l'API.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class WizardStore {
   private readonly offers = inject(OfferService);
   private readonly variants = inject(VariantService);
@@ -86,6 +88,13 @@ export class WizardStore {
     () => this.offerText().trim().length >= MIN_CHARS && this.cvText().trim().length >= MIN_CHARS,
   );
 
+  /** Du contenu est en jeu et rien n'a été exporté : prévenir avant de fermer l'onglet. */
+  readonly hasUnsavedWork = computed(
+    () =>
+      (this.offerText().trim().length > 0 || this.cvText().trim().length > 0) &&
+      this.application() === null,
+  );
+
   goTo(step: number): void {
     // L'Analyse et l'Adaptation exigent un premier calcul ; l'Avant/Après, un
     // texte adapté ; l'Export, un Avant/Après validé en entier.
@@ -93,7 +102,37 @@ export class WizardStore {
     if (step === 4 && !this.adaptedText().trim()) return;
     if (step === 5 && !this.exportReady()) return;
     if (step === 3 && !this.adaptedText().trim()) this.adaptedText.set(this.cvText());
+    this.setStep(step);
+  }
+
+  /** Page blanche : efface tout le parcours en mémoire (les données déjà
+   *  enregistrées en base - offres, candidatures - ne bougent pas). */
+  reset(): void {
+    this.offerText.set('');
+    this.cvText.set('');
+    this.linkedinText.set('');
+    this.offer.set(null);
+    this.analysis.set(null);
+    this.busy.set(false);
+    this.error.set(null);
+    this.adaptedText.set('');
+    this.confirmedAdditions.set(new Set());
+    this.exportReady.set(false);
+    this.variant.set(null);
+    this.application.set(null);
+    this.exportBusy.set(false);
+    this.exportError.set(null);
+    this.offerId = null;
+    this.diffSignature = null;
+    this.variantText = null;
+    this.setStep(1);
+  }
+
+  /** Changement d'étape : toujours repartir du haut (sinon on atterrit au milieu
+   *  de la nouvelle étape, à la position de scroll de l'ancienne). */
+  private setStep(step: number): void {
     this.step.set(step);
+    window.scrollTo({ top: 0 });
   }
 
   /** Export : persiste la variante validée, télécharge le PDF, ouvre le micro-suivi. */
@@ -239,7 +278,7 @@ export class WizardStore {
         next: ({ cv, linkedin }) => {
           this.analysis.set(this.combine(cv, linkedin));
           this.busy.set(false);
-          this.step.set(2);
+          this.setStep(2);
         },
         error: () => {
           this.error.set('Analyse impossible - le backend est-il lancé sur :8000 ?');

@@ -64,7 +64,8 @@ export class ProfilePage {
   protected readonly savingProfile = signal(false);
   protected readonly importingCv = signal(false);
 
-  // --- Formulaire fait ----------------------------------------------------
+  // --- Formulaire fait (replié par défaut : les données d'abord) ----------
+  protected readonly factFormOpen = signal(false);
   protected readonly factType = signal<FactType>('experience');
   protected readonly factTitle = signal('');
   protected readonly factContent = signal('');
@@ -72,7 +73,8 @@ export class ProfilePage {
   protected readonly editingFactId = signal<string | null>(null);
   protected readonly factHint = signal('');
 
-  // --- Formulaire preuve --------------------------------------------------
+  // --- Formulaire preuve (replié par défaut) -------------------------------
+  protected readonly proofFormOpen = signal(false);
   protected readonly proofType = signal<ProofType>('note');
   protected readonly proofTitle = signal('');
   protected readonly proofContent = signal('');
@@ -235,6 +237,11 @@ export class ProfilePage {
     });
   }
 
+  protected openFactForm(): void {
+    this.cancelFactEdit();
+    this.factFormOpen.set(true);
+  }
+
   protected startFactEdit(fact: Fact): void {
     this.editingFactId.set(fact.id);
     this.factType.set(fact.type);
@@ -242,9 +249,11 @@ export class ProfilePage {
     this.factContent.set(fact.content);
     this.factTags.set(fact.tags.join(', '));
     this.factHint.set('');
+    this.factFormOpen.set(true);
   }
 
   protected cancelFactEdit(): void {
+    this.factFormOpen.set(false);
     this.editingFactId.set(null);
     this.factType.set('experience');
     this.factTitle.set('');
@@ -324,6 +333,11 @@ export class ProfilePage {
     });
   }
 
+  protected openProofForm(): void {
+    this.cancelProofEdit();
+    this.proofFormOpen.set(true);
+  }
+
   protected startProofEdit(proof: Proof): void {
     this.editingProofId.set(proof.id);
     this.proofType.set(proof.type);
@@ -331,9 +345,11 @@ export class ProfilePage {
     this.proofContent.set(proof.content);
     this.proofFactIds.set([...proof.fact_ids]);
     this.proofHint.set('');
+    this.proofFormOpen.set(true);
   }
 
   protected cancelProofEdit(): void {
+    this.proofFormOpen.set(false);
     this.editingProofId.set(null);
     this.proofType.set('note');
     this.proofTitle.set('');

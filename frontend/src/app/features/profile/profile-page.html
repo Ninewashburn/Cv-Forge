@@ -113,70 +113,91 @@
     <div class="bank">
       <!-- ------------------------------------------------ Faits -->
       <section>
-        <h3>Faits de ton parcours</h3>
+        <div class="section-head">
+          <h3>Faits de ton parcours</h3>
+          @if (!factFormOpen() && facts().length > 0) {
+            <button type="button" class="btn btn-ghost add-btn" (click)="openFactForm()">
+              + Ajouter un fait
+            </button>
+          }
+        </div>
         <p class="sub">
           Expériences, compétences, projets... Coche « prouvable » quand une preuve l'appuie : c'est
           ce que le matching et l'adaptation utiliseront en priorité.
         </p>
 
-        <div class="card form-card">
-          <div class="form-row">
+        @if (!factFormOpen() && factHint()) {
+          <p class="hint section-hint">{{ factHint() }}</p>
+        }
+
+        @if (facts().length === 0 && !factFormOpen()) {
+          <div class="empty-state">
+            <p class="empty-title">Commence par un fait dont tu es sûr.</p>
+            <p class="empty-text">
+              Une expérience, une compétence, un projet : quelque chose que tu pourrais raconter en
+              entretien sans hésiter.
+            </p>
+            <button type="button" class="btn btn-primary" (click)="openFactForm()">
+              Ajouter mon premier fait
+            </button>
+          </div>
+        }
+
+        @if (factFormOpen()) {
+          <div class="card form-card">
+            <div class="form-row">
+              <label>
+                Type
+                <select #ft [value]="factType()" (change)="onFactTypeChange(ft.value)">
+                  @for (t of factTypes; track t.value) {
+                    <option [value]="t.value">{{ t.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="grow">
+                Titre
+                <input
+                  #fti
+                  [value]="factTitle()"
+                  (input)="factTitle.set(fti.value)"
+                  placeholder="Ex. Organisation du salon annuel de l'entreprise"
+                  autocomplete="off"
+                />
+              </label>
+            </div>
             <label>
-              Type
-              <select #ft [value]="factType()" (change)="onFactTypeChange(ft.value)">
-                @for (t of factTypes; track t.value) {
-                  <option [value]="t.value">{{ t.label }}</option>
-                }
-              </select>
+              Détail (factuel - ce que tu as fait, mesuré si tu l'as mesuré)
+              <textarea
+                #ftc
+                rows="3"
+                [value]="factContent()"
+                (input)="factContent.set(ftc.value)"
+              ></textarea>
             </label>
-            <label class="grow">
-              Titre
+            <label>
+              Mots-clés (séparés par des virgules)
               <input
-                #fti
-                [value]="factTitle()"
-                (input)="factTitle.set(fti.value)"
-                placeholder="Ex. Organisation du salon annuel de l'entreprise"
+                #ftt
+                [value]="factTags()"
+                (input)="factTags.set(ftt.value)"
+                placeholder="gestion, relation client, organisation"
                 autocomplete="off"
               />
             </label>
-          </div>
-          <label>
-            Détail (factuel - ce que tu as fait, mesuré si tu l'as mesuré)
-            <textarea
-              #ftc
-              rows="3"
-              [value]="factContent()"
-              (input)="factContent.set(ftc.value)"
-            ></textarea>
-          </label>
-          <label>
-            Mots-clés (séparés par des virgules)
-            <input
-              #ftt
-              [value]="factTags()"
-              (input)="factTags.set(ftt.value)"
-              placeholder="gestion, relation client, organisation"
-              autocomplete="off"
-            />
-          </label>
-          <div class="row">
-            <button type="button" class="btn btn-primary" (click)="submitFact()">
-              {{ editingFactId() ? 'Enregistrer le fait' : 'Ajouter ce fait' }}
-            </button>
-            @if (editingFactId()) {
+            <div class="row">
+              <button type="button" class="btn btn-primary" (click)="submitFact()">
+                {{ editingFactId() ? 'Enregistrer le fait' : 'Ajouter ce fait' }}
+              </button>
               <button type="button" class="btn btn-ghost" (click)="cancelFactEdit()">
                 Annuler
               </button>
-            }
-            @if (factHint()) {
-              <span class="hint">{{ factHint() }}</span>
-            }
+              @if (factHint()) {
+                <span class="hint">{{ factHint() }}</span>
+              }
+            </div>
           </div>
-        </div>
-
-        @if (facts().length === 0) {
-          <p class="empty">Aucun fait pour l'instant - commence par ce que tu sais prouver.</p>
         }
+
         @for (fact of facts(); track fact.id) {
           <article class="card item" [class.editing]="editingFactId() === fact.id">
             <div class="item-head">
@@ -215,80 +236,99 @@
 
       <!-- ------------------------------------------------ Preuves -->
       <section>
-        <h3>Banque de preuves</h3>
+        <div class="section-head">
+          <h3>Banque de preuves</h3>
+          @if (!proofFormOpen() && proofs().length > 0) {
+            <button type="button" class="btn btn-ghost add-btn" (click)="openProofForm()">
+              + Ajouter une preuve
+            </button>
+          }
+        </div>
         <p class="sub">
           Une note, un lien (article, portfolio, page en ligne...) ou un document (attestation,
           diplôme, certificat). Relie chaque preuve aux faits qu'elle appuie.
         </p>
 
-        <div class="card form-card">
-          <div class="form-row">
-            <label>
-              Type
-              <select #pt [value]="proofType()" (change)="onProofTypeChange(pt.value)">
-                @for (t of proofTypes; track t.value) {
-                  <option [value]="t.value">{{ t.label }}</option>
-                }
-              </select>
-            </label>
-            <label class="grow">
-              Titre
-              <input
-                #pti
-                [value]="proofTitle()"
-                (input)="proofTitle.set(pti.value)"
-                placeholder="Ex. Attestation de mon employeur"
-                autocomplete="off"
-              />
-            </label>
-          </div>
-          <label>
-            {{ proofType() === 'link' ? 'Adresse du lien' : 'Contenu / description' }}
-            <textarea
-              #ptc
-              rows="2"
-              [value]="proofContent()"
-              (input)="proofContent.set(ptc.value)"
-              [placeholder]="
-                proofType() === 'link' ? 'https://...' : 'Ce que cette preuve montre...'
-              "
-            ></textarea>
-          </label>
-          @if (facts().length > 0) {
-            <fieldset class="link-facts">
-              <legend>Appuie les faits :</legend>
-              @for (fact of facts(); track fact.id) {
-                <label class="fact-check">
-                  <input
-                    type="checkbox"
-                    [checked]="proofFactIds().includes(fact.id)"
-                    (change)="toggleProofFact(fact.id)"
-                  />
-                  {{ fact.title }}
-                </label>
-              }
-            </fieldset>
-          }
-          <div class="row">
-            <button type="button" class="btn btn-primary" (click)="submitProof()">
-              {{ editingProofId() ? 'Enregistrer la preuve' : 'Ajouter cette preuve' }}
+        @if (!proofFormOpen() && proofHint()) {
+          <p class="hint section-hint">{{ proofHint() }}</p>
+        }
+
+        @if (proofs().length === 0 && !proofFormOpen()) {
+          <div class="empty-state">
+            <p class="empty-title">Ta banque de preuves est vide.</p>
+            <p class="empty-text">
+              Une attestation, un diplôme, un lien vers ton travail, une simple note : tout ce qui
+              te permettra de dire « je peux le prouver ».
+            </p>
+            <button type="button" class="btn btn-primary" (click)="openProofForm()">
+              Ajouter ma première preuve
             </button>
-            @if (editingProofId()) {
+          </div>
+        }
+
+        @if (proofFormOpen()) {
+          <div class="card form-card">
+            <div class="form-row">
+              <label>
+                Type
+                <select #pt [value]="proofType()" (change)="onProofTypeChange(pt.value)">
+                  @for (t of proofTypes; track t.value) {
+                    <option [value]="t.value">{{ t.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="grow">
+                Titre
+                <input
+                  #pti
+                  [value]="proofTitle()"
+                  (input)="proofTitle.set(pti.value)"
+                  placeholder="Ex. Attestation de mon employeur"
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+            <label>
+              {{ proofType() === 'link' ? 'Adresse du lien' : 'Contenu / description' }}
+              <textarea
+                #ptc
+                rows="2"
+                [value]="proofContent()"
+                (input)="proofContent.set(ptc.value)"
+                [placeholder]="
+                  proofType() === 'link' ? 'https://...' : 'Ce que cette preuve montre...'
+                "
+              ></textarea>
+            </label>
+            @if (facts().length > 0) {
+              <fieldset class="link-facts">
+                <legend>Appuie les faits :</legend>
+                @for (fact of facts(); track fact.id) {
+                  <label class="fact-check">
+                    <input
+                      type="checkbox"
+                      [checked]="proofFactIds().includes(fact.id)"
+                      (change)="toggleProofFact(fact.id)"
+                    />
+                    {{ fact.title }}
+                  </label>
+                }
+              </fieldset>
+            }
+            <div class="row">
+              <button type="button" class="btn btn-primary" (click)="submitProof()">
+                {{ editingProofId() ? 'Enregistrer la preuve' : 'Ajouter cette preuve' }}
+              </button>
               <button type="button" class="btn btn-ghost" (click)="cancelProofEdit()">
                 Annuler
               </button>
-            }
-            @if (proofHint()) {
-              <span class="hint">{{ proofHint() }}</span>
-            }
+              @if (proofHint()) {
+                <span class="hint">{{ proofHint() }}</span>
+              }
+            </div>
           </div>
-        </div>
-
-        @if (proofs().length === 0) {
-          <p class="empty">
-            Aucune preuve pour l'instant - une attestation, un lien, une note suffisent.
-          </p>
         }
+
         @for (proof of proofs(); track proof.id) {
           <article class="card item" [class.editing]="editingProofId() === proof.id">
             <div class="item-head">

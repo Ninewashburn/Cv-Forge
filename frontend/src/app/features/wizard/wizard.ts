@@ -14,10 +14,10 @@ import { WizardStore } from './wizard-store';
 @Component({
   selector: 'cvforge-wizard',
   imports: [SourcesStep, AnalyseStep, AdaptationStep, AvantApresStep, ExportStep],
-  providers: [WizardStore],
   templateUrl: './wizard.html',
   styleUrl: './wizard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window:beforeunload)': 'onBeforeUnload($event)' },
 })
 export class Wizard {
   protected readonly store = inject(WizardStore);
@@ -35,5 +35,17 @@ export class Wizard {
     if (n === 4) return this.store.adaptedText().trim() === '';
     if (n === 5) return !this.store.exportReady();
     return false;
+  }
+
+  /** Filet à la fermeture de l'onglet : le parcours vit en mémoire tant que
+   *  rien n'est exporté - le navigateur demande confirmation avant de fermer. */
+  protected onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.store.hasUnsavedWork()) event.preventDefault();
+  }
+
+  protected restart(): void {
+    if (!this.store.hasUnsavedWork() || window.confirm('Tout effacer et repartir de zéro ?')) {
+      this.store.reset();
+    }
   }
 }
