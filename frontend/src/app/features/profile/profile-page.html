@@ -32,7 +32,7 @@
             #hl
             [value]="headline()"
             (input)="headline.set(hl.value)"
-            placeholder="Ex. Développeur full-stack Angular / Python"
+            placeholder="Ex. Assistant de gestion, 5 ans d'expérience"
             autocomplete="off"
           />
         </label>
@@ -55,7 +55,7 @@
           />
         </label>
         <label>
-          Liens (un par ligne - GitHub, portfolio...)
+          Liens (un par ligne - portfolio, profil en ligne, page perso...)
           <textarea #lk rows="2" [value]="linksText()" (input)="linksText.set(lk.value)"></textarea>
         </label>
         <label class="full">
@@ -135,7 +135,7 @@
                 #fti
                 [value]="factTitle()"
                 (input)="factTitle.set(fti.value)"
-                placeholder="Ex. Refonte du site vitrine en Angular"
+                placeholder="Ex. Organisation du salon annuel de l'entreprise"
                 autocomplete="off"
               />
             </label>
@@ -155,7 +155,7 @@
               #ftt
               [value]="factTags()"
               (input)="factTags.set(ftt.value)"
-              placeholder="angular, typescript, accessibilité"
+              placeholder="gestion, relation client, organisation"
               autocomplete="off"
             />
           </label>
@@ -217,8 +217,8 @@
       <section>
         <h3>Banque de preuves</h3>
         <p class="sub">
-          Une note, un lien (GitHub, article...) ou un document (attestation, certificat). Relie
-          chaque preuve aux faits qu'elle appuie.
+          Une note, un lien (article, portfolio, page en ligne...) ou un document (attestation,
+          diplôme, certificat). Relie chaque preuve aux faits qu'elle appuie.
         </p>
 
         <div class="card form-card">
@@ -237,7 +237,7 @@
                 #pti
                 [value]="proofTitle()"
                 (input)="proofTitle.set(pti.value)"
-                placeholder="Ex. Dépôt GitHub du projet"
+                placeholder="Ex. Attestation de mon employeur"
                 autocomplete="off"
               />
             </label>
@@ -286,7 +286,7 @@
 
         @if (proofs().length === 0) {
           <p class="empty">
-            Aucune preuve pour l'instant - un lien GitHub, une attestation, une note suffisent.
+            Aucune preuve pour l'instant - une attestation, un lien, une note suffisent.
           </p>
         }
         @for (proof of proofs(); track proof.id) {

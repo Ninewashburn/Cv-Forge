@@ -55,7 +55,7 @@ export class ProfilePage {
   protected readonly email = signal('');
   protected readonly phone = signal('');
   protected readonly location = signal('');
-  /** Un lien par ligne (GitHub, portfolio, LinkedIn...). */
+  /** Un lien par ligne (portfolio, profil en ligne, page perso...). */
   protected readonly linksText = signal('');
   protected readonly summary = signal('');
   /** CV complet importé/collé - le matching et le copilote s'en servent automatiquement. */
