@@ -60,6 +60,12 @@ def update_offer(session: Session, offer_id: str, data: OfferUpdate) -> Offer:
     for field, value in changes.items():
         setattr(offer, field, value)
     if "raw_text" in changes:
+        # Nouveau texte = nouvelle offre aux yeux de l'utilisateur : le titre
+        # par défaut suit, sinon l'export reste étiqueté sur l'ancienne offre
+        # (bug de traçabilité vu en test réel : « Caen » affiché pour une offre
+        # Nouméa). Un titre explicitement fourni dans le même appel prime.
+        if "title" not in changes:
+            offer.title = _default_title(offer.raw_text)
         _apply_analysis(offer)
     session.commit()
     return offer

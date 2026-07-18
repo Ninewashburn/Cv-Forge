@@ -127,6 +127,32 @@ def test_offer_title_defaults_to_first_line(client):
     assert offer["title"] == "Développeur Fullstack (H/F) - CDI"
 
 
+def test_offer_update_recomputes_title_and_analysis(client):
+    """Bug de test réel : coller une nouvelle offre par-dessus l'exemple gardait
+    l'ancien titre - l'export semblait rattaché à la mauvaise offre."""
+    offer = client.post(
+        "/api/offers",
+        json={"raw_text": "Développeur Fullstack Angular - CDI, Caen\nAngular Angular Spring"},
+    ).json()
+    updated = client.patch(
+        f"/api/offers/{offer['id']}",
+        json={"raw_text": "Développeur Full Stack (H/F) - Nouméa\nJava Java Kotlin"},
+    ).json()
+    assert updated["title"] == "Développeur Full Stack (H/F) - Nouméa"
+    keywords = str(updated["keywords"])
+    assert "java" in keywords
+    assert "angular" not in keywords
+
+
+def test_offer_update_keeps_explicit_title(client):
+    offer = client.post("/api/offers", json={"raw_text": "Premier texte complet ici"}).json()
+    updated = client.patch(
+        f"/api/offers/{offer['id']}",
+        json={"raw_text": "Deuxième texte complet ici", "title": "Mon titre à moi"},
+    ).json()
+    assert updated["title"] == "Mon titre à moi"
+
+
 def test_offer_soft_delete_excluded_from_list(client):
     offer = client.post("/api/offers", json={"raw_text": "Offre de test complète"}).json()
     assert client.delete(f"/api/offers/{offer['id']}").status_code == 204

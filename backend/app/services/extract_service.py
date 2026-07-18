@@ -67,6 +67,12 @@ def _from_pdf(content: bytes) -> str:
             "Aucun texte trouvé dans ce PDF - c'est probablement un document scanné "
             f"(image). {_FALLBACK_HINT}"
         )
+    text = _repair_exploded_text(text)
+    if _looks_exploded(text):
+        raise ValueError(
+            "Ce PDF a une mise en page qui complique l'extraction du texte "
+            f"(chaque lettre posée séparément). {_FALLBACK_HINT}"
+        )
     return text
 
 
@@ -84,6 +90,33 @@ def _from_plain_text(content: bytes) -> str:
     if not text:
         raise ValueError(f"Ce fichier est vide. {_FALLBACK_HINT}")
     return text
+
+
+def _repair_exploded_text(text: str) -> str:
+    """Répare les PDF (Canva, Figma...) qui posent chaque lettre séparément :
+    « E x p é r i e n c e s » redevient « Expériences ».
+
+    Une ligne est jugée éclatée quand l'essentiel de ses « mots » font un seul
+    caractère ; les groupes séparés par 2 espaces ou plus sont les vrais mots.
+    Les lignes normales ne sont jamais touchées (accents compris)."""
+    repaired = []
+    for line in text.split("\n"):
+        tokens = line.split()
+        singles = sum(1 for token in tokens if len(token) == 1)
+        if len(tokens) >= 4 and singles / len(tokens) > 0.6:
+            segments = re.split(r"\s{2,}", line.strip())
+            line = " ".join("".join(segment.split()) for segment in segments)
+        repaired.append(line)
+    return "\n".join(repaired)
+
+
+def _looks_exploded(text: str) -> bool:
+    """Vrai si, même après réparation, le texte reste en lettres détachées."""
+    tokens = text.split()
+    if len(tokens) < 20:
+        return False
+    singles = sum(1 for token in tokens if len(token) == 1)
+    return singles / len(tokens) > 0.5
 
 
 def _tidy(text: str) -> str:

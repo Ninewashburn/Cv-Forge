@@ -8,12 +8,14 @@ stemming volontairement minimal (pluriels, -euse/-eur, -trice/-teur).
 
 from __future__ import annotations
 
+import html
 import re
 import unicodedata
 
 Keyword = tuple[str, int]  # (mot-clé, fréquence dans l'offre)
 
-STOP_WORDS = frozenset(
+# Grammaire française + tournures génériques des offres.
+_LANGUAGE_STOP_WORDS = frozenset(
     "le la les un une des du de d l au aux a et ou en dans sur sous pour par avec "
     "sans chez vers entre vos votre nos notre mes mon ma ses son sa leur leurs ce "
     "cet cette ces qui que quoi dont si mais donc or ni car ne pas plus moins tres "
@@ -37,11 +39,44 @@ STOP_WORDS = frozenset(
     "cadre rigueur autonomie esprit sens coeur deja outil outils".split()
 )
 
+# Lexique « logistique » des offres : conditions, avantages, modalités - jamais
+# des compétences. Signalé en test réel (offre Nouméa) : sans ce filtre, le
+# matching réclamait « rtt », « déménagement », « transport quotidien »...
+# Assumé : « charge » ou « transport » peuvent aussi être des mots-métier, mais
+# dans une offre ils décrivent presque toujours les conditions du poste.
+_OFFER_NOISE_STOP_WORDS = frozenset(
+    "rtt teletravail demenagement transport quotidien domicile occasionnel "
+    "mutuelle prevoyance prime primes ticket tickets restaurant conge conges "
+    "semaine semaines horaire horaires contrat embauche demarrage immediat "
+    "immediate partir aide aides mois jour jours heure heures euro euros brut "
+    "net mensuel annuel charge charges prise bureau bureaux locaux deplacement "
+    "deplacements permis vehicule base bases avantage".split()
+)
+
+# Lieux fréquents des offres françaises : un lieu n'est jamais une compétence.
+# Liste heuristique (grandes villes, régions, outre-mer), extensible.
+_GEO_STOP_WORDS = frozenset(
+    "france paris lyon marseille toulouse nice nantes montpellier strasbourg "
+    "bordeaux lille rennes reims toulon grenoble dijon angers nimes clermont "
+    "ferrand etienne havre villeurbanne aix provence brest limoges tours "
+    "amiens perpignan metz besancon orleans rouen mulhouse caen nancy "
+    "avignon poitiers versailles pau rochelle calais cannes antibes annecy "
+    "beziers colmar quimper bourges normandie bretagne alsace lorraine "
+    "aquitaine occitanie auvergne rhone alpes corse guadeloupe martinique "
+    "guyane reunion mayotte caledonie noumea polynesie tahiti idf dom tom "
+    "drom nc".split()
+)
+
+STOP_WORDS = _LANGUAGE_STOP_WORDS | _OFFER_NOISE_STOP_WORDS | _GEO_STOP_WORDS
+
 _TOKEN_RE = re.compile(r"[a-z0-9+#.]{2,}")
 _NUMERIC_RE = re.compile(r"^[0-9.]+$")
 
 
 def normalize(text: str) -> str:
+    # Les offres collées depuis le web charrient des entités HTML brutes
+    # (&nbsp; &amp;...) : décodées ici, sinon « nbsp » devient un mot-clé.
+    text = html.unescape(text)
     text = text.lower().replace("œ", "oe").replace("æ", "ae")
     decomposed = unicodedata.normalize("NFD", text)
     return "".join(c for c in decomposed if not unicodedata.combining(c))

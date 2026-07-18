@@ -66,6 +66,44 @@ def test_rejects_empty_file(client):
     assert response.status_code == 400
 
 
+# ------------------------------------ PDF « lettres détachées » (Canva, test réel)
+
+
+def test_repair_exploded_text_rebuilds_words():
+    from app.services.extract_service import _repair_exploded_text
+
+    exploded = "E x p é r i e n c e s\nS e n s  d u  s e r v i c e\nE s p r i t  d ' é q u i p e"
+    assert _repair_exploded_text(exploded) == "Expériences\nSens du service\nEsprit d'équipe"
+
+
+def test_repair_leaves_normal_text_untouched():
+    from app.services.extract_service import _repair_exploded_text
+
+    normal = "Développeur full stack avec plusieurs années d'expérience.\nAngular, Java et SQL."
+    assert _repair_exploded_text(normal) == normal
+
+
+def test_pdf_exploded_words_are_repaired(client):
+    content = _pdf_bytes(
+        "P r é p a r a t i o n  d e s  c o m m a n d e s",
+        "R e l a t i o n  c l i e n t  e t  s e r v i c e",
+    )
+    response = _post(client, "canva.pdf", content, "application/pdf")
+    assert response.status_code == 200
+    text = response.json()["text"]
+    assert "Préparation des commandes" in text
+    assert "Relation client et service" in text
+
+
+def test_pdf_fully_exploded_gets_honest_error(client):
+    # Deux lettres par ligne : la réparation ligne à ligne ne s'applique pas
+    # (moins de 4 mots), le détecteur global doit alors refuser honnêtement.
+    lines = [f"{a} {b}" for a, b in zip("abcdefghijklm", "nopqrstuvwxyz")]
+    response = _post(client, "canva.pdf", _pdf_bytes(*lines), "application/pdf")
+    assert response.status_code == 400
+    assert "mise en page" in response.json()["detail"]
+
+
 def test_rejects_pdf_without_text(client):
     # Page vide = même symptôme qu'un document scanné en image.
     response = _post(client, "scan.pdf", _pdf_bytes(), "application/pdf")

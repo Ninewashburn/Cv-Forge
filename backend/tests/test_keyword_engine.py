@@ -92,3 +92,51 @@ def test_responsibilities_detected_by_action_verbs():
     missions = extract_responsibilities(OFFER)
     assert any("Développer" in m for m in missions)
     assert any("Concevoir" in m for m in missions)
+
+
+# -------------------------------------------- bruit d'offre (retour test réel)
+
+NOUMEA_OFFER = """Développeur Full Stack (H/F)
+AgileSoft.NC
+Nouméa (NC)
+À partir de 3 000 € par mois - CDI
+&nbsp;
+Lieu
+Nouméa (NC)
+&nbsp;
+Avantages
+Aide au déménagement
+Prise en charge du transport quotidien
+RTT
+Travail à domicile occasionnel
+&nbsp;
+Envie de soleil ? Venez nous rejoindre à Nouméa en Nouvelle Calédonie !
+Vous maîtrisez Java, Angular et SQL. Java et Angular sont nos outils de tous les jours.
+Développement d'applications Java, Angular et bases de données SQL."""
+
+
+def test_html_entities_never_become_keywords():
+    words = {
+        part
+        for keyword, _freq in extract_keywords("&nbsp; &nbsp; &nbsp; Angular &amp; Java Java")
+        for part in keyword.split()
+    }
+    assert "nbsp" not in words
+    assert "amp" not in words
+    assert "angular" in words
+
+
+def test_offer_logistics_and_geo_vocabulary_filtered():
+    """Retour de test réel (offre Nouméa) : les manquants ne doivent contenir
+    aucun mot logistique, aucune entité HTML, aucun lieu."""
+    words = {
+        part for keyword, _freq in extract_keywords(NOUMEA_OFFER) for part in keyword.split()
+    }
+    noise = {
+        "nbsp", "noumea", "nc", "caledonie", "partir", "aide", "demenagement",
+        "prise", "charge", "transport", "quotidien", "domicile", "occasionnel",
+        "rtt", "mois", "jours", "bases",
+    }
+    assert not (words & noise), words & noise
+    # Les vraies compétences, elles, restent.
+    assert {"java", "angular", "sql", "donnees"} <= words
