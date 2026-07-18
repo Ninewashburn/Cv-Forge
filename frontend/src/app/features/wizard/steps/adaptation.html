@@ -144,13 +144,24 @@
         Repartir de l'original
       </button>
     </div>
-    <textarea
-      #adapted
-      [value]="store.adaptedText()"
-      (input)="store.adaptedText.set(adapted.value)"
-      aria-label="CV adapté"
-      placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."
-    ></textarea>
+    <div class="editor-wrap">
+      <!-- Overlay de surlignage : fond seulement, sous le textarea. aria-hidden
+           car c'est un doublon visuel du texte deja lu par le textarea. -->
+      <div class="highlight-backdrop" aria-hidden="true" [scrollTop]="scrollTop()">
+        @for (segment of highlightSegments(); track $index) {
+          <span [class]="'seg-' + segment.kind">{{ segment.text }}</span>
+        }
+      </div>
+      <textarea
+        #adapted
+        class="has-overlay"
+        [value]="store.adaptedText()"
+        (input)="store.adaptedText.set(adapted.value)"
+        (scroll)="scrollTop.set(adapted.scrollTop)"
+        aria-label="CV adapté"
+        placeholder="Modifie ici, ou colle la réponse de ton IA (uniquement le CV, pas la liste « À vérifier »)."
+      ></textarea>
+    </div>
   </div>
 
   <aside class="live-panel" aria-live="polite">

@@ -1,9 +1,17 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 
 import { LlmService } from '../../../core/api';
 import { LlmConfig, MatchingResult, PromptKind } from '../../../core/models';
+import { buildHighlightSegments } from '../text-highlight';
 import { WizardStore } from '../wizard-store';
 
 interface PromptIntent {
@@ -29,6 +37,20 @@ export class AdaptationStep {
   protected readonly promptBusy = signal(false);
   protected readonly copyHint = signal('');
   protected readonly kind = signal<PromptKind>('adapter');
+
+  /** Position de scroll du textarea, répercutée sur l'overlay de surlignage. */
+  protected readonly scrollTop = signal(0);
+
+  /** Mots-clés de l'offre déjà couverts par le texte courant (matching live). */
+  private readonly coveredKeywords = computed(() =>
+    (this.live()?.keywords ?? []).filter((k) => k.covered).map((k) => k.keyword),
+  );
+
+  /** Segments d'affichage (fond seulement) alignés sur le textarea éditable :
+   *  vert = mot-clé couvert, teinte = ligne de section. Aucun gras (metrique). */
+  protected readonly highlightSegments = computed(() =>
+    buildHighlightSegments(this.store.adaptedText(), this.coveredKeywords()),
+  );
 
   // --- Niveau clé API (niveau 2) -----------------------------------------
   protected readonly llmConfig = signal<LlmConfig | null>(null);
