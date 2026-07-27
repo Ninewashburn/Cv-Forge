@@ -200,6 +200,47 @@ textarea[readonly] {
   color: #3a3933;
 }
 
+/* --- Surlignage live (etape 3) : overlay a FOND SEULEMENT sous le textarea ---
+   Le vrai texte (net, selectionnable) reste sur le textarea au premier plan ;
+   l'overlay ne peint que des bandes de couleur derriere. Metriques identiques
+   au pixel (meme police, padding, bordure, gouttiere) : aucun gras, jamais,
+   sinon les glyphes se decalent. Rendu par interpolation {{ }}, pas d'innerHTML. */
+.editor-wrap {
+  position: relative;
+}
+.highlight-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fdfdfb;
+  font: 13.5px/1.6 var(--mono);
+  color: transparent;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  scrollbar-gutter: stable;
+}
+.seg-keyword {
+  background: var(--ok-soft);
+  border-radius: 2px;
+}
+.seg-section {
+  background: var(--ember-soft);
+  border-radius: 2px;
+}
+.has-overlay {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  scrollbar-gutter: stable;
+}
+
 .btn-link {
   background: none;
   border: 0;

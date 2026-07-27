@@ -190,6 +190,9 @@ Dashboard · suivi complet · préparation entretien · app mobile · extension 
   - ⚠️ **Ne pas confondre avec la règle des 6P du CV Linter (V1.5)** : les **5P** = préparation entretien ; les **6P** = anti-patterns du CV. Deux grilles distinctes.
 - [ ] **Fiche mémo entretien** — consultable/imprimable juste avant l'entretien
 - [ ] **Analyse d'offre : signaux faibles** — détection points positifs / red flags d'une offre (issu des maquettes — bonne idée à conserver)
+- [ ] **CV semi-structuré — sections repliables et éditables indépendamment** *(ajout 2026-07-27, d'après retour test réel)* — remplacer le textarea unique de l'étape Adaptation par des sections (En-tête / Expériences / Compétences / Formation...) éditables séparément.
+  - **Pourquoi V2 et pas correctif d'ergonomie** : c'est un **changement de modèle de données** (le CV n'est plus une chaîne brute), à impact large — API, stockage, ET le Diff (l'Avant/Après compare aujourd'hui du texte brut via `lcsDiff` ; comparer section par section serait plus juste mais complexifie nettement l'algorithme). À réfléchir posément, pas en catimini.
+  - **Déjà livré en V1 comme substitut affichage-seul** *(2026-07-27)* : dans l'étape Adaptation, surlignage live des mots-clés couverts (vert) + repères des lignes de section (teinte), en overlay derrière le textarea — le CV reste une chaîne brute, aucun changement de modèle. Ça rapproche visuellement l'étape 3 de l'Avant/Après sans en payer le coût. Le semi-structuré reste la vraie évolution V2 si le besoin se confirme.
 
 > *"Historique" supprimé de la liste initiale — redondant avec Versioning (V1.5) et Suivi (V2).*
 
