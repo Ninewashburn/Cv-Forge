@@ -83,9 +83,40 @@ def test_coverage_realistic_cv_vs_offer():
     result = coverage(extract_keywords(OFFER), CV)
     assert 0 < result["score"] < 100
     missing = {r["keyword"] for r in result["results"] if not r["covered"]}
-    # Kubernetes est absent du CV - ici sous forme de bigramme « docker
-    # kubernetes » (répété 2× dans l'offre, il absorbe ses composants).
-    assert any("kubernetes" in keyword for keyword in missing)
+    # Kubernetes est absent du CV. Il apparaît « Docker, Kubernetes » et
+    # « Docker ; Kubernetes » dans l'offre : la virgule/le point-virgule
+    # empêchent le bigramme, donc kubernetes est un mot-clé A PART ENTIERE.
+    assert "kubernetes" in missing
+
+
+def test_bigram_never_crosses_punctuation():
+    """Retour test réel : « Docker, Kubernetes » ne doit PAS fusionner en une
+    seule compétence - ce sont deux technos distinctes."""
+    offer = (
+        "Vous maitrisez Docker, Kubernetes et Terraform. "
+        "Docker, Kubernetes et Terraform sont au coeur du poste. "
+        "Nos outils : Docker, Kubernetes, Terraform au quotidien."
+    )
+    keywords = dict(extract_keywords(offer))
+    assert "docker" in keywords
+    assert "kubernetes" in keywords
+    assert "terraform" in keywords
+    assert "docker kubernetes" not in keywords
+    # Un vrai terme composé (sans ponctuation au milieu) reste un bigramme.
+    keywords2 = dict(extract_keywords("Spring Boot ici. Spring Boot la. Spring Boot encore."))
+    assert "spring boot" in keywords2
+
+
+def test_generic_action_verbs_are_not_keywords():
+    """« participer », « deployer », « produit » décrivent l'activité, pas une
+    compétence - ils ne remontent jamais comme mots-clés."""
+    offer = (
+        "Participer aux revues. Deployer les livrables. Gerer le produit "
+        "et ses fonctionnalites. Angular et Docker sont requis."
+    )
+    words = {part for keyword, _freq in extract_keywords(offer) for part in keyword.split()}
+    assert not (words & {"participer", "deployer", "gerer", "produit", "fonctionnalites"})
+    assert {"angular", "docker"} <= words
 
 
 def test_responsibilities_detected_by_action_verbs():

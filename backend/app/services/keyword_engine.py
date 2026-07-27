@@ -67,7 +67,32 @@ _GEO_STOP_WORDS = frozenset(
     "drom nc".split()
 )
 
-STOP_WORDS = _LANGUAGE_STOP_WORDS | _OFFER_NOISE_STOP_WORDS | _GEO_STOP_WORDS
+# Verbes d'action et noms passe-partout des offres : ils décrivent l'activité,
+# pas une compétence matchable. Signalé en test réel : le matching réclamait
+# « participer », « deployer », « produit », « fonctionnalites » - personne ne
+# reformule son CV pour cocher « participer ». Les vraies technos (docker,
+# angular...) ne sont jamais dans cette liste.
+_GENERIC_ACTION_STOP_WORDS = frozenset(
+    "participer deployer gerer assurer realiser effectuer animer piloter "
+    "accompagner definir proposer organiser mettre prendre apporter fournir "
+    "produit produits fonctionnalite fonctionnalites tache taches projet "
+    "projets action actions activite activites process processus solution "
+    "solutions besoin besoins client clients quotidien".split()
+)
+
+STOP_WORDS = (
+    _LANGUAGE_STOP_WORDS
+    | _OFFER_NOISE_STOP_WORDS
+    | _GEO_STOP_WORDS
+    | _GENERIC_ACTION_STOP_WORDS
+)
+
+# Sépare le texte en segments : un bigramme ne se forme JAMAIS à travers une
+# virgule ou un point-virgule. « Docker, Kubernetes » = deux compétences
+# distinctes (signalé en test), pas le terme composé « docker kubernetes ».
+# On NE coupe PAS sur le point : il fait partie de tokens techniques (node.js,
+# .net, c#), déjà gérés par _TOKEN_RE.
+_SEGMENT_SPLIT_RE = re.compile(r"[,;:!?()\n/]+")
 
 _TOKEN_RE = re.compile(r"[a-z0-9+#.]{2,}")
 _NUMERIC_RE = re.compile(r"^[0-9.]+$")
@@ -82,13 +107,25 @@ def normalize(text: str) -> str:
     return "".join(c for c in decomposed if not unicodedata.combining(c))
 
 
-def tokenize(text: str) -> list[str]:
+def _clean_tokens(chunk: str) -> list[str]:
     tokens = []
-    for word in _TOKEN_RE.findall(normalize(text)):
+    for word in _TOKEN_RE.findall(chunk):
         word = word.rstrip(".")
         if len(word) >= 2 and not _NUMERIC_RE.match(word):
             tokens.append(word)
     return tokens
+
+
+def tokenize(text: str) -> list[str]:
+    return _clean_tokens(normalize(text))
+
+
+def tokenized_segments(text: str) -> list[list[str]]:
+    """Tokens groupés par segment (bornés par la ponctuation) - pour que les
+    bigrammes ne franchissent pas une virgule/point-virgule."""
+    normalized = normalize(text)
+    segments = [_clean_tokens(chunk) for chunk in _SEGMENT_SPLIT_RE.split(normalized)]
+    return [tokens for tokens in segments if tokens]
 
 
 def stem(word: str) -> str:
@@ -106,17 +143,19 @@ def stem(word: str) -> str:
 
 def extract_keywords(text: str, limit: int = 16) -> list[Keyword]:
     """Mots-clés pondérés par fréquence. Les bigrammes répétés (≥ 2) priment
-    sur leurs composants, dont la fréquence est décomptée d'autant."""
-    words = tokenize(text)
+    sur leurs composants, dont la fréquence est décomptée d'autant. Les
+    bigrammes ne se forment qu'à l'intérieur d'un segment (pas de virgule au
+    milieu)."""
     unigrams: dict[str, int] = {}
     bigrams: dict[str, int] = {}
-    for i, word in enumerate(words):
-        keep = word not in STOP_WORDS
-        if keep:
-            unigrams[word] = unigrams.get(word, 0) + 1
-        if i < len(words) - 1 and keep and words[i + 1] not in STOP_WORDS:
-            pair = f"{word} {words[i + 1]}"
-            bigrams[pair] = bigrams.get(pair, 0) + 1
+    for words in tokenized_segments(text):
+        for i, word in enumerate(words):
+            keep = word not in STOP_WORDS
+            if keep:
+                unigrams[word] = unigrams.get(word, 0) + 1
+            if i < len(words) - 1 and keep and words[i + 1] not in STOP_WORDS:
+                pair = f"{word} {words[i + 1]}"
+                bigrams[pair] = bigrams.get(pair, 0) + 1
 
     candidates = sorted(
         (item for item in bigrams.items() if item[1] >= 2), key=lambda kv: -kv[1]
