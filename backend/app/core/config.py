@@ -22,11 +22,24 @@ DB_FILENAME = "cvforge.db"
 
 
 def app_dir() -> Path:
-    """Dossier de l'application : celui de l'exe une fois gelé (PyInstaller),
-    sinon la racine ``backend/`` en développement."""
+    """Dossier PERSISTANT de l'application : celui de l'exe une fois gelé
+    (PyInstaller), sinon la racine ``backend/`` en développement. C'est ici que
+    vivent le marqueur portable et, en mode portable, les données - jamais dans
+    le dossier temporaire d'extraction."""
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
     return Path(__file__).resolve().parents[2]
+
+
+def resource_dir() -> Path:
+    """Ressources EMBARQUÉES en lecture seule (build Angular, scripts Alembic).
+
+    En ``--onefile``, PyInstaller les extrait dans un dossier temporaire
+    (``sys._MEIPASS``), effacé à chaque sortie - distinct de app_dir(). En
+    ``--onedir`` ou en développement, elles vivent dans app_dir(). Séparer les
+    deux est vital : les données ne doivent JAMAIS aller dans le temporaire."""
+    meipass = getattr(sys, "_MEIPASS", None)
+    return Path(meipass) if meipass else app_dir()
 
 
 def resolve_data_dir() -> Path:
@@ -55,7 +68,7 @@ def static_dir() -> Path | None:
     binaire ; en dev/local il vit dans ``frontend/dist``. Retourne ``None``
     si aucun build n'existe (mode API seule)."""
     if getattr(sys, "frozen", False):
-        candidate = app_dir() / "static"
+        candidate = resource_dir() / "static"
     else:
         candidate = app_dir().parent / "frontend" / "dist" / "cvforge" / "browser"
     return candidate if (candidate / "index.html").is_file() else None

@@ -71,6 +71,18 @@ cd frontend
 npm install && npm start
 ```
 
+**Construire l'exe portable** (Windows, un seul binaire double-cliquable — Python + FastAPI +
+interface, aucune installation) :
+
+```bash
+cd backend
+python build_portable.py     # construit l'interface au besoin, puis gèle avec PyInstaller
+# → backend/dist/CVForge.exe
+```
+
+Par défaut, l'exe range les données dans `~/.cvforge/`. Pour un **mode clé USB** (données à côté
+de l'exe, dans `./data/`), pose un fichier vide nommé `cvforge.portable` à côté du binaire.
+
 ## Où sont mes données ?
 
 Dans `~/.cvforge/` (une base SQLite + les pièces jointes de preuves), sous ton contrôle total :

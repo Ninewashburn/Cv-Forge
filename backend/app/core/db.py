@@ -65,10 +65,13 @@ def run_migrations() -> None:
     from alembic.config import Config
 
     from alembic import command
-    from app.core.config import app_dir
+    from app.core.config import resource_dir
 
-    cfg = Config(str(app_dir() / "alembic.ini"))
-    cfg.set_main_option("script_location", str(app_dir() / "alembic"))
+    # Ressources embarquées (alembic.ini + scripts) : resource_dir() pointe le
+    # dossier temporaire d'extraction en --onefile, app_dir() sinon.
+    base = resource_dir()
+    cfg = Config(str(base / "alembic.ini"))
+    cfg.set_main_option("script_location", str(base / "alembic"))
     command.upgrade(cfg, "head")
 
 
