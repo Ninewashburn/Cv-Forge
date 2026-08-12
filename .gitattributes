@@ -1,0 +1,4 @@
+# Les hooks git et scripts shell DOIVENT rester en LF : un CRLF sur la ligne
+# shebang (#!/bin/sh\r) casse l'execution du hook sur un clone frais.
+.githooks/** text eol=lf
+*.sh text eol=lf
