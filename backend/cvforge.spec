@@ -81,7 +81,11 @@ exe = EXE(  # noqa: F821
     strip=False,
     upx=False,  # ROADMAP : pas d'UPX (faux positifs antivirus)
     runtime_tmpdir=None,
-    console=True,  # console visible en beta : logs et erreurs lisibles
+    # Mode fenêtré : aucune console noire. Sur Windows 11 (Windows Terminal), la
+    # masquer à chaud ne marche pas ; on n'en crée simplement pas. Les erreurs de
+    # démarrage passent par une boite de dialogue (voir desktop.py), et le repli
+    # navigateur utilise une boite comme bouton d'arrêt.
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

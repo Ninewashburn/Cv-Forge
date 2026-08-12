@@ -1,14 +1,16 @@
 """Point d'entrée de l'application de bureau CVForge (exe portable, V1.5).
 
-Démarre le serveur FastAPI local et affiche l'interface. Deux modes, choisis
-automatiquement :
+Démarre le serveur FastAPI local et affiche l'interface. L'exe est **gelé en
+mode fenêtré** (``console=False``) : aucune console noire ne s'ouvre. Deux modes,
+choisis automatiquement :
 
 - **Fenêtre native** (pywebview / WebView2) si disponible : une vraie fenêtre
-  d'application, sans console visible. Fermer la fenêtre arrête proprement le
-  serveur. C'est le confort facon ADWCleaner.
-- **Repli navigateur** (comportement historique, toujours fiable) si pywebview
-  n'est pas installé ou si la fenêtre ne peut pas s'ouvrir (WebView2 absent) :
-  on ouvre le navigateur par défaut et la console sert de bouton d'arrêt.
+  d'application. Fermer la fenêtre arrête proprement le serveur. C'est le confort
+  facon ADWCleaner.
+- **Repli navigateur** (toujours fiable) si pywebview n'est pas installé ou si la
+  fenêtre ne peut pas s'ouvrir (WebView2 absent) : on ouvre le navigateur par
+  défaut, et une petite boite de dialogue sert de bouton d'arrêt (il n'y a pas de
+  console en mode fenêtré).
 
 C'est l'entrée gelée par PyInstaller ; en développement on continue d'utiliser
 ``uvicorn app.main:app --reload``.
@@ -37,6 +39,19 @@ import webbrowser
 HOST = "127.0.0.1"
 PREFERRED_PORT = 8000
 
+# Constantes MessageBox (user32) : OK simple, icone info, icone erreur.
+_MB_OK_INFO = 0x40
+_MB_OK_ERROR = 0x10
+
+
+def _ensure_std_streams() -> None:
+    """En mode fenêtré, PyInstaller peut laisser ``sys.stdout`` / ``stderr`` à
+    ``None`` : uvicorn ecrirait alors dans le vide et planterait. On garantit des
+    flux ecrivables (poubelle) au besoin, sans jamais ouvrir de console."""
+    for name in ("stdout", "stderr"):
+        if getattr(sys, name, None) is None:
+            setattr(sys, name, open(os.devnull, "w", encoding="utf-8"))
+
 
 def _pick_port() -> int:
     """Port 8000 s'il est libre, sinon un port choisi par le système. Comme
@@ -54,8 +69,8 @@ def _pick_port() -> int:
 
 
 def _wait_until_ready(url: str, attempts: int = 100) -> bool:
-    """Attend que l'API réponde (évite la page blanche d'une UI ouverte avant
-    que le serveur soit prêt). ~20 s max. Retourne False si le serveur ne répond
+    """Attend que l'API réponde (évite la page blanche d'une UI ouverte avant que
+    le serveur soit prêt). ~20 s max. Retourne False si le serveur ne répond
     jamais."""
     health = f"{url}/api/health"
     for _ in range(attempts):
@@ -67,12 +82,17 @@ def _wait_until_ready(url: str, attempts: int = 100) -> bool:
     return False
 
 
-def _open_browser_when_ready(url: str) -> None:
-    _wait_until_ready(url)
-    webbrowser.open(url)
+def _message_box(text: str, title: str = "CVForge", style: int = _MB_OK_INFO) -> None:
+    """Boite de dialogue Windows - notre canal d'affichage quand il n'y a pas de
+    console. Silencieux hors Windows ou si l'appel échoue."""
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
 
-
-# --------------------------------------------------------------- fenêtre native
+        ctypes.windll.user32.MessageBoxW(0, text, title, style)
+    except Exception:  # noqa: BLE001 - un dialogue raté ne doit jamais faire planter l'app
+        pass
 
 
 def _try_import_webview():
@@ -87,27 +107,10 @@ def _try_import_webview():
         return None
 
 
-def _set_console_visible(visible: bool) -> None:
-    """Masque (ou ré-affiche) la console Windows. En mode fenêtre, la console
-    n'a plus de rôle : on la cache. Sur un repli, on la laisse (bouton d'arrêt).
-    Silencieux hors Windows ou si la console n'existe pas."""
-    if sys.platform != "win32":
-        return
-    try:
-        import ctypes
-
-        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hwnd:
-            ctypes.windll.user32.ShowWindow(hwnd, 5 if visible else 0)  # SW_SHOW / SW_HIDE
-    except Exception:  # noqa: BLE001 - cacher la console ne doit jamais faire planter l'app
-        pass
-
-
 class _ThreadedServer:
-    """Uvicorn dans un thread démon, pour laisser le thread principal à la GUI.
-
-    Les gestionnaires de signaux d'uvicorn ne s'installent que sur le thread
-    principal : on les neutralise ici (l'arrêt passe par ``stop()``)."""
+    """Uvicorn dans un thread démon, pour laisser le thread principal à la GUI /
+    au dialogue d'arrêt. Les gestionnaires de signaux d'uvicorn ne s'installent
+    que sur le thread principal : on les neutralise (l'arrêt passe par ``stop()``)."""
 
     def __init__(self, app: object, port: int) -> None:
         import uvicorn
@@ -131,72 +134,86 @@ class _ThreadedServer:
         self._thread.join(timeout=5)
 
 
-def _run_windowed(app: object, url: str, port: int, webview) -> None:
-    """Serveur en tâche de fond + fenêtre native. Si la fenêtre ne peut pas
-    s'ouvrir (WebView2 absent, backend GUI manquant), on rétablit la console et
-    on se rabat sur le navigateur - l'app reste utilisable dans tous les cas."""
+def _serve_with_ui(app: object, url: str, port: int) -> None:
+    """Serveur en tâche de fond, puis fenêtre native si possible, sinon repli
+    navigateur. L'app reste utilisable dans tous les cas."""
     server = _ThreadedServer(app, port)
     server.start()
     _wait_until_ready(url)
+
     try:
-        webview.create_window("CVForge", url, width=1180, height=820, min_size=(900, 640))
-        _set_console_visible(False)
-        webview.start()  # bloque jusqu'à la fermeture de la fenêtre
-    except Exception as exc:  # noqa: BLE001 - repli navigateur, jamais fatal
-        _set_console_visible(True)
-        print(f"\nFenêtre native indisponible ({exc}) - ouverture du navigateur.", file=sys.stderr)
+        webview = _try_import_webview()
+        if webview is not None:
+            try:
+                webview.create_window("CVForge", url, width=1180, height=820, min_size=(900, 640))
+                webview.start()  # bloque jusqu'à la fermeture de la fenêtre
+                return
+            except Exception as exc:  # noqa: BLE001 - on se rabat sur le navigateur, jamais fatal
+                print(
+                    f"\nFenêtre native indisponible ({exc}) - ouverture du navigateur.",
+                    file=sys.stderr,
+                )
+                # On garde le même serveur (déjà prêt) pour le repli ci-dessous.
+
+        # Repli navigateur : pas de console en mode fenêtré, une boite fait le stop.
         webbrowser.open(url)
-        try:
+        if sys.platform == "win32":
+            _message_box(
+                "CVForge est ouvert dans ton navigateur.\n\n"
+                "Garde cette fenetre ouverte tant que tu utilises CVForge.\n"
+                "Clique sur OK (ou ferme cette fenetre) pour arreter CVForge.",
+                "CVForge",
+                _MB_OK_INFO,
+            )
+        else:
             while server.is_running():
                 time.sleep(0.5)
-        except KeyboardInterrupt:
-            pass
+    except KeyboardInterrupt:
+        pass
     finally:
         server.stop()
 
 
 def main() -> None:
+    _ensure_std_streams()
     port = _pick_port()
     url = f"http://{HOST}:{port}"
-
-    no_browser = os.environ.get("CVFORGE_NO_BROWSER") == "1"
-    webview = None if no_browser else _try_import_webview()
 
     print("=" * 58)
     print("  CVForge - candidater par la preuve (local-first)")
     print(f"  Interface : {url}")
     print("  Tes données restent sur cette machine. Rien n'est envoyé.")
-    if webview is not None:
-        print("  Ferme la fenêtre CVForge pour tout arrêter.")
-    else:
-        print("  Ferme cette fenêtre pour arrêter CVForge.")
     print("=" * 58)
 
     # On passe l'objet app (pas une chaîne d'import) : indispensable en mode
     # gelé, où uvicorn ne peut pas ré-importer par nom de module.
     from app.main import app
 
-    if webview is not None:
-        _run_windowed(app, url, port, webview)
+    # CVFORGE_NO_BROWSER=1 : ni fenêtre ni navigateur (serveur seul, tests).
+    # Serveur bloquant sur le thread principal, comme un uvicorn classique.
+    if os.environ.get("CVFORGE_NO_BROWSER") == "1":
+        import uvicorn
+
+        uvicorn.run(app, host=HOST, port=port, log_level="warning")
         return
 
-    # Chemins prouvés, inchangés : navigateur (ou rien) + serveur bloquant sur
-    # le thread principal (la console ferme l'app).
-    if not no_browser:
-        threading.Thread(target=_open_browser_when_ready, args=(url,), daemon=True).start()
-
-    import uvicorn
-
-    uvicorn.run(app, host=HOST, port=port, log_level="warning")
+    _serve_with_ui(app, url, port)
 
 
 if __name__ == "__main__":
     try:
+        _ensure_std_streams()
         main()
     except KeyboardInterrupt:
         pass
     except Exception as exc:  # noqa: BLE001 - dernier filet : montrer l'erreur, ne pas fermer sec
-        _set_console_visible(True)
-        print(f"\nCVForge n'a pas pu démarrer : {exc}", file=sys.stderr)
-        input("Appuie sur Entrée pour fermer...")
+        message = f"CVForge n'a pas pu démarrer :\n\n{exc}"
+        print(message, file=sys.stderr)
+        if sys.platform == "win32":
+            _message_box(message, "CVForge - erreur", _MB_OK_ERROR)
+        else:
+            try:
+                input("Appuie sur Entrée pour fermer...")
+            except EOFError:
+                pass
         raise
