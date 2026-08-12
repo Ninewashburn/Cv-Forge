@@ -59,19 +59,43 @@
         <h3>Ajouts à confirmer</h3>
         <p class="sub">
           Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document,
-          expérience) ? Bientôt, chaque confirmation se reliera à ta banque de preuves.
+          expérience) ? Note ta preuve dans « Comment ? » (facultatif) : elle rejoint ta banque de
+          preuves, prête à resservir sur une prochaine candidature.
         </p>
         @for (text of additions; track $index) {
-          <div class="seg">
-            <div class="seg-text">
-              <mark>{{ text }}</mark>
+          <div class="seg" [class.confirmed]="isConfirmed($index)">
+            <div class="seg-body">
+              <div class="seg-text">
+                <mark>{{ text }}</mark>
+              </div>
+              <label class="seg-proof">
+                <span class="seg-proof-label">Comment peux-tu le prouver ? (facultatif)</span>
+                <textarea
+                  rows="2"
+                  class="seg-proof-input"
+                  [value]="commentOf($index)"
+                  [disabled]="isSaved($index)"
+                  (input)="setComment($index, $event)"
+                  placeholder="Ex. : chez Untel, j'ai mis en place le pipeline (build, lint, test)."
+                ></textarea>
+              </label>
+              @if (isSaving($index)) {
+                <p class="seg-note">Enregistrement de la preuve...</p>
+              } @else if (isSaved($index)) {
+                <p class="seg-note ok">Preuve ajoutée à ta banque, reliée à cet ajout.</p>
+              } @else if (hasFailed($index)) {
+                <p class="seg-note warn">
+                  Ajout confirmé, mais la preuve n'a pas pu être enregistrée (banque indisponible).
+                  Réessaie en re-confirmant.
+                </p>
+              }
             </div>
             <button
               type="button"
               class="confirm"
               [class.on]="isConfirmed($index)"
               [attr.aria-pressed]="isConfirmed($index)"
-              (click)="store.toggleConfirmation($index)"
+              (click)="confirm($index, text)"
             >
               {{
                 isConfirmed($index)
