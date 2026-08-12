@@ -44,6 +44,17 @@ for package in ("anthropic", "fpdf"):
     binaries += pkg_binaries
     hiddenimports += pkg_hidden
 
+# pywebview (fenêtre native, optionnel) : présent au build => on l'embarque avec
+# ses backends de plateforme ; absent => l'exe se rabattra sur le navigateur.
+# Jamais bloquant pour le build.
+try:
+    wv_datas, wv_binaries, wv_hidden = collect_all("webview")
+    datas += wv_datas
+    binaries += wv_binaries
+    hiddenimports += wv_hidden
+except Exception as exc:  # noqa: BLE001 - pywebview absent : repli navigateur au runtime
+    print(f"[cvforge.spec] pywebview non embarque ({exc}) - l'exe utilisera le navigateur.")
+
 a = Analysis(  # noqa: F821
     ["desktop.py"],
     pathex=[str(BACKEND)],

@@ -26,6 +26,11 @@ dev = [
     "ruff>=0.9,<1",
     "pyinstaller>=6,<7",
 ]
+# Fenêtre native de l'exe (V1.5). Optionnel : sans lui, l'exe se rabat sur le
+# navigateur. Installé par build_portable.py avant de geler.
+desktop = [
+    "pywebview>=5,<6",
+]
 
 [tool.setuptools.packages.find]
 include = ["app*"]

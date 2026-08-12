@@ -80,6 +80,10 @@ python build_portable.py     # construit l'interface au besoin, puis gèle avec 
 # → backend/dist/CVForge.exe
 ```
 
+Au lancement, l'exe ouvre une **fenêtre native** (WebView2, present par defaut sur Windows 11) ;
+si elle n'est pas disponible, il se rabat automatiquement sur ton **navigateur** par defaut. Rien
+a installer dans les deux cas.
+
 Par défaut, l'exe range les données dans `~/.cvforge/`. Pour un **mode clé USB** (données à côté
 de l'exe, dans `./data/`), pose un fichier vide nommé `cvforge.portable` à côté du binaire.
 

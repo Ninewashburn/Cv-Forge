@@ -47,9 +47,24 @@ def _ensure_pyinstaller() -> None:
         _run([sys.executable, "-m", "pip", "install", "pyinstaller>=6,<7"], cwd=BACKEND)
 
 
+def _ensure_pywebview() -> None:
+    """Fenêtre native de l'exe. Optionnel : si l'install échoue (pas de réseau,
+    plateforme non gérée), on continue - l'exe se rabattra sur le navigateur."""
+    try:
+        import webview  # noqa: F401
+        return
+    except ImportError:
+        pass
+    try:
+        _run([sys.executable, "-m", "pip", "install", "pywebview>=5,<6"], cwd=BACKEND)
+    except subprocess.CalledProcessError:
+        print("Note : pywebview non installe - l'exe s'ouvrira dans le navigateur.")
+
+
 def main() -> None:
     _ensure_frontend_build()
     _ensure_pyinstaller()
+    _ensure_pywebview()
     _run(
         [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "cvforge.spec"],
         cwd=BACKEND,
