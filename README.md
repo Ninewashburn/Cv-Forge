@@ -108,8 +108,13 @@ ruff check app tests
 
 # frontend
 npm run lint
+npm run lint:tells        # garde anti-tells IA (frontend, prototypes, backend)
 npx prettier --check src
 ```
+
+Un **hook pre-commit** rejoue `lint:tells` et bloque le commit si un tell IA passe. Active-le
+une fois par clone : `node frontend/scripts/setup-hooks.mjs` (pose `core.hooksPath` sur
+`.githooks/`).
 
 ## Statut & feuille de route
 

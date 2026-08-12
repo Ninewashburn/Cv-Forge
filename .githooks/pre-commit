@@ -1,0 +1,23 @@
+#!/bin/sh
+# Garde anti-tells IA (convention CLAUDE.md) : bloque le commit si un caractere
+# "signature IA" (tiret cadratin, ellipse unique, quote courbe, fleche) traine
+# dans les sources. Les accents FR ne sont jamais vises, par construction.
+#
+# Active une fois par clone : git config core.hooksPath .githooks
+# (ou lance : node frontend/scripts/setup-hooks.mjs)
+#
+# Contournement exceptionnel : git commit --no-verify (a eviter).
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: node introuvable, garde anti-tells ignoree." >&2
+  exit 0
+fi
+
+node frontend/scripts/check-tells.mjs
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "" >&2
+  echo "Commit bloque : corrige les tells ci-dessus (voir CLAUDE.md)." >&2
+  echo "En dernier recours seulement : git commit --no-verify" >&2
+fi
+exit "$status"

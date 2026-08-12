@@ -8,8 +8,11 @@ import { fileURLToPath } from 'node:url';
 const ROOTS = [
   fileURLToPath(new URL('../src', import.meta.url)),
   fileURLToPath(new URL('../../prototypes', import.meta.url)),
+  // backend/app : messages utilisateur + gabarits de prompts (CLAUDE.md - la
+  // regle vaut aussi pour le backend). On ne scanne PAS tests/ (dev-only).
+  fileURLToPath(new URL('../../backend/app', import.meta.url)),
 ];
-const EXTENSIONS = new Set(['.ts', '.html', '.json', '.md', '.css', '.js', '.mjs']);
+const EXTENSIONS = new Set(['.ts', '.html', '.json', '.md', '.css', '.js', '.mjs', '.py']);
 
 const NAMES = {
   '–': 'demi-cadratin',
@@ -56,4 +59,4 @@ if (findings > 0) {
   console.error(`\n${findings} tell(s) IA trouvé(s) - corriger à la main, en préservant les accents.`);
   process.exit(1);
 }
-console.log('Aucun tell IA dans src/ ni prototypes/.');
+console.log('Aucun tell IA dans src/, prototypes/ ni backend/app/.');
