@@ -68,12 +68,19 @@
 .step.done .n {
   color: var(--ok);
 }
-.step:not([disabled]):not(.current):hover {
+.step:not([aria-disabled='true']):not(.current):hover {
   background: #ecece6;
 }
-.step[disabled] {
+.step[aria-disabled='true'] {
   opacity: 0.45;
-  cursor: not-allowed;
+  cursor: help; /* cliquable : le clic explique pourquoi l'etape est fermee */
+}
+
+/* Explication d'une etape fermee, sous la barre d'etapes. */
+.lock-note {
+  margin: -14px 0 20px;
+  font: 600 14px/1.45 var(--sans);
+  color: var(--warn);
 }
 
 .soon {

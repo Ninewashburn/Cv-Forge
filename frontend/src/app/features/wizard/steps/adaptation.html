@@ -1,16 +1,16 @@
 <h2>Adapte ton CV - le score évolue en direct</h2>
 <p class="lead">
-  Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule le matching
-  à chaque pause de frappe - sans IA, 100&nbsp;% local.
+  Modifie la colonne du milieu, à la main ou avec ton IA. Le panneau de droite recalcule la
+  correspondance avec l'offre à chaque pause de frappe - sans IA, 100&nbsp;% sur ton ordinateur.
 </p>
 
 <details class="copilote">
   <summary>Mode copilote - utilise ton propre ChatGPT ou Claude</summary>
   <div class="copilote-body">
     <p>
-      CVForge prépare un prompt verrouillé (instructions anti-hallucination incluses). Copie-le,
-      colle-le dans ton IA, puis rapporte uniquement le CV adapté dans la colonne du milieu. Aucune
-      clé API, aucun coût.
+      CVForge prépare le texte à coller dans ton IA (c'est ce qu'on appelle « le prompt »), avec des
+      règles strictes : rien d'inventé. Copie-le, colle-le dans ton IA, puis rapporte uniquement le
+      CV adapté dans la colonne du milieu. Aucune clé, aucun coût.
     </p>
 
     <div class="intents" role="group" aria-label="Intention du prompt">
@@ -34,22 +34,26 @@
         [disabled]="promptBusy()"
         (click)="preparePrompt()"
       >
-        {{ promptBusy() ? 'Préparation...' : 'Préparer le prompt verrouillé' }}
+        {{ promptBusy() ? 'Préparation...' : '1. Préparer le prompt' }}
       </button>
       @if (promptText()) {
-        <button type="button" class="btn btn-ghost" (click)="copyPrompt()">Copier le prompt</button>
+        <button type="button" class="btn btn-ghost" (click)="copyPrompt()">
+          2. Copier le prompt
+        </button>
       }
       <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener"
-        >Ouvrir Claude ↗</a
+        >3. Ouvrir Claude ↗</a
       >
       <a class="btn btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener"
-        >Ouvrir ChatGPT ↗</a
+        >3. Ouvrir ChatGPT ↗</a
       >
-      <span class="hint">{{ copyHint() }}</span>
     </div>
+    @if (copyNotice(); as n) {
+      <p class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
+    }
 
     @if (promptText()) {
-      <textarea class="prompt-out" readonly aria-label="Prompt verrouillé à copier">{{
+      <textarea class="prompt-out" readonly aria-label="Prompt à copier">{{
         promptText()
       }}</textarea>
     }
@@ -62,9 +66,9 @@
     @if (llmConfig(); as config) {
       @if (!config.configured) {
         <p>
-          Avec ta propre clé API Anthropic (Claude), CVForge envoie le prompt verrouillé et récupère
-          la proposition directement. La clé est enregistrée <strong>sur ta machine</strong>, côté
-          application - jamais dans le navigateur, jamais dans tes backups.
+          Avec ta propre clé API Anthropic (Claude), CVForge envoie le prompt et récupère la
+          proposition directement. La clé est enregistrée <strong>sur ta machine</strong>, côté
+          application - jamais dans le navigateur, jamais dans tes sauvegardes.
         </p>
         <div class="row">
           <input
@@ -122,11 +126,15 @@
           </div>
         </div>
       }
-      @if (apiHint()) {
-        <p class="api-hint">{{ apiHint() }}</p>
-      }
+    } @else if (llmConfigError()) {
+      <p class="notice notice-err">
+        Les réglages de la clé n'ont pas pu être lus. Réessaie dans un instant.
+      </p>
     } @else {
-      <p class="hint">Configuration indisponible - le backend est-il lancé ?</p>
+      <p class="hint">Lecture des réglages...</p>
+    }
+    @if (apiNotice(); as n) {
+      <p class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
     }
   </div>
 </details>
@@ -139,7 +147,7 @@
 
   <div>
     <div class="pane-label">
-      <span>CV ADAPTÉ - ÉDITABLE</span>
+      <span>CV ADAPTÉ - À MODIFIER ICI</span>
       <button type="button" class="btn-link" (click)="resetAdapted()">
         Repartir de l'original
       </button>
@@ -165,26 +173,39 @@
   </div>
 
   <aside class="live-panel" aria-live="polite">
-    <h3>MATCHING EN DIRECT</h3>
+    <h3>CORRESPONDANCE EN DIRECT</h3>
     @if (live(); as m) {
       <div class="live-score">
         <span>{{ m.score }}</span
         ><small>%</small>
       </div>
       <div class="score-track"><div class="score-fill" [style.width.%]="m.score"></div></div>
-      <p class="live-miss-title">? ENCORE ABSENTS</p>
+      @if (liveError()) {
+        <p class="notice notice-err">
+          Le score n'a pas pu être recalculé : celui-ci n'est peut-être plus à jour. Continue à
+          écrire, il se relancera tout seul.
+        </p>
+      }
+      <p class="live-miss-title">? ENCORE ABSENTS DE TON CV</p>
       <div class="live-chips">
         @for (keyword of m.missing; track keyword) {
           <span class="chip chip-miss">? {{ keyword }}</span>
         } @empty {
-          <span class="live-done">✓ Couverture totale des mots-clés.</span>
+          <span class="live-done">✓ Tous les mots importants de l'offre sont là.</span>
         }
       </div>
+    } @else if (liveError()) {
+      <p class="notice notice-err">
+        Le score n'a pas pu être calculé. Continue à écrire, il se relancera tout seul.
+      </p>
+    } @else if (!store.adaptedText().trim()) {
+      <p class="hint">Écris ou colle ton CV adapté pour voir le score.</p>
     } @else {
       <p class="hint">Calcul en cours...</p>
     }
     <p class="live-note">
-      Rappel : n'ajoute que du prouvable. L'étape suivante « Avant / Après » vérifiera chaque ajout.
+      Rappel : n'ajoute que ce que tu peux prouver. L'étape suivante « Avant / Après » te fera
+      vérifier chaque ajout.
     </p>
   </aside>
 </div>

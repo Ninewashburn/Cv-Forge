@@ -1,5 +1,5 @@
 <div class="atelier-head">
-  <p class="eyebrow">ATELIER - PARCOURS GUIDÉ</p>
+  <p class="eyebrow">ATELIER - PARCOURS GUIDÉ EN 5 ÉTAPES</p>
   @if (store.hasUnsavedWork() || store.application()) {
     <button type="button" class="btn-link" (click)="restart()">Recommencer à zéro</button>
   }
@@ -12,15 +12,19 @@
       class="step"
       [class.current]="store.step() === s.n"
       [class.done]="store.step() > s.n"
-      [disabled]="disabled(s.n)"
+      [attr.aria-disabled]="locked(s.n) ? 'true' : null"
       [attr.aria-current]="store.step() === s.n ? 'step' : null"
-      (click)="store.goTo(s.n)"
+      [title]="store.lockedReason(s.n) ?? ''"
+      (click)="select(s.n)"
     >
       <span class="n">{{ s.n < 10 ? '0' + s.n : s.n }}</span>
       <span class="t">{{ s.label }}</span>
     </button>
   }
 </nav>
+@if (lockNote()) {
+  <p class="lock-note">{{ lockNote() }}</p>
+}
 
 @switch (store.step()) {
   @case (1) {

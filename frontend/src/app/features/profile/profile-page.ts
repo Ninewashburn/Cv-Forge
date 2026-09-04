@@ -9,7 +9,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ExtractService, FactService, ProfileService, ProofService } from '../../core/api';
-import { Fact, FactType, Proof, ProofType } from '../../core/models';
+import { describeError } from '../../core/api/errors';
+import { Fact, FactType, fail, Notice, ok, Proof, ProofType } from '../../core/models';
 
 type PageState = 'loading' | 'ready' | 'error';
 
@@ -27,6 +28,15 @@ const PROOF_TYPES: readonly { value: ProofType; label: string }[] = [
   { value: 'link', label: 'Lien' },
   { value: 'document', label: 'Document' },
 ];
+
+// Messages de repli, sans jargon : le backend fournit le sien quand il a mieux.
+const LOAD_FALLBACK = "Ton profil n'a pas pu être chargé.";
+const FACTS_RELOAD_FALLBACK =
+  "La liste des faits n'a pas pu être rechargée. Actualise la page (touche F5).";
+const PROOFS_RELOAD_FALLBACK =
+  "La liste des preuves n'a pas pu être rechargée. Actualise la page (touche F5).";
+const IMPORT_FALLBACK =
+  "Ce fichier n'a pas pu être lu. Tu peux toujours copier son texte et le coller ici.";
 
 /** Profil maître + banque de preuves : la source de vérité que le wizard adapte ensuite. */
 @Component({
@@ -46,6 +56,7 @@ export class ProfilePage {
   protected readonly proofTypes = PROOF_TYPES;
 
   protected readonly state = signal<PageState>('loading');
+  protected readonly loadError = signal('');
   protected readonly facts = signal<Fact[]>([]);
   protected readonly proofs = signal<Proof[]>([]);
 
@@ -60,7 +71,7 @@ export class ProfilePage {
   protected readonly summary = signal('');
   /** CV complet importé/collé - le matching et le copilote s'en servent automatiquement. */
   protected readonly rawImportText = signal('');
-  protected readonly profileHint = signal('');
+  protected readonly profileHint = signal<Notice | null>(null);
   protected readonly savingProfile = signal(false);
   protected readonly importingCv = signal(false);
 
@@ -71,7 +82,7 @@ export class ProfilePage {
   protected readonly factContent = signal('');
   protected readonly factTags = signal('');
   protected readonly editingFactId = signal<string | null>(null);
-  protected readonly factHint = signal('');
+  protected readonly factHint = signal<Notice | null>(null);
 
   // --- Formulaire preuve (replié par défaut) -------------------------------
   protected readonly proofFormOpen = signal(false);
@@ -80,7 +91,7 @@ export class ProfilePage {
   protected readonly proofContent = signal('');
   protected readonly proofFactIds = signal<string[]>([]);
   protected readonly editingProofId = signal<string | null>(null);
-  protected readonly proofHint = signal('');
+  protected readonly proofHint = signal<Notice | null>(null);
   protected readonly attachingId = signal<string | null>(null);
 
   private readonly factById = computed(() => new Map(this.facts().map((f) => [f.id, f])));
@@ -93,6 +104,7 @@ export class ProfilePage {
 
   protected loadAll(): void {
     this.state.set('loading');
+    this.loadError.set('');
     this.profileService
       .get()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -108,7 +120,10 @@ export class ProfilePage {
           this.rawImportText.set(p.raw_import_text ?? '');
           this.state.set('ready');
         },
-        error: () => this.state.set('error'),
+        error: (err: unknown) => {
+          this.loadError.set(describeError(err, LOAD_FALLBACK));
+          this.state.set('error');
+        },
       });
     this.reloadFacts();
     this.reloadProofs();
@@ -118,14 +133,21 @@ export class ProfilePage {
     this.factService
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((facts) => this.facts.set(facts));
+      .subscribe({
+        next: (facts) => this.facts.set(facts),
+        error: (err: unknown) => this.factHint.set(fail(describeError(err, FACTS_RELOAD_FALLBACK))),
+      });
   }
 
   private reloadProofs(): void {
     this.proofService
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((proofs) => this.proofs.set(proofs));
+      .subscribe({
+        next: (proofs) => this.proofs.set(proofs),
+        error: (err: unknown) =>
+          this.proofHint.set(fail(describeError(err, PROOFS_RELOAD_FALLBACK))),
+      });
   }
 
   // ------------------------------------------------------------ profil
@@ -133,7 +155,7 @@ export class ProfilePage {
   protected saveProfile(): void {
     if (this.savingProfile()) return;
     this.savingProfile.set(true);
-    this.profileHint.set('');
+    this.profileHint.set(null);
     this.profileService
       .update({
         full_name: this.fullName().trim(),
@@ -152,11 +174,13 @@ export class ProfilePage {
       .subscribe({
         next: () => {
           this.savingProfile.set(false);
-          this.profileHint.set('Profil enregistré - sur ta machine, nulle part ailleurs.');
+          this.profileHint.set(ok('Profil enregistré - sur ta machine, nulle part ailleurs.'));
         },
-        error: () => {
+        error: (err: unknown) => {
           this.savingProfile.set(false);
-          this.profileHint.set("Enregistrement impossible - l'API locale répond-elle ?");
+          this.profileHint.set(
+            fail(describeError(err, "Le profil n'a pas pu être enregistré. Réessaie.")),
+          );
         },
       });
   }
@@ -167,7 +191,7 @@ export class ProfilePage {
     input.value = ''; // permet de resélectionner le même fichier
     if (!file || this.importingCv()) return;
     this.importingCv.set(true);
-    this.profileHint.set('');
+    this.profileHint.set(null);
     this.extractService
       .extract(file)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -175,14 +199,11 @@ export class ProfilePage {
         next: ({ text }) => {
           this.importingCv.set(false);
           this.rawImportText.set(text);
-          this.profileHint.set('Texte extrait - vérifie-le puis enregistre le profil.');
+          this.profileHint.set(ok('Texte extrait - vérifie-le puis enregistre le profil.'));
         },
-        error: (err: { error?: { detail?: string } }) => {
+        error: (err: unknown) => {
           this.importingCv.set(false);
-          this.profileHint.set(
-            err.error?.detail ??
-              'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
-          );
+          this.profileHint.set(fail(describeError(err, IMPORT_FALLBACK)));
         },
       });
   }
@@ -211,7 +232,7 @@ export class ProfilePage {
   protected submitFact(): void {
     const title = this.factTitle().trim();
     if (title.length < 3) {
-      this.factHint.set('Donne un titre au fait (3 caractères minimum).');
+      this.factHint.set(fail('Donne un titre au fait (3 caractères minimum).'));
       return;
     }
     const payload = {
@@ -230,10 +251,13 @@ export class ProfilePage {
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.cancelFactEdit();
-        this.factHint.set(editing ? 'Fait mis à jour.' : 'Fait ajouté.');
+        this.factHint.set(ok(editing ? 'Fait mis à jour.' : 'Fait ajouté.'));
         this.reloadFacts();
       },
-      error: () => this.factHint.set('Enregistrement du fait impossible.'),
+      error: (err: unknown) =>
+        this.factHint.set(
+          fail(describeError(err, "Le fait n'a pas pu être enregistré. Réessaie.")),
+        ),
     });
   }
 
@@ -248,7 +272,7 @@ export class ProfilePage {
     this.factTitle.set(fact.title);
     this.factContent.set(fact.content);
     this.factTags.set(fact.tags.join(', '));
-    this.factHint.set('');
+    this.factHint.set(null);
     this.factFormOpen.set(true);
   }
 
@@ -259,25 +283,44 @@ export class ProfilePage {
     this.factTitle.set('');
     this.factContent.set('');
     this.factTags.set('');
-    this.factHint.set('');
+    this.factHint.set(null);
   }
 
-  protected toggleValidated(fact: Fact): void {
+  /** Case « prouvable » : si l'enregistrement échoue, la case revient à son
+   *  état réel - l'écran ne prétend jamais qu'un choix a été enregistré. */
+  protected toggleValidated(fact: Fact, checkbox: HTMLInputElement): void {
+    this.factHint.set(null);
     this.factService
       .update(fact.id, { validated: !fact.validated })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.reloadFacts());
+      .subscribe({
+        next: () => this.reloadFacts(),
+        error: (err: unknown) => {
+          checkbox.checked = fact.validated;
+          this.factHint.set(
+            fail(describeError(err, "Le changement n'a pas pu être enregistré. Réessaie.")),
+          );
+        },
+      });
   }
 
   protected removeFact(fact: Fact): void {
     if (!window.confirm(`Supprimer le fait « ${fact.title} » ?`)) return;
+    this.factHint.set(null);
     this.factService
       .remove(fact.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.editingFactId() === fact.id) this.cancelFactEdit();
-        this.reloadFacts();
-        this.reloadProofs(); // les liaisons preuve > fait ont pu changer
+      .subscribe({
+        next: () => {
+          if (this.editingFactId() === fact.id) this.cancelFactEdit();
+          this.factHint.set(ok('Fait supprimé.'));
+          this.reloadFacts();
+          this.reloadProofs(); // les liaisons preuve > fait ont pu changer
+        },
+        error: (err: unknown) =>
+          this.factHint.set(
+            fail(describeError(err, "Le fait n'a pas pu être supprimé. Réessaie.")),
+          ),
       });
   }
 
@@ -310,7 +353,7 @@ export class ProfilePage {
   protected submitProof(): void {
     const title = this.proofTitle().trim();
     if (title.length < 3) {
-      this.proofHint.set('Donne un titre à la preuve (3 caractères minimum).');
+      this.proofHint.set(fail('Donne un titre à la preuve (3 caractères minimum).'));
       return;
     }
     const payload = {
@@ -326,10 +369,13 @@ export class ProfilePage {
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.cancelProofEdit();
-        this.proofHint.set(editing ? 'Preuve mise à jour.' : 'Preuve ajoutée.');
+        this.proofHint.set(ok(editing ? 'Preuve mise à jour.' : 'Preuve ajoutée.'));
         this.reloadProofs();
       },
-      error: () => this.proofHint.set('Enregistrement de la preuve impossible.'),
+      error: (err: unknown) =>
+        this.proofHint.set(
+          fail(describeError(err, "La preuve n'a pas pu être enregistrée. Réessaie.")),
+        ),
     });
   }
 
@@ -344,7 +390,7 @@ export class ProfilePage {
     this.proofTitle.set(proof.title);
     this.proofContent.set(proof.content);
     this.proofFactIds.set([...proof.fact_ids]);
-    this.proofHint.set('');
+    this.proofHint.set(null);
     this.proofFormOpen.set(true);
   }
 
@@ -355,18 +401,26 @@ export class ProfilePage {
     this.proofTitle.set('');
     this.proofContent.set('');
     this.proofFactIds.set([]);
-    this.proofHint.set('');
+    this.proofHint.set(null);
   }
 
   protected removeProof(proof: Proof): void {
     if (!window.confirm(`Supprimer la preuve « ${proof.title} » ?`)) return;
+    this.proofHint.set(null);
     this.proofService
       .remove(proof.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.editingProofId() === proof.id) this.cancelProofEdit();
-        this.reloadProofs();
-        this.reloadFacts(); // les compteurs de preuves des faits changent
+      .subscribe({
+        next: () => {
+          if (this.editingProofId() === proof.id) this.cancelProofEdit();
+          this.proofHint.set(ok('Preuve supprimée.'));
+          this.reloadProofs();
+          this.reloadFacts(); // les compteurs de preuves des faits changent
+        },
+        error: (err: unknown) =>
+          this.proofHint.set(
+            fail(describeError(err, "La preuve n'a pas pu être supprimée. Réessaie.")),
+          ),
       });
   }
 
@@ -375,18 +429,21 @@ export class ProfilePage {
     input.value = ''; // permet de resélectionner le même fichier
     if (!file || this.attachingId()) return;
     this.attachingId.set(proof.id);
-    this.proofHint.set('');
+    this.proofHint.set(null);
     this.proofService
       .attachFile(proof.id, file)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.attachingId.set(null);
+          this.proofHint.set(ok('Pièce jointe enregistrée.'));
           this.reloadProofs();
         },
-        error: (err: { error?: { detail?: string } }) => {
+        error: (err: unknown) => {
           this.attachingId.set(null);
-          this.proofHint.set(err.error?.detail ?? 'Pièce jointe impossible.');
+          this.proofHint.set(
+            fail(describeError(err, "La pièce jointe n'a pas pu être enregistrée. Réessaie.")),
+          );
         },
       });
   }

@@ -9,10 +9,13 @@ export class BackupService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiBaseUrl}/backup`;
 
-  /** URL de téléchargement direct (le navigateur gère le fichier). */
-  readonly exportUrl = `${this.base}/export`;
+  /** Archive ZIP complète (base + fichiers de preuves), reçue comme un fichier
+   *  pour que l'écran puisse dire clairement si ça a marché ou non. */
+  export(): Observable<Blob> {
+    return this.http.get(`${this.base}/export`, { responseType: 'blob' });
+  }
 
-  /** Restaure un backup : remplace TOUTES les données locales. */
+  /** Restaure une sauvegarde : remplace TOUTES les données locales. */
   import(file: File): Observable<void> {
     const form = new FormData();
     form.append('file', file);

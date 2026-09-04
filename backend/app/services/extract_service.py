@@ -19,6 +19,7 @@ MAX_SIZE_BYTES = 20 * 1024 * 1024
 _TEXT_EXTENSIONS = (".txt", ".text", ".md")
 
 _FALLBACK_HINT = "Le copier-coller reste toujours possible."
+TOO_LARGE_MESSAGE = f"Fichier trop volumineux (20 Mo maximum). {_FALLBACK_HINT}"
 
 
 def extract_text(filename: str | None, content: bytes) -> str:
@@ -26,9 +27,7 @@ def extract_text(filename: str | None, content: bytes) -> str:
     if not content:
         raise ValueError(f"Ce fichier est vide. {_FALLBACK_HINT}")
     if len(content) > MAX_SIZE_BYTES:
-        raise ValueError(
-            f"Fichier trop volumineux (20 Mo maximum). {_FALLBACK_HINT}"
-        )
+        raise ValueError(TOO_LARGE_MESSAGE)
 
     name = (filename or "").lower()
     # Signature avant extension : un « offre.txt » qui est en réalité un PDF marche quand même.

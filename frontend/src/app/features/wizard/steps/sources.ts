@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
   signal,
@@ -9,9 +10,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ExtractService } from '../../../core/api';
+import { describeError } from '../../../core/api/errors';
 import { WizardStore } from '../wizard-store';
 
 type ImportTarget = 'offer' | 'cv' | 'linkedin';
+
+const IMPORT_FALLBACK =
+  "Ce fichier n'a pas pu être lu. Tu peux toujours copier son texte et le coller ici.";
 
 /** Étape 1 : les deux matières premières (offre + CV) + profil LinkedIn optionnel. */
 @Component({
@@ -29,6 +34,17 @@ export class SourcesStep {
   protected readonly importing = signal<ImportTarget | null>(null);
   protected readonly importError = signal('');
 
+  /** Ce qu'il manque encore pour lancer l'analyse - dit en clair, à côté du
+   *  bouton, au lieu d'un bouton grisé sans explication. */
+  protected readonly readiness = computed(() => {
+    const offer = this.store.offerReady();
+    const cv = this.store.cvReady();
+    if (offer && cv) return 'Tout est prêt : lance la comparaison.';
+    if (!offer && !cv) return "Pour commencer : colle l'offre d'emploi et ton CV ci-dessus.";
+    if (!offer) return "Il manque l'offre d'emploi (ou son texte est trop court).";
+    return 'Il manque ton CV (ou son texte est trop court).';
+  });
+
   /** « Importer un fichier » : extraction locale, le texte reste éditable avant analyse. */
   protected onImportFile(target: ImportTarget, input: HTMLInputElement): void {
     const file = input.files?.[0];
@@ -44,12 +60,9 @@ export class SourcesStep {
           this.importing.set(null);
           this.fieldOf(target).set(text);
         },
-        error: (err: { error?: { detail?: string } }) => {
+        error: (err: unknown) => {
           this.importing.set(null);
-          this.importError.set(
-            err.error?.detail ??
-              'Lecture du fichier impossible. Le copier-coller reste toujours possible.',
-          );
+          this.importError.set(describeError(err, IMPORT_FALLBACK));
         },
       });
   }

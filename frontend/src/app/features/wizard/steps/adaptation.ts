@@ -7,10 +7,11 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, EMPTY, of, switchMap } from 'rxjs';
 
 import { LlmService } from '../../../core/api';
-import { LlmConfig, MatchingResult, PromptKind } from '../../../core/models';
+import { describeError } from '../../../core/api/errors';
+import { fail, LlmConfig, MatchingResult, Notice, ok, PromptKind } from '../../../core/models';
 import { buildHighlightSegments } from '../text-highlight';
 import { WizardStore } from '../wizard-store';
 
@@ -33,9 +34,11 @@ export class AdaptationStep {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly live = signal<MatchingResult | null>(null);
+  /** Le dernier recalcul a échoué : le score affiché n'est plus à jour. Dit à l'écran. */
+  protected readonly liveError = signal(false);
   protected readonly promptText = signal('');
   protected readonly promptBusy = signal(false);
-  protected readonly copyHint = signal('');
+  protected readonly copyNotice = signal<Notice | null>(null);
   protected readonly kind = signal<PromptKind>('adapter');
 
   /** Position de scroll du textarea, répercutée sur l'overlay de surlignage. */
@@ -54,12 +57,13 @@ export class AdaptationStep {
 
   // --- Niveau clé API (niveau 2) -----------------------------------------
   protected readonly llmConfig = signal<LlmConfig | null>(null);
+  protected readonly llmConfigError = signal(false);
   protected readonly keyInput = signal('');
   protected readonly savingKey = signal(false);
   /** Consentement explicite : coché à chaque session, jamais présumé. */
   protected readonly consent = signal(false);
   protected readonly adapting = signal(false);
-  protected readonly apiHint = signal('');
+  protected readonly apiNotice = signal<Notice | null>(null);
 
   protected readonly intents: readonly PromptIntent[] = [
     { kind: 'adapter', label: 'Adapter', hint: "Reformuler le CV pour l'offre (défaut)" },
@@ -69,15 +73,28 @@ export class AdaptationStep {
   ];
 
   constructor() {
-    // Matching en direct : recalcul (sans IA) à chaque pause de frappe.
+    // Matching en direct : recalcul (sans IA) à chaque pause de frappe. Un
+    // échec ne tue jamais le flux (catchError > EMPTY) : le prochain caractère
+    // relance le calcul, et l'écran dit que le score affiché n'est plus à jour.
     toObservable(this.store.adaptedText)
       .pipe(
         debounceTime(350),
         distinctUntilChanged(),
-        switchMap((text) => (text.trim() ? this.store.liveMatch(text) : of(null))),
+        switchMap((text) => {
+          if (!text.trim()) return of(null);
+          return this.store.liveMatch(text).pipe(
+            catchError(() => {
+              this.liveError.set(true);
+              return EMPTY;
+            }),
+          );
+        }),
         takeUntilDestroyed(),
       )
-      .subscribe((result) => this.live.set(result));
+      .subscribe((result) => {
+        this.liveError.set(false);
+        this.live.set(result);
+      });
 
     this.reloadLlmConfig();
   }
@@ -87,8 +104,14 @@ export class AdaptationStep {
       .getConfig()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (config) => this.llmConfig.set(config),
-        error: () => this.llmConfig.set(null),
+        next: (config) => {
+          this.llmConfig.set(config);
+          this.llmConfigError.set(false);
+        },
+        error: () => {
+          this.llmConfig.set(null);
+          this.llmConfigError.set(true);
+        },
       });
   }
 
@@ -96,7 +119,7 @@ export class AdaptationStep {
     const key = this.keyInput().trim();
     if (!key || this.savingKey()) return;
     this.savingKey.set(true);
-    this.apiHint.set('');
+    this.apiNotice.set(null);
     this.llm
       .saveConfig(key)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -105,31 +128,38 @@ export class AdaptationStep {
           this.savingKey.set(false);
           this.keyInput.set(''); // la clé ne reste jamais dans le navigateur
           this.llmConfig.set(config);
-          this.apiHint.set('Clé enregistrée sur ta machine (jamais dans le navigateur).');
+          this.apiNotice.set(ok('Clé enregistrée sur ta machine (jamais dans le navigateur).'));
         },
-        error: (err: { error?: { detail?: string } }) => {
+        error: (err: unknown) => {
           this.savingKey.set(false);
-          this.apiHint.set(err.error?.detail ?? 'Enregistrement de la clé impossible.');
+          this.apiNotice.set(
+            fail(describeError(err, "La clé n'a pas pu être enregistrée. Réessaie.")),
+          );
         },
       });
   }
 
   protected removeKey(): void {
     if (!window.confirm('Retirer ta clé API de cette machine ?')) return;
+    this.apiNotice.set(null);
     this.llm
       .removeConfig()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.consent.set(false);
-        this.apiHint.set('');
-        this.reloadLlmConfig();
+      .subscribe({
+        next: () => {
+          this.consent.set(false);
+          this.apiNotice.set(ok('Clé retirée de cette machine.'));
+          this.reloadLlmConfig();
+        },
+        error: (err: unknown) =>
+          this.apiNotice.set(fail(describeError(err, "La clé n'a pas pu être retirée. Réessaie."))),
       });
   }
 
   protected runAdapt(): void {
     if (this.adapting() || !this.consent() || !this.llmConfig()?.configured) return;
     this.adapting.set(true);
-    this.apiHint.set('');
+    this.apiNotice.set(null);
     this.store
       .adaptWithApi(this.kind())
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -140,13 +170,17 @@ export class AdaptationStep {
           // éditable, et l'export reste verrouillé tant que l'Avant/Après
           // n'a pas été validé (porte d'intégrité du store).
           this.store.adaptedText.set(result.adapted_text);
-          this.apiHint.set(
-            `Proposition de ${result.model} reçue - vérifie chaque changement dans l'Avant / Après.`,
+          this.apiNotice.set(
+            ok(
+              `Proposition de ${result.model} reçue - vérifie chaque changement dans l'Avant / Après.`,
+            ),
           );
         },
-        error: (err: { error?: { detail?: string } }) => {
+        error: (err: unknown) => {
           this.adapting.set(false);
-          this.apiHint.set(err.error?.detail ?? 'Appel au fournisseur impossible.');
+          this.apiNotice.set(
+            fail(describeError(err, "L'appel à l'IA n'a pas abouti. Réessaie dans un instant.")),
+          );
         },
       });
   }
@@ -154,7 +188,7 @@ export class AdaptationStep {
   protected preparePrompt(): void {
     if (this.promptBusy()) return;
     this.promptBusy.set(true);
-    this.copyHint.set('');
+    this.copyNotice.set(null);
     this.store
       .buildPrompt(this.kind())
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -162,9 +196,12 @@ export class AdaptationStep {
         next: (result) => {
           this.promptText.set(result.prompt);
           this.promptBusy.set(false);
+          this.copyNotice.set(ok('Prompt prêt ci-dessous - copie-le, puis colle-le dans ton IA.'));
         },
-        error: () => {
-          this.copyHint.set('Erreur - backend indisponible ?');
+        error: (err: unknown) => {
+          this.copyNotice.set(
+            fail(describeError(err, "Le prompt n'a pas pu être préparé. Réessaie.")),
+          );
           this.promptBusy.set(false);
         },
       });
@@ -173,9 +210,13 @@ export class AdaptationStep {
   protected async copyPrompt(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.promptText());
-      this.copyHint.set('Copié - colle-le dans ton IA.');
+      this.copyNotice.set(ok('Copié - colle-le dans ton IA (Ctrl + V).'));
     } catch {
-      this.copyHint.set('Copie impossible - sélectionne le texte à la main.');
+      this.copyNotice.set(
+        fail(
+          'Copie automatique impossible - sélectionne le texte ci-dessous et copie-le (Ctrl + C).',
+        ),
+      );
     }
   }
 

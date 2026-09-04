@@ -8,3 +8,4 @@ export * from './matching.model';
 export * from './application.model';
 export * from './extract.model';
 export * from './llm.model';
+export * from './notice.model';

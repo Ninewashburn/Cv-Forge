@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
 import { AdaptationStep } from './steps/adaptation';
 import { AnalyseStep } from './steps/analyse';
@@ -22,6 +22,9 @@ import { WizardStore } from './wizard-store';
 export class Wizard {
   protected readonly store = inject(WizardStore);
 
+  /** Explication affichée quand on clique sur une étape encore fermée. */
+  protected readonly lockNote = signal('');
+
   protected readonly steps = [
     { n: 1, label: 'Sources' },
     { n: 2, label: 'Analyse' },
@@ -30,11 +33,16 @@ export class Wizard {
     { n: 5, label: 'Export' },
   ] as const;
 
-  protected disabled(n: number): boolean {
-    if (n === 2 || n === 3) return this.store.analysis() === null;
-    if (n === 4) return this.store.adaptedText().trim() === '';
-    if (n === 5) return !this.store.exportReady();
-    return false;
+  protected locked(n: number): boolean {
+    return this.store.lockedReason(n) !== null;
+  }
+
+  /** Une étape fermée reste cliquable : le clic explique pourquoi elle l'est,
+   *  au lieu d'un bouton grisé muet. */
+  protected select(n: number): void {
+    const reason = this.store.lockedReason(n);
+    this.lockNote.set(reason ?? '');
+    if (reason === null) this.store.goTo(n);
   }
 
   /** Filet à la fermeture de l'onglet : le parcours vit en mémoire tant que
@@ -45,6 +53,7 @@ export class Wizard {
 
   protected restart(): void {
     if (!this.store.hasUnsavedWork() || window.confirm('Tout effacer et repartir de zéro ?')) {
+      this.lockNote.set('');
       this.store.reset();
     }
   }

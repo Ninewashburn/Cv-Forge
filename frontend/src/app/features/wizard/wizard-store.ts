@@ -3,14 +3,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { ApplicationService, OfferService, VariantService } from '../../core/api';
+import { describeError } from '../../core/api/errors';
+import { downloadBlob, fileSlug } from '../../core/download';
 import {
   AdaptResult,
   Application,
   ApplicationStatus,
   CopilotPrompt,
   CvVariant,
+  fail,
   MatchingResult,
+  Notice,
   Offer,
+  ok,
   PromptKind,
 } from '../../core/models';
 import { SampleKind, SAMPLES } from './samples';
@@ -32,7 +37,15 @@ export interface Analysis {
   keywords: AnalysedKeyword[];
 }
 
-const MIN_CHARS = 40;
+/** En dessous, ce n'est pas un texte exploitable (une offre ou un CV font des centaines de caractères). */
+export const MIN_CHARS = 40;
+
+// Messages de repli, sans jargon : le backend fournit le sien quand il a mieux.
+const ANALYSE_FALLBACK = "L'analyse n'a pas abouti. Réessaie dans un instant.";
+const EXPORT_FALLBACK = "Le PDF n'a pas pu être créé. Réessaie dans un instant.";
+const EXPORT_TRACK_FALLBACK =
+  "Le PDF est téléchargé, mais le suivi de candidature n'a pas pu être créé. Réessaie le téléchargement.";
+const TRACK_FALLBACK = "Le statut n'a pas pu être enregistré. Réessaie.";
 
 /**
  * État partagé du parcours. Fourni à la racine : un détour par une autre page
@@ -77,16 +90,19 @@ export class WizardStore {
   readonly variant = signal<CvVariant | null>(null);
   readonly application = signal<Application | null>(null);
   readonly exportBusy = signal(false);
-  readonly exportError = signal<string | null>(null);
+  /** Résultat du dernier export : PDF téléchargé, ou ce qui a échoué. */
+  readonly exportNotice = signal<Notice | null>(null);
+  /** Résultat du dernier enregistrement de suivi de candidature. */
+  readonly trackNotice = signal<Notice | null>(null);
 
   private offerId: string | null = null;
   private diffSignature: string | null = null;
   /** Texte adapté au moment où la variante a été persistée (détection d'obsolescence). */
   private variantText: string | null = null;
 
-  readonly canAnalyse = computed(
-    () => this.offerText().trim().length >= MIN_CHARS && this.cvText().trim().length >= MIN_CHARS,
-  );
+  readonly offerReady = computed(() => this.offerText().trim().length >= MIN_CHARS);
+  readonly cvReady = computed(() => this.cvText().trim().length >= MIN_CHARS);
+  readonly canAnalyse = computed(() => this.offerReady() && this.cvReady());
 
   /** Du contenu est en jeu et rien n'a été exporté : prévenir avant de fermer l'onglet. */
   readonly hasUnsavedWork = computed(
@@ -95,12 +111,21 @@ export class WizardStore {
       this.application() === null,
   );
 
+  /** Pourquoi une étape est encore fermée - null si elle est accessible. Même
+   *  règle que goTo(), formulée pour l'utilisateur. */
+  lockedReason(step: number): string | null {
+    if ((step === 2 || step === 3) && !this.analysis()) {
+      return "Commence par comparer ton CV à l'offre (étape 1).";
+    }
+    if (step === 4 && !this.adaptedText().trim()) return "Adapte d'abord ton CV (étape 3).";
+    if (step === 5 && !this.exportReady()) {
+      return "Confirme d'abord chaque ajout dans l'Avant / Après (étape 4).";
+    }
+    return null;
+  }
+
   goTo(step: number): void {
-    // L'Analyse et l'Adaptation exigent un premier calcul ; l'Avant/Après, un
-    // texte adapté ; l'Export, un Avant/Après validé en entier.
-    if ((step === 2 || step === 3) && !this.analysis()) return;
-    if (step === 4 && !this.adaptedText().trim()) return;
-    if (step === 5 && !this.exportReady()) return;
+    if (this.lockedReason(step) !== null) return;
     if (step === 3 && !this.adaptedText().trim()) this.adaptedText.set(this.cvText());
     this.setStep(step);
   }
@@ -121,7 +146,8 @@ export class WizardStore {
     this.variant.set(null);
     this.application.set(null);
     this.exportBusy.set(false);
-    this.exportError.set(null);
+    this.exportNotice.set(null);
+    this.trackNotice.set(null);
     this.offerId = null;
     this.diffSignature = null;
     this.variantText = null;
@@ -140,7 +166,7 @@ export class WizardStore {
     const offer = this.offer();
     if (!offer || this.exportBusy() || !this.exportReady()) return;
     this.exportBusy.set(true);
-    this.exportError.set(null);
+    this.exportNotice.set(null);
 
     const adapted = this.adaptedText();
     const existing = this.variant();
@@ -150,6 +176,10 @@ export class WizardStore {
         : existing
           ? this.variants.update(existing.id, { adapted_text: adapted, status: 'validated' })
           : this.offers.generateVariant(offer.id, { adapted_text: adapted });
+
+    // Le PDF part avant la création du suivi : si cette dernière échoue, le
+    // message doit dire que le fichier, lui, est bien arrivé.
+    let downloaded = false;
 
     variant$
       .pipe(
@@ -161,7 +191,8 @@ export class WizardStore {
           this.variants.pdf(variant.id).pipe(map((blob) => ({ variant, blob }))),
         ),
         switchMap(({ variant, blob }) => {
-          this.triggerDownload(blob, offer.title);
+          downloadBlob(blob, `cv-adapte-${fileSlug(offer.title, 'offre')}.pdf`);
+          downloaded = true;
           const known = this.application();
           return known
             ? of(known)
@@ -173,37 +204,34 @@ export class WizardStore {
         next: (application) => {
           this.application.set(application);
           this.exportBusy.set(false);
+          this.exportNotice.set(
+            ok('PDF téléchargé - tu le trouveras dans ton dossier « Téléchargements ».'),
+          );
         },
-        error: () => {
-          this.exportError.set('Export impossible - le backend est-il lancé sur :8000 ?');
+        error: (err: unknown) => {
+          const fallback = downloaded ? EXPORT_TRACK_FALLBACK : EXPORT_FALLBACK;
+          this.exportNotice.set(fail(describeError(err, fallback)));
           this.exportBusy.set(false);
         },
       });
   }
 
-  setApplicationStatus(status: ApplicationStatus): void {
+  /** Micro-suivi : enregistre le statut. Retourne l'observable pour que l'écran
+   *  puisse remettre le sélecteur à sa valeur précédente en cas d'échec - on ne
+   *  laisse jamais croire qu'un choix est enregistré quand il ne l'est pas. */
+  setApplicationStatus(status: ApplicationStatus): Observable<Application> {
     const application = this.application();
-    if (!application) return;
-    this.applications
-      .update(application.id, { status })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((updated) => this.application.set(updated));
-  }
-
-  private triggerDownload(blob: Blob, offerTitle: string): void {
-    const slug =
-      offerTitle
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^A-Za-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, 60) || 'offre';
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `cv-adapte-${slug}.pdf`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    if (!application) return EMPTY;
+    this.trackNotice.set(null);
+    return this.applications.update(application.id, { status }).pipe(
+      tap({
+        next: (updated) => {
+          this.application.set(updated);
+          this.trackNotice.set(ok('Suivi enregistré.'));
+        },
+        error: (err: unknown) => this.trackNotice.set(fail(describeError(err, TRACK_FALLBACK))),
+      }),
+    );
   }
 
   /** Matching du texte en cours d'adaptation (recalcul en direct, sans IA). */
@@ -280,8 +308,8 @@ export class WizardStore {
           this.busy.set(false);
           this.setStep(2);
         },
-        error: () => {
-          this.error.set('Analyse impossible - le backend est-il lancé sur :8000 ?');
+        error: (err: unknown) => {
+          this.error.set(describeError(err, ANALYSE_FALLBACK));
           this.busy.set(false);
         },
       });

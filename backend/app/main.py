@@ -8,9 +8,11 @@ Single process : l'app sert aussi le build Angular quand il existe
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
@@ -28,6 +30,20 @@ from app.routers import (
     variants_router,
 )
 from app.services.errors import NotFoundError
+
+logger = logging.getLogger("cvforge")
+
+# Messages de repli, en français simple : c'est ce que voit l'utilisateur quand
+# rien de plus précis n'a été prévu. La trace technique, elle, va dans le
+# journal du serveur - jamais à l'écran.
+INVALID_REQUEST_MESSAGE = (
+    "Les informations envoyées sont incomplètes ou mal formées. "
+    "Vérifie ce que tu as saisi, puis réessaie."
+)
+UNEXPECTED_ERROR_MESSAGE = (
+    "CVForge a rencontré un problème inattendu. Réessaie ; si ça continue, "
+    "ferme puis relance l'application. Ton travail enregistré est conservé."
+)
 
 
 @asynccontextmanager
@@ -55,6 +71,21 @@ def create_app() -> FastAPI:
     @app.exception_handler(NotFoundError)
     async def not_found_handler(_request: Request, exc: NotFoundError) -> JSONResponse:
         return JSONResponse(status_code=404, content={"detail": str(exc)})
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_handler(
+        _request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
+        # Sans ce filet, FastAPI renvoie une LISTE d'erreurs en anglais : le
+        # frontend l'afficherait telle quelle (« [object Object] »).
+        logger.warning("Requête invalide : %s", exc.errors())
+        return JSONResponse(status_code=422, content={"detail": INVALID_REQUEST_MESSAGE})
+
+    @app.exception_handler(Exception)
+    async def unexpected_handler(_request: Request, exc: Exception) -> JSONResponse:
+        # Dernier filet : jamais de « Internal Server Error » anglais à l'écran.
+        logger.exception("Erreur inattendue : %s", exc)
+        return JSONResponse(status_code=500, content={"detail": UNEXPECTED_ERROR_MESSAGE})
 
     @app.get("/api/health", tags=["health"])
     def health() -> dict[str, str]:

@@ -130,6 +130,9 @@ h2 {
 .consent-check input {
   accent-color: var(--ember);
 }
+.notice {
+  margin: 10px 0 0;
+}
 .api-hint {
   font: 12.5px/1.5 var(--sans);
   color: var(--muted);

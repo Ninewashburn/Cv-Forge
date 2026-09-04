@@ -7,7 +7,14 @@
 
 <div class="card">
   @if (tooLong) {
-    <p class="hint">Texte trop long pour la comparaison mot à mot (limite mémoire).</p>
+    <p class="notice notice-err">
+      Ces textes sont trop longs pour être comparés mot à mot. Raccourcis le CV adapté à l'étape
+      précédente (ou l'original à l'étape 1), puis reviens ici : l'export reste fermé tant que la
+      comparaison n'a pas pu être faite.
+    </p>
+    <div class="gate">
+      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">< Modifier encore</button>
+    </div>
   } @else {
     <div class="panes">
       <div>

@@ -16,12 +16,25 @@
   </nav>
 </header>
 
+@if (status.offline()) {
+  <div class="alert-bar" role="alert">
+    <span>{{ status.offlineMessage }}</span>
+  </div>
+} @else if (status.unexpected(); as message) {
+  <div class="alert-bar" role="alert">
+    <span>{{ message }}</span>
+    <button type="button" class="alert-close" (click)="status.dismissUnexpected()">
+      Fermer ce message
+    </button>
+  </div>
+}
+
 <main class="page">
   <router-outlet />
 </main>
 
 <footer class="site-footer">
-  <span>ANTI-HALLUCINATION : RIEN N'EST INVENTÉ</span>
-  <span>LOCAL-FIRST : RIEN NE SORT SANS TON GESTE</span>
+  <span>RIEN N'EST INVENTÉ À TA PLACE</span>
+  <span>RIEN NE SORT DE TON ORDINATEUR SANS TON GESTE</span>
   <span>AVANT / APRÈS : TOUT EST TRACÉ</span>
 </footer>

@@ -115,6 +115,20 @@ h3 {
 }
 
 .hint {
-  font: 12.5px var(--sans);
+  font: 13.5px var(--sans);
   color: var(--muted);
+}
+
+/* Messages d'état partagés : une confirmation reste discrète, une erreur se
+   voit (taille lisible, couleur, repère) - lisible sans lunettes de dev. */
+.notice {
+  font: 14px/1.45 var(--sans);
+  color: var(--ok);
+}
+.notice-err {
+  color: var(--del);
+  font-weight: 600;
+}
+.notice-err::before {
+  content: '⚠ ';
 }

@@ -14,6 +14,10 @@ async def extract(file: UploadFile) -> ExtractedText:
 
     Endpoint générique unique pour les trois zones (offre, CV, profil LinkedIn) :
     le texte renvoyé atterrit dans le champ, éditable avant toute analyse."""
+    # Taille annoncée vérifiée AVANT de lire : un mauvais clic sur un fichier
+    # énorme ne doit pas remplir la mémoire pour finir refusé.
+    if file.size is not None and file.size > extract_service.MAX_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail=extract_service.TOO_LARGE_MESSAGE)
     content = await file.read()
     try:
         text = extract_service.extract_text(file.filename, content)

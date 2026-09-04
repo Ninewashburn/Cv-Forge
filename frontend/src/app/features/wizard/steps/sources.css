@@ -64,9 +64,17 @@ label {
   cursor: default;
 }
 
-.import-err {
-  font: 12.5px var(--sans);
-  color: var(--del);
+.howto {
+  font: 14px/1.5 var(--sans);
+  color: var(--ink);
+  background: var(--warn-soft);
+  border-left: 3px solid var(--warn);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  margin: 0 0 16px;
+  max-width: 820px;
+}
+.notice {
   margin: 10px 0 0;
 }
 
@@ -151,9 +159,13 @@ textarea:focus {
   cursor: pointer;
 }
 
-.err {
-  font: 12.5px var(--sans);
-  color: var(--del);
+.readiness {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.readiness.ready {
+  color: var(--ok);
 }
 .footer-row {
   border-top: 1px solid var(--line);

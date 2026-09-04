@@ -99,7 +99,7 @@
   - Pas un diff git : lisible par tout public
 - [x] **Export PDF** propre (format simple, parsable)
 - [x] **Backup ZIP** — export/import complet des données (incarnation du "tes données t'appartiennent")
-- [x] **Micro-tracking** — 1 champ par candidature exportée : "réponse reçue ? entretien obtenu ?"
+- [x] **Micro-tracking** — 1 champ par candidature exportée : "réponse reçue ? entretien obtenu ?" *(complété 2026-09-04 : le suivi est aussi accessible depuis l'Accueil, section « Mes candidatures » - sans ça, un statut ne pouvait être modifié que dans la session d'export en cours, et le MVP statement restait immesurable en pratique)*
   - 3 clics max. Rend le MVP statement mesurable.
 - [x] **Zone « révélation » LinkedIn** ⭐ *(inspiré d'un atelier RH Michelin — le profil LinkedIn comme contexte, version honnête. Aussi en Lite, texte seul.)*
   - **Principe — deux statuts de données, jamais confondus :**

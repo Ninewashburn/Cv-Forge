@@ -49,43 +49,51 @@ prompt, et aucune proposition n'est appliquée sans passer par l'Avant / Après.
 
 ## Démarrage
 
-Pré-requis : **Python 3.12+** (et **Node.js 20+** pour construire l'interface ; sans Node,
-l'application démarre en mode API seule sur `/docs`).
+### Pour utiliser CVForge (aucune installation)
 
-**En un double-clic** — `start.bat` (Windows) ou `./start.sh` (macOS/Linux) : la première
+Sur Windows : télécharge `CVForge.exe`, double-clique dessus. C'est tout - pas de compte, pas de
+configuration, pas de logiciel à installer à côté. Une fenêtre s'ouvre avec l'application ; la
+fermer arrête CVForge. Si la fenêtre native n'est pas disponible, CVForge s'ouvre dans ton
+navigateur habituel, avec une petite boîte de dialogue pour l'arrêter.
+
+Par défaut, l'exe range les données dans `~/.cvforge/`. Pour un **mode clé USB** (données à côté
+de l'exe, dans `./data/`), pose un fichier vide nommé `cvforge.portable` à côté du binaire.
+
+Pour essayer sans rien télécharger :
+[`prototypes/cvforge-lite/index.html`](prototypes/cvforge-lite/index.html), un simple fichier
+HTML à ouvrir dans le navigateur (version allégée, sans import PDF ni banque de preuves).
+
+### Pour construire l'exe soi-même (Windows)
+
+```bash
+cd backend
+python build_portable.py     # construit l'interface au besoin, puis gèle avec PyInstaller
+# -> backend/dist/CVForge.exe
+```
+
+### Pour développer
+
+Pré-requis : **Python 3.12+** et **Node.js 20+** (sans Node, l'application démarre en mode API
+seule sur `/docs`).
+
+**En un double-clic** - `start.bat` (Windows) ou `./start.sh` (macOS/Linux) : la première
 exécution crée l'environnement Python, construit l'interface si `frontend/node_modules` est
 présent, puis ouvre <http://localhost:8000>.
 
 **En mode développement** :
 
 ```bash
-# Terminal 1 — API sur :8000
+# Terminal 1 - API sur :8000
 cd backend
 python -m venv .venv
 source .venv/bin/activate            # Windows : .venv\Scripts\activate
 pip install -e ".[dev]"
 uvicorn app.main:app --port 8000
 
-# Terminal 2 — interface sur :4200 (proxy vers :8000)
+# Terminal 2 - interface sur :4200 (proxy vers :8000)
 cd frontend
 npm install && npm start
 ```
-
-**Construire l'exe portable** (Windows, un seul binaire double-cliquable — Python + FastAPI +
-interface, aucune installation) :
-
-```bash
-cd backend
-python build_portable.py     # construit l'interface au besoin, puis gèle avec PyInstaller
-# → backend/dist/CVForge.exe
-```
-
-Au lancement, l'exe ouvre une **fenêtre native** (WebView2, present par defaut sur Windows 11) ;
-si elle n'est pas disponible, il se rabat automatiquement sur ton **navigateur** par defaut. Rien
-a installer dans les deux cas.
-
-Par défaut, l'exe range les données dans `~/.cvforge/`. Pour un **mode clé USB** (données à côté
-de l'exe, dans `./data/`), pose un fichier vide nommé `cvforge.portable` à côté du binaire.
 
 ## Où sont mes données ?
 
@@ -107,7 +115,7 @@ douloureuse.
 
 ```bash
 # backend (venv activé)
-pytest                    # 81 tests
+pytest                    # 94 tests
 ruff check app tests
 
 # frontend
@@ -123,7 +131,7 @@ une fois par clone : `node frontend/scripts/setup-hooks.mjs` (pose `core.hooksPa
 ## Statut & feuille de route
 
 **V1 fonctionnelle** : le parcours complet (offre → analyse → adaptation → Avant/Après → PDF →
-suivi) marche de bout en bout, avec 81 tests backend. Elle n'a pas encore été éprouvée par de
+suivi) marche de bout en bout, avec 94 tests backend. Elle n'a pas encore été éprouvée par de
 vrais testeurs — les retours sont bienvenus via les issues.
 
 Feuille de route détaillée : [`docs/roadmap/ROADMAP.md`](docs/roadmap/ROADMAP.md) — V1.5 : exe

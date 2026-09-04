@@ -103,3 +103,68 @@ h2 {
 .restore-label {
   cursor: pointer;
 }
+
+/* Trois gestes, dits en clair - le parcours tient en une phrase par etape. */
+.howto-steps {
+  max-width: 680px;
+  margin: 20px 0 0;
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.howto-steps li {
+  margin-bottom: 6px;
+}
+
+/* Micro-suivi : toutes les candidatures exportees, statut modifiable ici. */
+.apps-card {
+  max-width: 680px;
+  margin-top: 20px;
+}
+.apps-card h3 {
+  font: 700 16px var(--serif);
+  margin: 0 0 4px;
+}
+.apps-card .sub {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.app-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+.app-meta {
+  font: 12.5px var(--mono);
+  color: var(--muted);
+}
+.app-title {
+  flex: 1;
+  min-width: 160px;
+  font: 600 14px var(--sans);
+}
+.app-row select {
+  font: 600 13.5px var(--sans);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  background: #fafaf7;
+}
+
+.status-line .btn-link,
+.backup-card .btn-link {
+  background: none;
+  border: 0;
+  color: var(--ember);
+  font: 600 13.5px var(--sans);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+.card .notice {
+  margin: 12px 0 0;
+}

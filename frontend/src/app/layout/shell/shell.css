@@ -83,3 +83,38 @@
   letter-spacing: 0.1em;
   color: var(--muted);
 }
+
+/* Bandeau d'alerte global : serveur arrêté ou erreur non prévue. Lisible de
+   loin (taille, contraste), jamais masqué par le contenu. */
+.alert-bar {
+  width: min(1440px, 94vw);
+  margin: 8px auto 0;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--del-soft);
+  border: 1px solid var(--del);
+  border-radius: 8px;
+  color: var(--del);
+  font: 600 15px/1.45 var(--sans);
+}
+.alert-bar::before {
+  content: '⚠';
+  font-size: 18px;
+}
+.alert-bar span {
+  flex: 1;
+  min-width: 240px;
+}
+.alert-close {
+  background: var(--card);
+  border: 1px solid var(--del);
+  color: var(--del);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font: 600 13px var(--sans);
+  cursor: pointer;
+}

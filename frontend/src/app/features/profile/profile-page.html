@@ -3,7 +3,8 @@
 <p class="lead">
   Tout ce qui est écrit ici doit être <strong>vrai et prouvable en entretien</strong>. C'est la
   matière première que l'Atelier adapte ensuite à chaque offre - rien d'autre ne sera jamais inventé
-  à ta place.
+  à ta place. Cette page est facultative : l'Atelier fonctionne aussi avec un simple copier-coller
+  de ton CV.
 </p>
 
 @switch (state()) {
@@ -11,9 +12,8 @@
     <p class="hint">Chargement depuis ta base locale...</p>
   }
   @case ('error') {
-    <p class="err">
-      API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code>
-    </p>
+    <p class="notice notice-err">{{ loadError() }}</p>
+    <button type="button" class="btn btn-ghost" (click)="loadAll()">Réessayer</button>
   }
   @case ('ready') {
     <!-- ============================================= Profil maître -->
@@ -65,7 +65,8 @@
         <div class="full">
           <div class="label-row">
             <span class="field-label"
-              >Ton CV complet (le matching et le copilote s'en servent automatiquement)</span
+              >Ton CV complet (la comparaison avec l'offre et le mode copilote s'en servent
+              automatiquement)</span
             >
             <button
               type="button"
@@ -103,8 +104,8 @@
         >
           {{ savingProfile() ? 'Enregistrement...' : 'Enregistrer le profil' }}
         </button>
-        @if (profileHint()) {
-          <span class="hint">{{ profileHint() }}</span>
+        @if (profileHint(); as n) {
+          <span class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</span>
         }
       </div>
     </section>
@@ -126,8 +127,10 @@
           ce que le matching et l'adaptation utiliseront en priorité.
         </p>
 
-        @if (!factFormOpen() && factHint()) {
-          <p class="hint section-hint">{{ factHint() }}</p>
+        @if (!factFormOpen()) {
+          @if (factHint(); as n) {
+            <p class="notice section-hint" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
+          }
         }
 
         @if (facts().length === 0 && !factFormOpen()) {
@@ -191,8 +194,8 @@
               <button type="button" class="btn btn-ghost" (click)="cancelFactEdit()">
                 Annuler
               </button>
-              @if (factHint()) {
-                <span class="hint">{{ factHint() }}</span>
+              @if (factHint(); as n) {
+                <span class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</span>
               }
             </div>
           </div>
@@ -209,9 +212,10 @@
                 title="Une preuve de la banque appuie ce fait"
               >
                 <input
+                  #provable
                   type="checkbox"
                   [checked]="fact.validated"
-                  (change)="toggleValidated(fact)"
+                  (change)="toggleValidated(fact, provable)"
                 />
                 prouvable
               </label>
@@ -249,8 +253,10 @@
           diplôme, certificat). Relie chaque preuve aux faits qu'elle appuie.
         </p>
 
-        @if (!proofFormOpen() && proofHint()) {
-          <p class="hint section-hint">{{ proofHint() }}</p>
+        @if (!proofFormOpen()) {
+          @if (proofHint(); as n) {
+            <p class="notice section-hint" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
+          }
         }
 
         @if (proofs().length === 0 && !proofFormOpen()) {
@@ -322,8 +328,8 @@
               <button type="button" class="btn btn-ghost" (click)="cancelProofEdit()">
                 Annuler
               </button>
-              @if (proofHint()) {
-                <span class="hint">{{ proofHint() }}</span>
+              @if (proofHint(); as n) {
+                <span class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</span>
               }
             </div>
           </div>

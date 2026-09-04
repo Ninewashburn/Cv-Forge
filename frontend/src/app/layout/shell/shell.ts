@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-/** Layout de l'application : masthead + navigation + zone de contenu routée. */
+import { AppStatus } from '../../core/app-status';
+
+/** Layout de l'application : masthead + navigation + zone de contenu routée,
+ *  et le bandeau d'alerte global (serveur arrêté, erreur non prévue). */
 @Component({
   selector: 'cvforge-shell',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
@@ -9,4 +12,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   styleUrl: './shell.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Shell {}
+export class Shell {
+  protected readonly status = inject(AppStatus);
+}

@@ -139,7 +139,16 @@ def _serve_with_ui(app: object, url: str, port: int) -> None:
     navigateur. L'app reste utilisable dans tous les cas."""
     server = _ThreadedServer(app, port)
     server.start()
-    _wait_until_ready(url)
+    if not _wait_until_ready(url):
+        # Ouvrir une fenêtre sur un serveur mort donnerait une page blanche
+        # inexplicable. On s'arrête ici, avec un message clair (boite de
+        # dialogue via le filet de main()).
+        server.stop()
+        raise RuntimeError(
+            "le serveur local n'a pas répondu à temps.\n\n"
+            "Ferme les autres fenêtres CVForge éventuellement ouvertes, "
+            "puis relance l'application."
+        )
 
     try:
         webview = _try_import_webview()

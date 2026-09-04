@@ -1,9 +1,9 @@
-<p class="eyebrow">CVFORGE V1 - LOCAL-FIRST</p>
-<h2>Candidater comme on code : avec méthode, traçabilité, sans bullshit.</h2>
+<p class="eyebrow">CVFORGE - TOUT SE PASSE SUR TON ORDINATEUR</p>
+<h2>Adapter ton CV à une offre, sans jamais rien inventer.</h2>
 <p class="lead">
-  Colle une offre et ton CV dans l'Atelier : matching sans IA, adaptation contrôlée,
-  <strong>Avant / Après</strong> où chaque ajout est confirmé « vrai et prouvable », export PDF et
-  suivi de candidature. Tout se passe sur ta machine.
+  Colle une offre d'emploi et ton CV dans l'Atelier. CVForge te montre ce que ton CV couvre déjà,
+  t'aide à l'adapter (à la main ou avec ton IA habituelle), puis te fait vérifier chaque changement
+  dans un <strong>Avant / Après</strong> avant de créer le PDF. Rien ne part sur internet.
 </p>
 
 <div class="card status-card" [attr.data-state]="state()">
@@ -11,46 +11,90 @@
     <span class="dot"></span>
     @switch (state()) {
       @case ('loading') {
-        <span>Connexion à l'API locale...</span>
+        <span>Démarrage...</span>
       }
       @case ('connected') {
-        <span>Application locale prête - tes données sont sur ta machine.</span>
+        <span>CVForge est prêt - tes données sont sur ton ordinateur.</span>
       }
       @case ('error') {
-        <span
-          >API injoignable. Lance le backend : <code>uvicorn app.main:app --port 8000</code></span
-        >
+        <span class="notice notice-err">{{ loadError() }}</span>
+        <button type="button" class="btn-link" (click)="loadProfile()">Réessayer</button>
       }
     }
   </div>
 
   @if (profile(); as p) {
     <dl class="profile-peek">
-      <dt>Profil maître</dt>
-      <dd>{{ p.headline || "(en-tête vide - à remplir dans l'Atelier)" }}</dd>
-      <dt>Identifiant</dt>
+      <dt>Ton profil</dt>
       <dd>
-        <code>{{ p.id }}</code>
+        {{
+          p.headline ||
+            "(pas encore rempli - c'est facultatif, tu peux le faire dans « Profil & Preuves »)"
+        }}
       </dd>
     </dl>
   }
 </div>
 
+<ol class="howto-steps">
+  <li><strong>Ouvre l'Atelier</strong> et colle l'offre d'emploi et ton CV.</li>
+  <li>
+    <strong>Regarde</strong> ce que ton CV couvre déjà, puis <strong>adapte-le</strong> - seul ou
+    avec ton IA.
+  </li>
+  <li>
+    <strong>Vérifie</strong> chaque changement dans l'Avant / Après, puis
+    <strong>télécharge</strong> le PDF.
+  </li>
+</ol>
+
 <div class="cta-row">
   <a routerLink="/atelier" class="btn btn-primary">Ouvrir l'Atelier</a>
-  <span class="hint">Rien ne sort de ta machine - tout est local.</span>
+  <span class="hint">Environ 5 minutes. Rien ne sort de ton ordinateur.</span>
 </div>
+
+@if (applications().length > 0) {
+  <div class="card apps-card">
+    <h3>Mes candidatures</h3>
+    <p class="sub">
+      Quand tu as des nouvelles, indique-le ici : c'est ce qui permet de voir ce qui marche.
+    </p>
+    @for (t of applications(); track t.application.id) {
+      <div class="app-row">
+        <span class="app-meta">{{ t.application.sent_at | date: 'dd/MM/yyyy' }}</span>
+        <span class="app-title">{{ t.title }}</span>
+        <select
+          #sel
+          [value]="t.application.status"
+          (change)="onStatusChange(t, sel)"
+          [attr.aria-label]="'Où en est la candidature ' + t.title + ' ?'"
+        >
+          @for (status of statuses; track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+          }
+        </select>
+      </div>
+    }
+    @if (applicationsNotice(); as n) {
+      <p class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
+    }
+  </div>
+} @else if (applicationsNotice(); as n) {
+  <p class="notice notice-err">{{ n.text }}</p>
+}
 
 <div class="card backup-card">
   <h3>Tes données t'appartiennent</h3>
   <p class="sub">
-    Emporte tout dans un fichier ZIP (base + preuves), ou restaure un backup existant. Aucune donnée
-    n'est envoyée où que ce soit.
+    Enregistre tout dans un fichier ZIP (profil, preuves, candidatures) pour le garder en lieu sûr
+    ou le transférer sur un autre ordinateur. Rien n'est envoyé où que ce soit.
   </p>
   <div class="backup-row">
-    <a class="btn btn-ghost" [href]="backup.exportUrl">⬇ Exporter mes données (ZIP)</a>
+    <button type="button" class="btn btn-ghost" [disabled]="exporting()" (click)="exportBackup()">
+      {{ exporting() ? 'Préparation...' : '⬇ Enregistrer une sauvegarde (ZIP)' }}
+    </button>
     <label class="btn btn-ghost restore-label">
-      {{ restoring() ? 'Restauration...' : '⬆ Restaurer un backup' }}
+      {{ restoring() ? 'Restauration...' : '⬆ Restaurer une sauvegarde' }}
       <input
         #restoreInput
         type="file"
@@ -60,8 +104,8 @@
         hidden
       />
     </label>
-    @if (backupHint()) {
-      <span class="hint">{{ backupHint() }}</span>
-    }
   </div>
+  @if (backupNotice(); as n) {
+    <p class="notice" [class.notice-err]="n.tone === 'error'">{{ n.text }}</p>
+  }
 </div>
