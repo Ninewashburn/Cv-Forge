@@ -3,7 +3,9 @@
 Fonctions pures (aucune DB, aucun réseau) : extraction de mots-clés pondérés
 par fréquence (unigrammes + bigrammes), et couverture d'un texte par rapport
 à ces mots-clés. Le français est géré par normalisation (accents, œ/æ) et un
-stemming volontairement minimal (pluriels, -euse/-eur, -trice/-teur).
+stemming léger : pluriels, féminins de métiers, et les familles dérivationnelles
+régulières (déploiement / déployer / déployé, configuration / configurer,
+administrateur / administration) - sans sur-généraliser.
 """
 
 from __future__ import annotations
@@ -128,16 +130,42 @@ def tokenized_segments(text: str) -> list[list[str]]:
     return [tokens for tokens in segments if tokens]
 
 
+# Suffixes dérivationnels, du plus long au plus court : UN SEUL est retiré, et
+# seulement s'il reste un radical d'au moins _MIN_STEM lettres. But : réunir
+# les familles régulières d'un même mot (verbe en -er, nom en -ement/-ation,
+# agent en -eur/-ateur) SANS sur-généraliser - un faux « couvert » trompe
+# plus qu'un manquant (roadmap V1.5, retour test réel « déployer / déploiement »).
+# Volontairement absents : -tion seul (gestion > ges), -ant (important >
+# import = collision avec importer), -ir, -ité, -ique.
+# Miroir TS dans frontend/.../text-highlight.ts : garder les deux identiques.
+_MIN_STEM = 5
+_DERIVATION_SUFFIXES = ("ement", "ation", "ateur", "eur", "er", "e")
+
+
 def stem(word: str) -> str:
+    """Radical commun d'une famille de mots. Opère sur des tokens normalisés
+    (sans accents). Symétrique : appliqué au mot-clé ET au texte comparé."""
     s = word
+    # Pluriels : -s, et -x des pluriels en -aux / -eux (réseaux, jeux).
     if len(s) > 3 and s.endswith("s"):
         s = s[:-1]
+    elif len(s) > 4 and s.endswith("x"):
+        s = s[:-1]
+    # Féminins de métiers : développeuse > développeur, administratrice > administrateur.
     if len(s) > 5 and s.endswith("euse"):
         s = s[:-4] + "eur"
     elif len(s) > 6 and s.endswith("trice"):
         s = s[:-5] + "teur"
     elif len(s) > 4 and s.endswith("ee"):
         s = s[:-1]
+    # Familles dérivationnelles régulières.
+    for suffix in _DERIVATION_SUFFIXES:
+        if s.endswith(suffix) and len(s) - len(suffix) >= _MIN_STEM:
+            s = s[: -len(suffix)]
+            break
+    # Alternance y / i : déploy(er) et déploi(ement), nettoy(er) et nettoi(e).
+    if s.endswith("y"):
+        s = s[:-1] + "i"
     return s
 
 

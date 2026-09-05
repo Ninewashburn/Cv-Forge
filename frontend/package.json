@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "cvforge-frontend",
   "version": "0.1.0",
   "private": true,
@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "test": "ng test --watch=false",
     "lint:tells": "node scripts/check-tells.mjs",
     "lint": "ng lint"
   },
@@ -26,8 +27,10 @@
     "@eslint/js": "^10.0.1",
     "angular-eslint": "21.4.0",
     "eslint": "^10.3.0",
+    "jsdom": "^30.0.1",
     "prettier": "^3.9.5",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.59.2"
+    "typescript-eslint": "8.59.2",
+    "vitest": "^4.1.11"
   }
 }

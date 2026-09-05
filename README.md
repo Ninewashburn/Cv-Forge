@@ -115,10 +115,11 @@ douloureuse.
 
 ```bash
 # backend (venv activé)
-pytest                    # 94 tests
+pytest                    # 97 tests
 ruff check app tests
 
 # frontend
+npm test                  # 53 tests Vitest : Avant/Après (diff), surlignage, filets d'erreur, parcours
 npm run lint
 npm run lint:tells        # garde anti-tells IA (frontend, prototypes, backend)
 npx prettier --check src
@@ -131,7 +132,7 @@ une fois par clone : `node frontend/scripts/setup-hooks.mjs` (pose `core.hooksPa
 ## Statut & feuille de route
 
 **V1 fonctionnelle** : le parcours complet (offre → analyse → adaptation → Avant/Après → PDF →
-suivi) marche de bout en bout, avec 94 tests backend. Elle n'a pas encore été éprouvée par de
+suivi) marche de bout en bout, avec 97 tests backend et 53 tests frontend. Elle n'a pas encore été éprouvée par de
 vrais testeurs — les retours sont bienvenus via les issues.
 
 Feuille de route détaillée : [`docs/roadmap/ROADMAP.md`](docs/roadmap/ROADMAP.md) — V1.5 : exe

@@ -10,7 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ProofService } from '../../../core/api';
-import { addedSegments, diffStats, lcsDiff, paneSegments, PaneSegment, tokensOf } from '../diff';
+import { addedSegments, diffStats, diffText, paneSegments, PaneSegment } from '../diff';
 import { WizardStore } from '../wizard-store';
 
 /**
@@ -33,7 +33,6 @@ export class AvantApresStep {
   private readonly proofs = inject(ProofService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly tooLong: boolean;
   protected readonly left: PaneSegment[];
   protected readonly right: PaneSegment[];
   protected readonly additions: string[];
@@ -48,16 +47,16 @@ export class AvantApresStep {
   // Le diff est figé à l'entrée de l'étape : les textes ne changent pas ici.
   constructor() {
     this.store.syncDiffSignature();
-    const ops = lcsDiff(tokensOf(this.store.cvText()), tokensOf(this.store.adaptedText()));
-    this.tooLong = ops === null;
-    this.left = ops ? paneSegments(ops, 'left') : [];
-    this.right = ops ? paneSegments(ops, 'right') : [];
-    this.additions = ops ? addedSegments(ops) : [];
-    this.stats = ops ? diffStats(ops) : { added: 0, removed: 0 };
+    // diffText ne renvoie jamais null : même un texte démesuré a un Avant/Après.
+    const ops = diffText(this.store.cvText(), this.store.adaptedText());
+    this.left = paneSegments(ops, 'left');
+    this.right = paneSegments(ops, 'right');
+    this.additions = addedSegments(ops);
+    this.stats = diffStats(ops);
 
-    // La porte d'export s'ouvre quand tout est confirmé - et seulement si le
-    // diff a pu être vérifié (passage par l'Avant/Après obligatoire).
-    effect(() => this.store.exportReady.set(!this.tooLong && this.allConfirmed()));
+    // La porte d'export s'ouvre quand tout est confirmé (passage par
+    // l'Avant/Après obligatoire).
+    effect(() => this.store.exportReady.set(this.allConfirmed()));
   }
 
   protected readonly confirmedCount = computed(() => this.store.confirmedAdditions().size);

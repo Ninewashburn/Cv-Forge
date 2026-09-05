@@ -6,138 +6,127 @@
 </p>
 
 <div class="card">
-  @if (tooLong) {
-    <p class="notice notice-err">
-      Ces textes sont trop longs pour être comparés mot à mot. Raccourcis le CV adapté à l'étape
-      précédente (ou l'original à l'étape 1), puis reviens ici : l'export reste fermé tant que la
-      comparaison n'a pas pu être faite.
-    </p>
-    <div class="gate">
-      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">< Modifier encore</button>
-    </div>
-  } @else {
-    <div class="panes">
-      <div>
-        <div class="pane-label"><span>ORIGINAL</span></div>
-        <div class="diff-pane">
-          @for (segment of left; track $index) {
-            @if (segment.type === 'break') {
-              <br />
-            } @else {
-              <span [class.d-del]="segment.kind === 'removed'">{{ segment.text }}</span
-              >{{ ' ' }}
-            }
+  <div class="panes">
+    <div>
+      <div class="pane-label"><span>ORIGINAL</span></div>
+      <div class="diff-pane">
+        @for (segment of left; track $index) {
+          @if (segment.type === 'break') {
+            <br />
+          } @else {
+            <span [class.d-del]="segment.kind === 'removed'">{{ segment.text }}</span
+            >{{ ' ' }}
           }
-        </div>
-      </div>
-      <div>
-        <div class="pane-label"><span>ADAPTÉ</span></div>
-        <div class="diff-pane">
-          @for (segment of right; track $index) {
-            @if (segment.type === 'break') {
-              <br />
-            } @else {
-              <span [class.d-ins]="segment.kind === 'added'">{{ segment.text }}</span
-              >{{ ' ' }}
-            }
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="diff-stats">
-      <span class="ins"
-        >+ {{ stats.added }} mot{{ stats.added > 1 ? 's' : '' }} ajouté{{
-          stats.added > 1 ? 's' : ''
-        }}</span
-      >
-      <span class="del"
-        >− {{ stats.removed }} mot{{ stats.removed > 1 ? 's' : '' }} supprimé{{
-          stats.removed > 1 ? 's' : ''
-        }}</span
-      >
-      @if (stats.added + stats.removed === 0) {
-        <span>Aucune modification.</span>
-      }
-    </div>
-
-    @if (additions.length > 0) {
-      <div class="segs">
-        <h3>Ajouts à confirmer</h3>
-        <p class="sub">
-          Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document,
-          expérience) ? Note ta preuve dans « Comment ? » (facultatif) : elle rejoint ta banque de
-          preuves, prête à resservir sur une prochaine candidature.
-        </p>
-        @for (text of additions; track $index) {
-          <div class="seg" [class.confirmed]="isConfirmed($index)">
-            <div class="seg-body">
-              <div class="seg-text">
-                <mark>{{ text }}</mark>
-              </div>
-              <label class="seg-proof">
-                <span class="seg-proof-label">Comment peux-tu le prouver ? (facultatif)</span>
-                <textarea
-                  rows="2"
-                  class="seg-proof-input"
-                  [value]="commentOf($index)"
-                  [disabled]="isSaved($index)"
-                  (input)="setComment($index, $event)"
-                  placeholder="Ex. : chez Untel, j'ai mis en place le pipeline (build, lint, test)."
-                ></textarea>
-              </label>
-              @if (isSaving($index)) {
-                <p class="seg-note">Enregistrement de la preuve...</p>
-              } @else if (isSaved($index)) {
-                <p class="seg-note ok">Preuve ajoutée à ta banque, reliée à cet ajout.</p>
-              } @else if (hasFailed($index)) {
-                <p class="seg-note warn">
-                  Ajout confirmé, mais la preuve n'a pas pu être enregistrée (banque indisponible).
-                  Réessaie en re-confirmant.
-                </p>
-              }
-            </div>
-            <button
-              type="button"
-              class="confirm"
-              [class.on]="isConfirmed($index)"
-              [attr.aria-pressed]="isConfirmed($index)"
-              (click)="confirm($index, text)"
-            >
-              {{
-                isConfirmed($index)
-                  ? '✓ CONFIRMÉ - VRAI ET PROUVABLE'
-                  : 'CONFIRMER - VRAI ET PROUVABLE ?'
-              }}
-            </button>
-          </div>
         }
       </div>
-    } @else {
-      <div class="all-good">
-        Aucun contenu ajouté - uniquement des reformulations ou suppressions. Rien à confirmer.
+    </div>
+    <div>
+      <div class="pane-label"><span>ADAPTÉ</span></div>
+      <div class="diff-pane">
+        @for (segment of right; track $index) {
+          @if (segment.type === 'break') {
+            <br />
+          } @else {
+            <span [class.d-ins]="segment.kind === 'added'">{{ segment.text }}</span
+            >{{ ' ' }}
+          }
+        }
       </div>
-    }
+    </div>
+  </div>
 
-    <div class="gate">
-      <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">< Modifier encore</button>
-      <span class="spacer"></span>
-      @if (additions.length > 0) {
-        <span class="gate-count" [class.ok]="allConfirmed()">
-          {{ confirmedCount() }}/{{ additions.length }} ajout{{
-            additions.length > 1 ? 's' : ''
-          }}
-          confirmé{{ confirmedCount() > 1 ? 's' : '' }}
-        </span>
+  <div class="diff-stats">
+    <span class="ins"
+      >+ {{ stats.added }} mot{{ stats.added > 1 ? 's' : '' }} ajouté{{
+        stats.added > 1 ? 's' : ''
+      }}</span
+    >
+    <span class="del"
+      >− {{ stats.removed }} mot{{ stats.removed > 1 ? 's' : '' }} supprimé{{
+        stats.removed > 1 ? 's' : ''
+      }}</span
+    >
+    @if (stats.added + stats.removed === 0) {
+      <span>Aucune modification.</span>
+    }
+  </div>
+
+  @if (additions.length > 0) {
+    <div class="segs">
+      <h3>Ajouts à confirmer</h3>
+      <p class="sub">
+        Pour chaque passage ajouté : est-ce vrai, et peux-tu le prouver (projet, document,
+        expérience) ? Note ta preuve dans « Comment ? » (facultatif) : elle rejoint ta banque de
+        preuves, prête à resservir sur une prochaine candidature.
+      </p>
+      @for (text of additions; track $index) {
+        <div class="seg" [class.confirmed]="isConfirmed($index)">
+          <div class="seg-body">
+            <div class="seg-text">
+              <mark>{{ text }}</mark>
+            </div>
+            <label class="seg-proof">
+              <span class="seg-proof-label">Comment peux-tu le prouver ? (facultatif)</span>
+              <textarea
+                rows="2"
+                class="seg-proof-input"
+                [value]="commentOf($index)"
+                [disabled]="isSaved($index)"
+                (input)="setComment($index, $event)"
+                placeholder="Ex. : chez Untel, j'ai mis en place le pipeline (build, lint, test)."
+              ></textarea>
+            </label>
+            @if (isSaving($index)) {
+              <p class="seg-note">Enregistrement de la preuve...</p>
+            } @else if (isSaved($index)) {
+              <p class="seg-note ok">Preuve ajoutée à ta banque, reliée à cet ajout.</p>
+            } @else if (hasFailed($index)) {
+              <p class="seg-note warn">
+                Ajout confirmé, mais la preuve n'a pas pu être enregistrée (banque indisponible).
+                Réessaie en re-confirmant.
+              </p>
+            }
+          </div>
+          <button
+            type="button"
+            class="confirm"
+            [class.on]="isConfirmed($index)"
+            [attr.aria-pressed]="isConfirmed($index)"
+            (click)="confirm($index, text)"
+          >
+            {{
+              isConfirmed($index)
+                ? '✓ CONFIRMÉ - VRAI ET PROUVABLE'
+                : 'CONFIRMER - VRAI ET PROUVABLE ?'
+            }}
+          </button>
+        </div>
       }
-      <button
-        type="button"
-        class="btn btn-primary"
-        [disabled]="!allConfirmed()"
-        (click)="store.goTo(5)"
-      >
-        {{ allConfirmed() ? "Passer à l'export" : 'Confirme les ajouts pour exporter' }}
-      </button>
+    </div>
+  } @else {
+    <div class="all-good">
+      Aucun contenu ajouté - uniquement des reformulations ou suppressions. Rien à confirmer.
     </div>
   }
+
+  <div class="gate">
+    <button type="button" class="btn btn-ghost" (click)="store.goTo(3)">< Modifier encore</button>
+    <span class="spacer"></span>
+    @if (additions.length > 0) {
+      <span class="gate-count" [class.ok]="allConfirmed()">
+        {{ confirmedCount() }}/{{ additions.length }} ajout{{
+          additions.length > 1 ? 's' : ''
+        }}
+        confirmé{{ confirmedCount() > 1 ? 's' : '' }}
+      </span>
+    }
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!allConfirmed()"
+      (click)="store.goTo(5)"
+    >
+      {{ allConfirmed() ? "Passer à l'export" : 'Confirme les ajouts pour exporter' }}
+    </button>
+  </div>
 </div>

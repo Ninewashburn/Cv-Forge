@@ -42,10 +42,55 @@ def test_tokenize_filters_short_and_numeric():
 
 def test_stem_handles_french_feminines_and_plurals():
     # Le stem opère sur des tokens normalisés (sans accents), cf. tokenize().
-    assert stem("developpeuses") == "developpeur"
-    assert stem("developpeuse") == "developpeur"
-    assert stem("tests") == "test"
-    assert stem("administratrice") == "administrateur"
+    # Contrat : les variantes d'un même mot partagent un radical - la forme
+    # exacte du radical n'est pas garantie.
+    assert stem("developpeuses") == stem("developpeur")
+    assert stem("developpeuse") == stem("developpeur")
+    assert stem("tests") == stem("test")
+    assert stem("administratrice") == stem("administrateur")
+    assert stem("reseaux") == stem("reseau")
+
+
+def test_stem_joins_regular_word_families():
+    """Roadmap V1.5, retour test réel : « déployer » dans l'offre et
+    « déploiement » dans le CV doivent se rejoindre (verbe en -er, nom en
+    -ement / -ation, agent en -eur / -ateur, participe, alternance y/i)."""
+    families = [
+        ("deploiement", "deployer", "deploye", "deploiee"),
+        ("developpement", "developper", "developpeur", "developpeuse"),
+        ("configuration", "configurer", "configure"),
+        ("automatisation", "automatiser", "automatise"),
+        ("administrateur", "administration", "administrer", "administratrice"),
+        ("utilisateur", "utilisation", "utiliser"),
+        ("analyse", "analyser", "analyses"),
+        ("management", "manager"),
+        ("recrutement", "recruter", "recrute"),
+    ]
+    for family in families:
+        stems = {stem(word) for word in family}
+        assert len(stems) == 1, (family, stems)
+
+
+def test_stem_does_not_overgeneralize():
+    """Un faux « couvert » trompe plus qu'un manquant : ces paires restent
+    distinctes, et les technos courtes ne sont pas rabotées."""
+    for left, right in [
+        ("gestion", "geste"),
+        ("important", "importer"),
+        ("portable", "port"),
+        ("forme", "formation"),
+        ("coeur", "co"),
+    ]:
+        assert stem(left) != stem(right), (left, right)
+    for tech in ("docker", "angular", "python", "java", "sql", "scrum", "c#", ".net"):
+        assert stem(tech) == tech
+
+
+def test_coverage_joins_verb_and_noun_of_same_family():
+    """« déploiement » (offre) est couvert par « déployé » (CV), sans IA."""
+    result = coverage([("deploiement", 2), ("configuration", 1)], "J'ai déployé et configuré")
+    assert all(r["covered"] for r in result["results"])
+    assert result["score"] == 100
 
 
 def test_extract_keywords_finds_repeated_bigram():

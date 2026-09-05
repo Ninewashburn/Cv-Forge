@@ -45,7 +45,7 @@ const SECTION_FIRST_WORDS = new Set([
   'savoir-faire',
 ]);
 
-function normalizeToken(word: string): string {
+export function normalizeToken(word: string): string {
   return word
     .toLowerCase()
     .replace(/œ/g, 'oe')
@@ -54,13 +54,26 @@ function normalizeToken(word: string): string {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-/** Même stemming minimal que le moteur Python (pluriels, -euse/-eur, -trice/-teur). */
-function stem(word: string): string {
+const MIN_STEM = 5;
+const DERIVATION_SUFFIXES = ['ement', 'ation', 'ateur', 'eur', 'er', 'e'] as const;
+
+/** Miroir EXACT du stem() de keyword_engine.py - garder les deux identiques.
+ *  Pluriels, féminins de métiers, familles dérivationnelles régulières
+ *  (déploiement / déployer / déployé), alternance y/i. */
+export function stem(word: string): string {
   let s = word;
   if (s.length > 3 && s.endsWith('s')) s = s.slice(0, -1);
+  else if (s.length > 4 && s.endsWith('x')) s = s.slice(0, -1);
   if (s.length > 5 && s.endsWith('euse')) s = s.slice(0, -4) + 'eur';
   else if (s.length > 6 && s.endsWith('trice')) s = s.slice(0, -5) + 'teur';
   else if (s.length > 4 && s.endsWith('ee')) s = s.slice(0, -1);
+  for (const suffix of DERIVATION_SUFFIXES) {
+    if (s.endsWith(suffix) && s.length - suffix.length >= MIN_STEM) {
+      s = s.slice(0, -suffix.length);
+      break;
+    }
+  }
+  if (s.endsWith('y')) s = s.slice(0, -1) + 'i';
   return s;
 }
 
